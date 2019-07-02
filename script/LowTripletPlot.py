@@ -14,18 +14,18 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 df = pd.read_csv(sys.argv[1])
 
 sns.distplot(
-    df[df["Metric"] == "Streak Distance"]["Triangle Ratio"],
+    df[df["Metric"] == "Streak Distance"]["Detour Difference"],
     color="skyblue",
     label="Streak Distance"
 )
 sns.distplot(
-    df[df["Metric"] == "Hamming Distance"]["Triangle Ratio"],
+    df[df["Metric"] == "Hamming Distance"]["Detour Difference"],
     color="red",
     label="Hamming Distance"
 )
 # sns.plt.legend()
 
 plt.savefig(
-    "triangle-dists.pdf",
+    "detour-dists.pdf",
     transparent=True
 )
