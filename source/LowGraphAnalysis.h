@@ -8,7 +8,7 @@
 
 #include "Config.h"
 
-void LowMutationalWalk(Config &cfg) {
+void LowGraphAnalysis(Config &cfg) {
 
   emp::HammingMetric<32> ham;
   emp::StreakMetric<32> streak;
@@ -19,62 +19,60 @@ void LowMutationalWalk(Config &cfg) {
   emp::Random rand(cfg.SEED());
 
   size_t s;
-  size_t r;
-  size_t t;
+  size_t from;
+  size_t to;
   std::string metric;
   double match;
 
-  emp::DataFile df(cfg.LMW_FILE());
+  emp::DataFile df(cfg.LGA_FILE());
   df.AddVar(s, "Sample");
-  df.AddVar(r, "Replicate");
-  df.AddVar(t, "Step");
+  df.AddVar(from, "From");
+  df.AddVar(to, "To");
   df.AddVar(metric, "Metric");
   df.AddVar(match, "Match Distance");
   df.PrintHeaderKeys();
 
-  for(s = 0; s < cfg.LMW_NSAMPLES(); ++s) {
+  for(s = 0; s < cfg.LGA_NSAMPLES(); ++s) {
     std::cout << "sample " << s << std::endl;
 
-    const emp::BitSet<32> orig_bs(rand);
-    const size_t orig_st = rand.GetUInt();
-    const int orig_it = rand.GetUInt();
+    emp::vector<emp::BitSet<32>> bs;
+    bs.reserve(cfg.LGA_NNODES());
+    emp::vector<size_t> st;
+    st.reserve(cfg.LGA_NNODES());
+    emp::vector<int> it;
+    it.reserve(cfg.LGA_NNODES());
 
-    for(r = 0; r < cfg.LMW_NREPS(); ++r) {
-      std::cout << ".";
-      std::cout.flush();
-      emp::BitSet<32> bs = orig_bs;
-      size_t st = orig_st;
-      int it = orig_it;
+    for(size_t n = 0; n < cfg.LGA_NNODES(); ++n) {
+      bs.emplace_back(rand);
+      st.push_back(rand.GetUInt());
+      it.push_back(rand.GetUInt());
+    }
 
-      for(t = 0; t < cfg.LMW_NSTEPS(); ++t) {
-
-        bs.Toggle(rand.GetUInt(32));
-        st += rand.P(0.5) ? -1 : 1;
-        it += rand.P(0.5) ? -1 : 1;
+    for(from = 0; from < cfg.LGA_NNODES(); ++from) {
+      for(to = from; to < cfg.LGA_NNODES(); ++to) {
 
         metric = "Hamming Distance";
-        match = ham(orig_bs, bs) / ham.max_dist;
+        match = ham(bs[from], bs[to]) / ham.max_dist;
         df.Update();
 
         metric = "Streak Distance";
-        match = streak(orig_bs, bs) / streak.max_dist;
+        match = streak(bs[from], bs[to]) / streak.max_dist;
         df.Update();
 
         metric = "Bitstring Integer Distance";
-        match = intdiff(orig_bs, bs) / intdiff.max_dist;
+        match = intdiff(bs[from], bs[to]) / intdiff.max_dist;
         df.Update();
 
         metric = "Bidirectional Integer Distance";
-        match = absdiff(orig_it, it) / absdiff.max_dist;
+        match = absdiff(it[from], it[to]) / absdiff.max_dist;
         df.Update();
 
         metric = "Unidirectional Integer Distance";
-        match = nextup(orig_st, st) / nextup.max_dist;
+        match = nextup(st[from], st[to]) / nextup.max_dist;
         df.Update();
 
       }
     }
-    std::cout << std::endl;
   }
 
 }

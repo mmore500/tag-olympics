@@ -13,8 +13,14 @@ EMP_BUILD_CONFIG(
   VALUE(FILENAME, std::string, "configs.cfg", "Default config filename"),
 
   GROUP(LOW_MUTATIONAL_WALK, "Settings for low-mutational-walk experiment"),
-  VALUE(NSTEPS, size_t, 500, "Number of mutational steps in each walk"),
-  VALUE(NREPS, size_t, 1, "Number of replicates of each walk"),
-  VALUE(NSAMPLES, size_t, 1000, "Number of sample walks to conduct"),
+  VALUE(LMW_NSTEPS, size_t, 100, "Number of mutational steps in each walk"),
+  VALUE(LMW_NREPS, size_t, 1, "Number of replicates of each walk"),
+  VALUE(LMW_NSAMPLES, size_t, 1000, "Number of sample walks to conduct"),
+  VALUE(LMW_FILE, std::string, "low-mutational-walk.csv", "Default out filename"),
+
+  GROUP(LOW_GRAPH_ANALYSIS, "Settings for low-graph-analysis experiment"),
+  VALUE(LGA_NNODES, size_t, 100, "Number of nodes in each graph"),
+  VALUE(LGA_NSAMPLES, size_t, 100, "Number of sample graphs to study"),
+  VALUE(LGA_FILE, std::string, "low-graph-analysis.csv", "Default out filename"),
 
 )

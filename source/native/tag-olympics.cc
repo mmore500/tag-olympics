@@ -10,6 +10,7 @@
 
 #include "../Config.h"
 #include "../LowMutationalWalk.h"
+#include "../LowGraphAnalysis.h"
 
 // This is the main function for the NATIVE version of Tag Olympics.
 
@@ -29,6 +30,8 @@ int main(int argc, char* argv[])
   std::cout << "==============================\n"
            << std::endl;
 
+
   LowMutationalWalk(cfg);
+  // LowGraphAnalysis(cfg);
 
 }
