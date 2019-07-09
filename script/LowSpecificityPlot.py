@@ -17,13 +17,6 @@ proc = pd.DataFrame(df.groupby(["Metric","Sample"]).mean()["Match Distance"]).re
 
 proc["Specificity"] = proc["Match Distance"]
 
-print(proc[proc["Metric"] == "Sliding Hamming Distance"]["Specificity"])
-
-sns.distplot(
-    proc[proc["Metric"] == "Sliding Streak Distance"]["Specificity"],
-    color="skyblue",
-    label="Sliding Streak Distance"
-)
 sns.distplot(
     proc[proc["Metric"] == "Sliding Streak Distance"]["Specificity"],
     color="skyblue",
