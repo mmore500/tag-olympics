@@ -2,6 +2,7 @@
 #include <limits>
 
 #include "tools/MatchBin.h"
+#include "tools/matchbin_utils.h"
 #include "tools/Random.h"
 #include "config/ArgManager.h"
 #include "data/DataFile.h"
