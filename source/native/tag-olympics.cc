@@ -12,6 +12,7 @@
 #include "../LowMutationalWalk.h"
 #include "../LowGraphAnalysis.h"
 #include "../LowTripletAnalysis.h"
+#include "../LowSpecificityAnalysis.h"
 
 // This is the main function for the NATIVE version of Tag Olympics.
 
@@ -34,6 +35,7 @@ int main(int argc, char* argv[])
 
   // LowMutationalWalk(cfg);
   // LowGraphAnalysis(cfg);
-  LowTripletAnalysis(cfg);
+  // LowTripletAnalysis(cfg);
+  LowSpecificityAnalysis(cfg);
 
 }
