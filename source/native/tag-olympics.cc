@@ -23,7 +23,13 @@ int main(int argc, char* argv[])
   Config cfg;
   cfg.Read(cfg.FILENAME());
 
-  // TODO command line args
+  emp::ArgManager am(
+    argc,
+    argv,
+    emp::ArgManager::make_builtin_specs(&cfg)
+  );
+
+  if (!am.ProcessBuiltin(&cfg)) return 1;
 
   std::cout << "==============================" << std::endl;
   std::cout << "|    How am I configured?    |" << std::endl;
@@ -32,10 +38,25 @@ int main(int argc, char* argv[])
   std::cout << "==============================\n"
            << std::endl;
 
+  const auto res = am.UseArg("_positional");
 
-  // LowMutationalWalk(cfg);
-  // LowGraphAnalysis(cfg);
-  // LowTripletAnalysis(cfg);
-  LowSpecificityAnalysis(cfg);
-
+  if (!res) {
+    std::cout << "no run type provided" << std::endl;
+  } else if (res->size() > 1) {
+    std::cout << "multiple run types provided" << std::endl;
+  } else if (res->at(0) == "LMW") {
+    std::cout << "running mode: " << res->at(0) << std::endl;
+    LowMutationalWalk(cfg);
+  } else if (res->at(0) == "LGA") {
+    std::cout << "running mode: " << res->at(0) << std::endl;
+    LowGraphAnalysis(cfg);
+  } else if (res->at(0) == "LTA") {
+    std::cout << "running mode: " << res->at(0) << std::endl;
+    LowTripletAnalysis(cfg);
+  } else if (res->at(0) == "LSA") {
+    std::cout << "running mode: " << res->at(0) << std::endl;
+    LowSpecificityAnalysis(cfg);
+  } else {
+    std::cout << "uknown running mode: " << res->at(0) << std::endl;
+  }
 }
