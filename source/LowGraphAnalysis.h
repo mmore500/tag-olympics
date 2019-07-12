@@ -13,9 +13,10 @@ void LowGraphAnalysis(Config &cfg) {
 
   emp::HammingMetric<32> ham;
   emp::StreakMetric<32> streak;
-  emp::AbsIntDiffMetric<32> intdiff;
-  emp::AbsDiffMetric absdiff;
-  emp::NextUpMetric<> nextup; // std::numeric_limits<size_t>::max()
+  emp::SymmetricWrapMetric<32> swm;
+  emp::SymmetricNoWrapMetric<32> snwm;
+  emp::AsymmetricWrapMetric<32> awm;
+  emp::AsymmetricNoWrapMetric<32> anwm;
 
   emp::Random rand(cfg.SEED());
 
@@ -38,38 +39,36 @@ void LowGraphAnalysis(Config &cfg) {
 
     emp::vector<emp::BitSet<32>> bs;
     bs.reserve(cfg.LGA_NNODES());
-    emp::vector<size_t> st;
-    st.reserve(cfg.LGA_NNODES());
-    emp::vector<int> it;
-    it.reserve(cfg.LGA_NNODES());
 
     for(size_t n = 0; n < cfg.LGA_NNODES(); ++n) {
       bs.emplace_back(rand);
-      st.push_back(rand.GetUInt());
-      it.push_back(rand.GetUInt());
     }
 
     for(from = 0; from < cfg.LGA_NNODES(); ++from) {
       for(to = from; to < cfg.LGA_NNODES(); ++to) {
 
         metric = "Hamming Distance";
-        match = ham(bs[from], bs[to]) / ham.max_dist;
+        match = ham(bs[from], bs[to]);
         df.Update();
 
         metric = "Streak Distance";
-        match = streak(bs[from], bs[to]) / streak.max_dist;
+        match = streak(bs[from], bs[to]);
         df.Update();
 
-        metric = "Bitstring Integer Distance";
-        match = intdiff(bs[from], bs[to]) / intdiff.max_dist;
+        metric = "Symmetric Wrap Metric Distance";
+        match = swm(bs[from], bs[to]);
         df.Update();
 
-        metric = "Bidirectional Integer Distance";
-        match = absdiff(it[from], it[to]) / absdiff.max_dist;
+        metric = "Symmetric No Wrap Metric Distance";
+        match = snwm(bs[from], bs[to]);
         df.Update();
 
-        metric = "Unidirectional Integer Distance";
-        match = nextup(st[from], st[to]) / nextup.max_dist;
+        metric = "Asymmetic Wrap Metric Distance";
+        match = awm(bs[from], bs[to]);
+        df.Update();
+
+        metric = "Asymmetic No Wrap Metric Distance";
+        match = anwm(bs[from], bs[to]);
         df.Update();
 
       }

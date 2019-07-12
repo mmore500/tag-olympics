@@ -14,8 +14,8 @@ void LowSpecificityAnalysis(Config &cfg) {
 
   emp::HammingMetric<32> ham;
   emp::StreakMetric<32> streak;
-  emp::Slide<emp::HammingMetric<32>> slide_ham;
-  emp::Slide<emp::StreakMetric<32>> slide_streak;
+  emp::SlideMod<emp::HammingMetric<32>> slide_ham;
+  emp::SlideMod<emp::StreakMetric<32>> slide_streak;
 
   emp::Random rand(cfg.SEED());
 
@@ -35,25 +35,35 @@ void LowSpecificityAnalysis(Config &cfg) {
     std::cout << "sample " << s << std::endl;
 
     emp::BitSet<32> samp(rand);
+    emp::BitSet<32> samp_w(rand, 0.75);
 
     for(r = 0; r < cfg.LSA_NREPS(); ++r) {
 
       emp::BitSet<32> rep(rand);
+      emp::BitSet<32> rep_w(rand, 0.75);
 
       metric = "Hamming Distance";
-      match = ham(samp, rep) / ham.max_dist;
+      match = ham(samp, rep);
       df.Update();
 
       metric = "Streak Distance";
-      match = streak(samp, rep) / streak.max_dist;
+      match = streak(samp, rep);
+      df.Update();
+
+      metric = "Weighted Hamming Distance";
+      match = ham(samp_w, rep_w);
+      df.Update();
+
+      metric = "Weighted Streak Distance";
+      match = streak(samp_w, rep_w);
       df.Update();
 
       metric = "Sliding Hamming Distance";
-      match = slide_ham(samp, rep) / slide_ham.max_dist;
+      match = slide_ham(samp, rep);
       df.Update();
 
       metric = "Sliding Streak Distance";
-      match = slide_streak(samp, rep) / slide_streak.max_dist;
+      match = slide_streak(samp, rep);
       df.Update();
 
       // metric = "Bitstring Integer Distance";

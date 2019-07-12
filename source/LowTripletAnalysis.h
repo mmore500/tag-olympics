@@ -13,9 +13,10 @@ void LowTripletAnalysis(Config &cfg) {
 
   emp::HammingMetric<32> ham;
   emp::StreakMetric<32> streak;
-  emp::AbsIntDiffMetric<32> intdiff;
-  emp::AbsDiffMetric absdiff;
-  emp::NextUpMetric<> nextup; // std::numeric_limits<size_t>::max()
+  emp::SymmetricWrapMetric<32> swm;
+  emp::SymmetricNoWrapMetric<32> snwm;
+  emp::AsymmetricWrapMetric<32> awm;
+  emp::AsymmetricNoWrapMetric<32> anwm;
 
   emp::Random rand(cfg.SEED());
 
@@ -35,31 +36,29 @@ void LowTripletAnalysis(Config &cfg) {
     emp::BitSet<32> bs_x(rand);
     emp::BitSet<32> bs_y(rand);
     emp::BitSet<32> bs_z(rand);
-    size_t st_x = rand.GetUInt();
-    size_t st_y = rand.GetUInt();
-    size_t st_z = rand.GetUInt();
-    int it_x = rand.GetUInt();
-    int it_y = rand.GetUInt();
-    int it_z = rand.GetUInt();
 
     metric = "Hamming Distance";
-    detdiff = (ham(bs_x, bs_y) + ham(bs_y, bs_z) - ham(bs_x, bs_z))/ham.max_dist;
+    detdiff = (ham(bs_x, bs_y) + ham(bs_y, bs_z) - ham(bs_x, bs_z));
     df.Update();
 
     metric = "Streak Distance";
-    detdiff = (streak(bs_x, bs_y) + streak(bs_y, bs_z) - streak(bs_x, bs_z))/streak.max_dist;
+    detdiff = (streak(bs_x, bs_y) + streak(bs_y, bs_z) - streak(bs_x, bs_z));
     df.Update();
 
-    metric = "Bitstring Integer Distance";
-    detdiff = (intdiff(bs_x, bs_y) + intdiff(bs_y, bs_z) - intdiff(bs_x, bs_z))/intdiff.max_dist;
+    metric = "Symmetric Wrap Metric Distance";
+    detdiff = (swm(bs_x, bs_y) + swm(bs_y, bs_z) - swm(bs_x, bs_z));
     df.Update();
 
-    metric = "Bidirectional Integer Distance";
-    detdiff = (absdiff(it_x, it_y) + absdiff(it_y, it_z) - absdiff(it_x, it_z))/absdiff.max_dist;
+    metric = "Symmetric No Wrap Metric Distance";
+    detdiff = (snwm(bs_x, bs_y) + snwm(bs_y, bs_z) - snwm(bs_x, bs_z));
     df.Update();
 
-    metric = "Unidirectional Integer Distance";
-    detdiff = (nextup(st_x, st_y) + nextup(st_y, st_z) - nextup(st_x, st_z))/nextup.max_dist;
+    metric = "Asymmetic Wrap Metric Distance";
+    detdiff = (awm(bs_x, bs_y) + awm(bs_y, bs_z) - awm(bs_x, bs_z));
+    df.Update();
+
+    metric = "Asymmetic No Wrap Metric Distance";
+    detdiff = (anwm(bs_x, bs_y) + anwm(bs_y, bs_z) - anwm(bs_x, bs_z));
     df.Update();
 
   }

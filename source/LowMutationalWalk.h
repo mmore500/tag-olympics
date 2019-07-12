@@ -13,9 +13,10 @@ void LowMutationalWalk(Config &cfg) {
 
   emp::HammingMetric<32> ham;
   emp::StreakMetric<32> streak;
-  emp::AbsIntDiffMetric<32> intdiff;
-  emp::AbsDiffMetric absdiff;
-  emp::NextUpMetric<> nextup; // std::numeric_limits<size_t>::max()
+  emp::SymmetricWrapMetric<32> swm;
+  emp::SymmetricNoWrapMetric<32> snwm;
+  emp::AsymmetricWrapMetric<32> awm;
+  emp::AsymmetricNoWrapMetric<32> anwm;
 
   emp::Random rand(cfg.SEED());
 
@@ -37,40 +38,38 @@ void LowMutationalWalk(Config &cfg) {
     std::cout << "sample " << s << std::endl;
 
     const emp::BitSet<32> orig_bs(rand);
-    const size_t orig_st = rand.GetUInt();
-    const int orig_it = rand.GetUInt();
 
     for(r = 0; r < cfg.LMW_NREPS(); ++r) {
       std::cout << ".";
       std::cout.flush();
       emp::BitSet<32> bs = orig_bs;
-      size_t st = orig_st;
-      int it = orig_it;
 
       for(t = 0; t < cfg.LMW_NSTEPS(); ++t) {
 
         bs.Toggle(rand.GetUInt(32));
-        st += rand.P(0.5) ? -1 : 1;
-        it += rand.P(0.5) ? -1 : 1;
 
         metric = "Hamming Distance";
-        match = ham(orig_bs, bs) / ham.max_dist;
+        match = ham(orig_bs, bs);
         df.Update();
 
         metric = "Streak Distance";
-        match = streak(orig_bs, bs) / streak.max_dist;
+        match = streak(orig_bs, bs);
         df.Update();
 
-        metric = "Bitstring Integer Distance";
-        match = intdiff(orig_bs, bs) / intdiff.max_dist;
+        metric = "Symmetric Wrap Metric Distance";
+        match = swm(orig_bs, bs);
         df.Update();
 
-        metric = "Bidirectional Integer Distance";
-        match = absdiff(orig_it, it) / absdiff.max_dist;
+        metric = "Symmetric No Wrap Metric Distance";
+        match = snwm(orig_bs, bs);
         df.Update();
 
-        metric = "Unidirectional Integer Distance";
-        match = nextup(orig_st, st) / nextup.max_dist;
+        metric = "Asymmetic Wrap Metric Distance";
+        match = awm(orig_bs, bs);
+        df.Update();
+
+        metric = "Asymmetic No Wrap Metric Distance";
+        match = anwm(orig_bs, bs);
         df.Update();
 
       }
