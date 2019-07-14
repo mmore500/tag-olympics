@@ -72,9 +72,7 @@ struct AddDim {
 
       append<typename Pack::pop>(c);
 
-    }
-
-    if constexpr (Pack::IsEmpty() && Dim > 1) {
+    } else if constexpr (Dim > 1) {
 
       AddDim<Dim/2>::template append<typename AddDim<Dim/2>::pack_t>(c);
 
