@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <limits>
 
@@ -8,25 +10,19 @@
 #include "data/DataFile.h"
 
 #include "Config.h"
+#include "Metrics.h"
 
-void LowTripletAnalysis(Config &cfg) {
-
-  emp::HammingMetric<32> ham;
-  emp::StreakMetric<32> streak;
-  emp::SymmetricWrapMetric<32> swm;
-  emp::SymmetricNoWrapMetric<32> snwm;
-  emp::AsymmetricWrapMetric<32> awm;
-  emp::AsymmetricNoWrapMetric<32> anwm;
+void LowTripletAnalysis(const Metrics &metrics, const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
   size_t s;
-  std::string metric;
+  std::string name;
   double detdiff;
 
   emp::DataFile df(cfg.LTA_FILE());
   df.AddVar(s, "Sample");
-  df.AddVar(metric, "Metric");
+  df.AddVar(name, "Metric");
   df.AddVar(detdiff, "Detour Difference");
   df.PrintHeaderKeys();
 
@@ -37,30 +33,12 @@ void LowTripletAnalysis(Config &cfg) {
     emp::BitSet<32> bs_y(rand);
     emp::BitSet<32> bs_z(rand);
 
-    metric = "Hamming Distance";
-    detdiff = (ham(bs_x, bs_y) + ham(bs_y, bs_z) - ham(bs_x, bs_z));
-    df.Update();
-
-    metric = "Streak Distance";
-    detdiff = (streak(bs_x, bs_y) + streak(bs_y, bs_z) - streak(bs_x, bs_z));
-    df.Update();
-
-    metric = "Symmetric Wrap Metric Distance";
-    detdiff = (swm(bs_x, bs_y) + swm(bs_y, bs_z) - swm(bs_x, bs_z));
-    df.Update();
-
-    metric = "Symmetric No Wrap Metric Distance";
-    detdiff = (snwm(bs_x, bs_y) + snwm(bs_y, bs_z) - snwm(bs_x, bs_z));
-    df.Update();
-
-    metric = "Asymmetic Wrap Metric Distance";
-    detdiff = (awm(bs_x, bs_y) + awm(bs_y, bs_z) - awm(bs_x, bs_z));
-    df.Update();
-
-    metric = "Asymmetic No Wrap Metric Distance";
-    detdiff = (anwm(bs_x, bs_y) + anwm(bs_y, bs_z) - anwm(bs_x, bs_z));
-    df.Update();
-
+    for (const auto & mptr : metrics.mets) {
+      const auto & metric = *mptr;
+      name = metric.name() + " Distance";
+      detdiff = (metric(bs_x, bs_y) + metric(bs_y, bs_z) - metric(bs_x, bs_z));
+      df.Update();
+    }
   }
 
 }

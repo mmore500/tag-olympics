@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <limits>
 
@@ -8,29 +10,23 @@
 #include "data/DataFile.h"
 
 #include "Config.h"
+#include "Metrics.h"
 
-void LowMutationalWalk(Config &cfg) {
-
-  emp::HammingMetric<32> ham;
-  emp::StreakMetric<32> streak;
-  emp::SymmetricWrapMetric<32> swm;
-  emp::SymmetricNoWrapMetric<32> snwm;
-  emp::AsymmetricWrapMetric<32> awm;
-  emp::AsymmetricNoWrapMetric<32> anwm;
+void LowMutationalWalk(const Metrics &metrics, const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
   size_t s;
   size_t r;
   size_t t;
-  std::string metric;
+  std::string name;
   double match;
 
   emp::DataFile df(cfg.LMW_FILE());
   df.AddVar(s, "Sample");
   df.AddVar(r, "Replicate");
   df.AddVar(t, "Step");
-  df.AddVar(metric, "Metric");
+  df.AddVar(name, "Metric");
   df.AddVar(match, "Match Distance");
   df.PrintHeaderKeys();
 
@@ -48,29 +44,12 @@ void LowMutationalWalk(Config &cfg) {
 
         bs.Toggle(rand.GetUInt(32));
 
-        metric = "Hamming Distance";
-        match = ham(orig_bs, bs);
-        df.Update();
-
-        metric = "Streak Distance";
-        match = streak(orig_bs, bs);
-        df.Update();
-
-        metric = "Symmetric Wrap Metric Distance";
-        match = swm(orig_bs, bs);
-        df.Update();
-
-        metric = "Symmetric No Wrap Metric Distance";
-        match = snwm(orig_bs, bs);
-        df.Update();
-
-        metric = "Asymmetic Wrap Metric Distance";
-        match = awm(orig_bs, bs);
-        df.Update();
-
-        metric = "Asymmetic No Wrap Metric Distance";
-        match = anwm(orig_bs, bs);
-        df.Update();
+        for (const auto & mptr : metrics.mets) {
+          const auto & metric = *mptr;
+          name = metric.name() + " Distance";
+          match = metric(orig_bs, bs);
+          df.Update();
+        }
 
       }
     }

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <limits>
 
@@ -9,25 +11,21 @@
 #include "data/DataFile.h"
 
 #include "Config.h"
+#include "Metrics.h"
 
-void LowSpecificityAnalysis(Config &cfg) {
-
-  emp::HammingMetric<32> ham;
-  emp::StreakMetric<32> streak;
-  emp::SlideMod<emp::HammingMetric<32>> slide_ham;
-  emp::SlideMod<emp::StreakMetric<32>> slide_streak;
+void LowSpecificityAnalysis(const Metrics &metrics, const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
   size_t s;
   size_t r;
-  std::string metric;
+  std::string name;
   double match;
 
   emp::DataFile df(cfg.LSA_FILE());
   df.AddVar(s, "Sample");
   df.AddVar(r, "Replicate");
-  df.AddVar(metric, "Metric");
+  df.AddVar(name, "Metric");
   df.AddVar(match, "Match Distance");
   df.PrintHeaderKeys();
 
@@ -42,33 +40,13 @@ void LowSpecificityAnalysis(Config &cfg) {
       emp::BitSet<32> rep(rand);
       emp::BitSet<32> rep_w(rand, 0.75);
 
-      metric = "Hamming Distance";
-      match = ham(samp, rep);
-      df.Update();
 
-      metric = "Streak Distance";
-      match = streak(samp, rep);
-      df.Update();
-
-      metric = "Weighted Hamming Distance";
-      match = ham(samp_w, rep_w);
-      df.Update();
-
-      metric = "Weighted Streak Distance";
-      match = streak(samp_w, rep_w);
-      df.Update();
-
-      metric = "Sliding Hamming Distance";
-      match = slide_ham(samp, rep);
-      df.Update();
-
-      metric = "Sliding Streak Distance";
-      match = slide_streak(samp, rep);
-      df.Update();
-
-      // metric = "Bitstring Integer Distance";
-      // match = intdiff(samp, rep) / intdiff.max_dist;
-      // df.Update();
+      for (const auto & mptr : metrics.mets) {
+        const auto & metric = *mptr;
+        name = metric.name() + " Distance";
+        match = metric(samp, rep);
+        df.Update();
+      }
 
     }
   }
