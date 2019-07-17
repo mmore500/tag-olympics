@@ -20,6 +20,7 @@ void MakeMetricKey(const Metrics &metrics, const Config &cfg) {
   bool slide_mod;
   bool anti_mod;
   std::string base;
+  std::string dim_type;
 
   emp::DataFile df(cfg.MMK_FILE());
   df.AddVar(name, "Metric");
@@ -28,6 +29,7 @@ void MakeMetricKey(const Metrics &metrics, const Config &cfg) {
   df.AddVar(width, "Width");
   df.AddVar(slide_mod, "Sliding");
   df.AddVar(anti_mod, "Inverse");
+  df.AddVar(dim_type, "Dimension Type");
   df.PrintHeaderKeys();
 
   for (const auto & mptr : metrics.mets) {
@@ -39,6 +41,14 @@ void MakeMetricKey(const Metrics &metrics, const Config &cfg) {
     slide_mod = metric.name().find("Sliding") != std::string::npos;
     anti_mod = metric.name().find("Inverse") != std::string::npos;
     base = metric.base();
+
+    if (metric.name().find("Minimum") != std::string::npos) {
+      dim_type = "Minimum";
+    } else if (metric.name().find("Mean") != std::string::npos) {
+      dim_type = "Mean";
+    } else {
+      dim_type = "None";
+    }
 
     df.Update();
   }
