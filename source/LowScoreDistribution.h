@@ -27,13 +27,16 @@ void LowScoreDistribution(const Metrics &metrics, const Config &cfg) {
   df.PrintHeaderKeys();
 
   for(s = 0; s < cfg.LSD_NSAMPLES(); ++s) {
-    if (s % 10000 == 0)  std::cout << "sample " << s << std::endl;
 
     emp::BitSet<32> bs_a(rand);
     emp::BitSet<32> bs_b(rand);
 
     for (const auto & mptr : metrics.mets) {
       const auto & metric = *mptr;
+
+      // filter out non-interesting data
+      if (metric.name().find("Inverse") != std::string::npos) continue;
+
       name = metric.name() + " Distance";
       score = metric(bs_a, bs_b);
       df.Update();
