@@ -14,6 +14,7 @@
 #include "../LowTripletAnalysis.h"
 #include "../LowSpecificityAnalysis.h"
 #include "../LowScoreDistribution.h"
+#include "../MakeMetricKey.h"
 #include "../Metrics.h"
 
 // This is the main function for the NATIVE version of Tag Olympics.
@@ -63,6 +64,9 @@ int main(int argc, char* argv[])
   } else if (res->at(0) == "LSD") {
     std::cout << "running mode: " << res->at(0) << std::endl;
     LowScoreDistribution(metrics, cfg);
+  } else if (res->at(0) == "MMK") {
+    std::cout << "running mode: " << res->at(0) << std::endl;
+    MakeMetricKey(metrics, cfg);
   } else {
     std::cout << "uknown running mode: " << res->at(0) << std::endl;
   }

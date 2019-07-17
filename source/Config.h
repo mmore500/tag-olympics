@@ -36,4 +36,7 @@ EMP_BUILD_CONFIG(
   VALUE(LSD_NSAMPLES, size_t, 500, "Number of samples to take"),
   VALUE(LSD_FILE, std::string, "low-score-distribution.csv", "Default out filename"),
 
+  GROUP(MAKE_METRIC_KEY, "Settings for make-metric-key utility"),
+  VALUE(MMK_FILE, std::string, "metric-key.csv", "Default out filename"),
+
 )
