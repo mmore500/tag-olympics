@@ -32,4 +32,8 @@ EMP_BUILD_CONFIG(
   VALUE(LSA_NREPS, size_t, 10000, "Number of replicates per sample"),
   VALUE(LSA_FILE, std::string, "low-specificty-analysis.csv", "Default out filename"),
 
+  GROUP(LOW_SCORE_DISTRIBUTION, "Settings for low-score-distribution experiment"),
+  VALUE(LSD_NSAMPLES, size_t, 500, "Number of samples to take"),
+  VALUE(LSD_FILE, std::string, "low-score-distribution.csv", "Default out filename"),
+
 )
