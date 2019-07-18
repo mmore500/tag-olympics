@@ -28,8 +28,8 @@ EMP_BUILD_CONFIG(
   VALUE(LTA_FILE, std::string, "low-triplet-analysis.csv", "Default out filename"),
 
   GROUP(LOW_SPECIFICITY_ANALYSIS, "Settings for low-specificty-analysis experiment"),
-  VALUE(LSA_NSAMPLES, size_t, 250, "Number of samples to characterize"),
-  VALUE(LSA_NREPS, size_t, 10000, "Number of replicates per sample"),
+  VALUE(LSA_NSAMPLES, size_t, 500, "Number of samples to characterize"),
+  VALUE(LSA_NREPS, size_t, 20000, "Number of replicates per sample"),
   VALUE(LSA_FILE, std::string, "low-specificty-analysis.csv", "Default out filename"),
 
   GROUP(LOW_SCORE_DISTRIBUTION, "Settings for low-score-distribution experiment"),
