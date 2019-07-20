@@ -51,7 +51,7 @@ g = sns.FacetGrid(
     row='Dimension',
     margin_titles=True
 ).set(xlim=(0, 1))
-g.map(sns.lineplot, "Match Score", "Mutational Step")
+g.map(sns.lineplot, "Mutational Step",  "Match Score")
 
 plt.savefig(
     "minimum-low-mutational-walk.pdf",
@@ -64,7 +64,7 @@ g = sns.FacetGrid(
     row='Dimension',
     margin_titles=True
 ).set(xlim=(0, 1))
-g.map(sns.lineplot, "Match Score", "Mutational Step")
+g.map(sns.lineplot, "Mutational Step",  "Match Score")
 
 plt.savefig(
     "mean-low-mutational-walk.pdf",
