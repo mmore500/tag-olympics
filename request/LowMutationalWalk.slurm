@@ -49,21 +49,17 @@ git clone git@github.com:devosoft/Empirical -b match-bin && \
 git clone git@github.com:mmore500/tag-olympics && \
 
 # Compile executable
-cd tag-olympics && make && \ 
+cd tag-olympics && make && \
 
 # Generate data
 ./tag-olympics MMK && \
 ./tag-olympics LMW && \
 
-# Might need this for python to work correctly
-module purge && \
-
 # Run plotting script
-source ~/pyEnv/bin/activate && \
-time python tag-olympics/script/LowMutationalWalkPlot.py metric-key.csv low-mutational-walk.csv && \
+singularity exec shub://mmore500/tag-olympics python3 /opt/tag-olympics/script/LowMutationalWalkPlot.py metric-key.csv low-mutational-walk.csv && \
 
 # After the job is done we copy our output back to $SLURM_SUBMIT_DIR
-cp ${SCRATCH_DIRECTORY}/*.pdf ${SLURM_SUBMIT_DIR}
+cp *.pdf ${SLURM_SUBMIT_DIR}
 
 # In addition to the copied files, you will also find a file called
 # slurm-1234.out in the submit directory. This file will contain all output that
