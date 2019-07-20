@@ -36,7 +36,7 @@
 
 # You may not place any commands before the last SBATCH directive
 
-module purge; module load gcc/7.3.0-2.30 git
+module purge; module load gcc/8.2.0-2.31.1
 source ~/pyEnv/bin/activate
 
 # Define and create a unique scratch directory for this job
@@ -47,10 +47,9 @@ cd ${SCRATCH_DIRECTORY}
 
 # You can copy everything you need to the scratch directory
 # ${SLURM_SUBMIT_DIR} points to the path where this script was submitted from
-modulea
+# modulea
 
-git clone git@github.com:devosoft/Empirical
-cd Empirical && git checkout match-bin && git pull origin master && cd ..
+git clone git@github.com:devosoft/Empirical -b match-bin
 
 git clone git@github.com:mmore500/tag-olympics
 cd tag-olympics && make && cp tag-olympics .. && cd ..
