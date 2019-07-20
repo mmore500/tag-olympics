@@ -37,10 +37,9 @@
 # You may not place any commands before the last SBATCH directive
 
 module purge; module load gcc/8.2.0-2.31.1
-source ~/pyEnv/bin/activate
 
 # Define and create a unique scratch directory for this job
-SCRATCH_DIRECTORY=/mnt/scratch/${USER}/${SLURM_JOBID}.stallo-adm.uit.no
+SCRATCH_DIRECTORY=/mnt/scratch/${USER}/test
 mkdir -p ${SCRATCH_DIRECTORY}
 cd ${SCRATCH_DIRECTORY}
 
@@ -56,7 +55,9 @@ cd tag-olympics && make && cp tag-olympics .. && cd ..
 
 ./tag-olympics MMK | tee -a log.txt
 ./tag-olympics LMW | tee -a log.txt
-time python3 tag-olympics/script/LowMutationalWalkPlot.py metric-key.csv low-mutational-walk.csv | tee -a log.txtSs
+module purge
+source ~/pyEnv/bin/activate
+time python tag-olympics/script/LowMutationalWalkPlot.py metric-key.csv low-mutational-walk.csv | tee -a log.txt
 
 # After the job is done we copy our output back to $SLURM_SUBMIT_DIR
 cp ${SCRATCH_DIRECTORY}/*.pdf ${SLURM_SUBMIT_DIR}
