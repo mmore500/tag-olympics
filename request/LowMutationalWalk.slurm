@@ -49,18 +49,18 @@ git clone git@github.com:devosoft/Empirical -b match-bin && \
 git clone git@github.com:mmore500/tag-olympics && \
 
 # Compile executable
-cd tag-olympics && make && cp tag-olympics .. && cd .. && \
+cd tag-olympics && make && \ 
 
 # Generate data
-./tag-olympics MMK | tee -a log.txt && \
-./tag-olympics LMW | tee -a log.txt && \
+./tag-olympics MMK && \
+./tag-olympics LMW && \
 
 # Might need this for python to work correctly
 module purge && \
 
 # Run plotting script
 source ~/pyEnv/bin/activate && \
-time python tag-olympics/script/LowMutationalWalkPlot.py metric-key.csv low-mutational-walk.csv | tee -a log.txt && \
+time python tag-olympics/script/LowMutationalWalkPlot.py metric-key.csv low-mutational-walk.csv && \
 
 # After the job is done we copy our output back to $SLURM_SUBMIT_DIR
 cp ${SCRATCH_DIRECTORY}/*.pdf ${SLURM_SUBMIT_DIR}
