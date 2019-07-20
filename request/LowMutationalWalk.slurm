@@ -56,7 +56,7 @@ cd tag-olympics && make && \
 ./tag-olympics LMW && \
 
 # Run plotting script
-singularity exec -B $(pwd):/pwd shub://mmore500/tag-olympics python3 /opt/tag-olympics/script/LowMutationalWalkPlot.py /pwd/metric-key.csv /pwd/low-mutational-walk.csv && \
+singularity exec -B $(pwd):/pwd shub://mmore500/tag-olympics cd /pwd -c "cd /pwd && python3 /opt/tag-olympics/script/LowMutationalWalkPlot.py metric-key.csv low-mutational-walk.csv" && \
 
 # After the job is done we copy our output back to $SLURM_SUBMIT_DIR
 cp *.pdf ${SLURM_SUBMIT_DIR}
