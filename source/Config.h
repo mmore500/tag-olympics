@@ -24,7 +24,7 @@ EMP_BUILD_CONFIG(
   VALUE(LGA_FILE, std::string, "low-graph-analysis.csv", "Default out filename"),
 
   GROUP(LOW_TRIPLET_ANALYSIS, "Settings for low-triplet-analysis experiment"),
-  VALUE(LTA_NSAMPLES, size_t, 100000, "Number of sample graphs to study"),
+  VALUE(LTA_NSAMPLES, size_t, 2000, "Number of sample graphs to study"),
   VALUE(LTA_FILE, std::string, "low-triplet-analysis.csv", "Default out filename"),
 
   GROUP(LOW_SPECIFICITY_ANALYSIS, "Settings for low-specificty-analysis experiment"),

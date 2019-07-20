@@ -27,7 +27,7 @@ void LowTripletAnalysis(const Metrics &metrics, const Config &cfg) {
   df.PrintHeaderKeys();
 
   for(s = 0; s < cfg.LTA_NSAMPLES(); ++s) {
-    if (s % 10000 == 0)  std::cout << "sample " << s << std::endl;
+    if (s % 10 == 0)  std::cout << "sample " << s << std::endl;
 
     emp::BitSet<32> bs_x(rand);
     emp::BitSet<32> bs_y(rand);
