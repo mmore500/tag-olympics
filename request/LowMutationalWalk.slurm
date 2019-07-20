@@ -63,11 +63,8 @@ source ~/pyEnv/bin/activate && \
 time python tag-olympics/script/LowMutationalWalkPlot.py metric-key.csv low-mutational-walk.csv | tee -a log.txt && \
 
 # After the job is done we copy our output back to $SLURM_SUBMIT_DIR
-cp ${SCRATCH_DIRECTORY}/*.pdf ${SLURM_SUBMIT_DIR} && \
+cp ${SCRATCH_DIRECTORY}/*.pdf ${SLURM_SUBMIT_DIR}
 
 # In addition to the copied files, you will also find a file called
 # slurm-1234.out in the submit directory. This file will contain all output that
 # was produced during runtime, i.e. stdout and stderr.
-
-# Finish the script
-exit 0
