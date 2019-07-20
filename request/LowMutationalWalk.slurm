@@ -36,40 +36,38 @@
 
 # You may not place any commands before the last SBATCH directive
 
-module purge; module load gcc/8.2.0-2.31.1
+module purge && module load GCC/8.2.0-2.31.1 && \
 
 # Define and create a unique scratch directory for this job
-SCRATCH_DIRECTORY=/mnt/scratch/${USER}/test
-mkdir -p ${SCRATCH_DIRECTORY}
-cd ${SCRATCH_DIRECTORY}
+SCRATCH_DIRECTORY=/mnt/scratch/${USER}/job_${SLURM_JOBID} && \
+mkdir -p ${SCRATCH_DIRECTORY} && \
+cd ${SCRATCH_DIRECTORY} && \
 
+# Clone down source
+git clone git@github.com:devosoft/Empirical -b match-bin && \
 
-# You can copy everything you need to the scratch directory
-# ${SLURM_SUBMIT_DIR} points to the path where this script was submitted from
-# modulea
+git clone git@github.com:mmore500/tag-olympics && \
 
-git clone git@github.com:devosoft/Empirical -b match-bin
+# Compile executable
+cd tag-olympics && make && cp tag-olympics .. && cd .. && \
 
-git clone git@github.com:mmore500/tag-olympics
-cd tag-olympics && make && cp tag-olympics .. && cd ..
+# Generate data
+./tag-olympics MMK | tee -a log.txt && \
+./tag-olympics LMW | tee -a log.txt && \
 
-./tag-olympics MMK | tee -a log.txt
-./tag-olympics LMW | tee -a log.txt
-module purge
-source ~/pyEnv/bin/activate
-time python tag-olympics/script/LowMutationalWalkPlot.py metric-key.csv low-mutational-walk.csv | tee -a log.txt
+# Might need this for python to work correctly
+module purge && \
+
+# Run plotting script
+source ~/pyEnv/bin/activate && \
+time python tag-olympics/script/LowMutationalWalkPlot.py metric-key.csv low-mutational-walk.csv | tee -a log.txt && \
 
 # After the job is done we copy our output back to $SLURM_SUBMIT_DIR
-cp ${SCRATCH_DIRECTORY}/*.pdf ${SLURM_SUBMIT_DIR}
+cp ${SCRATCH_DIRECTORY}/*.pdf ${SLURM_SUBMIT_DIR} && \
 
 # In addition to the copied files, you will also find a file called
 # slurm-1234.out in the submit directory. This file will contain all output that
 # was produced during runtime, i.e. stdout and stderr.
-
-# After everything is saved to the home directory, delete the work directory to
-# save space on /global/work
-#cd ${SLURM_SUBMIT_DIR}
-#rm -rf ${SCRATCH_DIRECTORY}
 
 # Finish the script
 exit 0
