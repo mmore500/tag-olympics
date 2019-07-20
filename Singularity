@@ -39,12 +39,10 @@ pip3 install seaborn
 
 git clone https://github.com/devosoft/Empirical /opt/Empirical -b match-bin
 
-cd /opt/tag-olympics && make
-
 chmod 777 -R /opt
 
 ################################################################################
 # Run the user's login shell, or a user specified command
 ################################################################################
 %runscript
-/opt/tag-olympics/tag-olympics "$@"
+echo "Nothing here but us birds!"
