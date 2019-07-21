@@ -50,7 +50,7 @@ g = sns.FacetGrid(
     col='Metric',
     row='Dimension',
     margin_titles=True
-).set(xlim=(0, 1))
+).set(ylim=(0, 1))
 g.map(sns.lineplot, "Mutational Step",  "Match Score")
 
 plt.savefig(
@@ -63,7 +63,7 @@ g = sns.FacetGrid(
     col='Metric',
     row='Dimension',
     margin_titles=True
-).set(xlim=(0, 1))
+).set(ylim=(0, 1))
 g.map(sns.lineplot, "Mutational Step",  "Match Score")
 
 plt.savefig(
