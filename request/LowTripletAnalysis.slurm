@@ -56,7 +56,7 @@ cd tag-olympics && make && \
 ./tag-olympics LTA && \
 
 # Run plotting script
-singularity exec -B $(pwd):/pwd shub://mmore500/tag-olympics cd /pwd bash -c "cd /pwd && python3 /opt/tag-olympics/script/LowTripletPlot.py metric-key.csv low-triplet-analysis.csv" && \
+singularity exec -B $(pwd):/pwd shub://mmore500/tag-olympics bash -c "cd /pwd && python3 /opt/tag-olympics/script/LowTripletPlot.py metric-key.csv low-triplet-analysis.csv" && \
 
 # After the job is done we copy our output back to $SLURM_SUBMIT_DIR
 cp *.pdf ${SLURM_SUBMIT_DIR}
