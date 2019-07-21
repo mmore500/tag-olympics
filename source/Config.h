@@ -15,7 +15,7 @@ EMP_BUILD_CONFIG(
   GROUP(LOW_MUTATIONAL_WALK, "Settings for low-mutational-walk experiment"),
   VALUE(LMW_NSTEPS, size_t, 100, "Number of mutational steps in each walk"),
   VALUE(LMW_NREPS, size_t, 1, "Number of replicates of each walk"),
-  VALUE(LMW_NSAMPLES, size_t, 1000, "Number of sample walks to conduct"),
+  VALUE(LMW_NSAMPLES, size_t, 20000, "Number of sample walks to conduct"),
   VALUE(LMW_FILE, std::string, "low-mutational-walk.csv", "Default out filename"),
 
   GROUP(LOW_GRAPH_ANALYSIS, "Settings for low-graph-analysis experiment"),
@@ -24,7 +24,7 @@ EMP_BUILD_CONFIG(
   VALUE(LGA_FILE, std::string, "low-graph-analysis.csv", "Default out filename"),
 
   GROUP(LOW_TRIPLET_ANALYSIS, "Settings for low-triplet-analysis experiment"),
-  VALUE(LTA_NSAMPLES, size_t, 2000, "Number of sample graphs to study"),
+  VALUE(LTA_NSAMPLES, size_t, 20000, "Number of sample graphs to study"),
   VALUE(LTA_FILE, std::string, "low-triplet-analysis.csv", "Default out filename"),
 
   GROUP(LOW_SPECIFICITY_ANALYSIS, "Settings for low-specificty-analysis experiment"),
