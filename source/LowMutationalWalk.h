@@ -48,12 +48,12 @@ void LowMutationalWalk(const Metrics &metrics, const Config &cfg) {
 
         for (step = 0; step < cfg.LMW_NSTEPS(); ++step) {
 
-          walker.Toggle(rand.GetUInt(32));
-
           name = metric.name() + " Distance";
           match = metric(orig_bs, walker);
 
           df.Update();
+
+          walker.Toggle(rand.GetUInt(32));
 
         }
 
