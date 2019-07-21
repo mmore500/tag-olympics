@@ -27,7 +27,7 @@
 # --mem will define memory per node and
 # --mem-per-cpu will define memory per CPU/core. Choose one of those.
 ##SBATCH --mem-per-cpu=1500MB
-#SBATCH --mem=8GB
+#SBATCH --mem=96GB
 
 # Turn on mail notification. There are many possible self-explaining values:
 # NONE, BEGIN, END, FAIL, ALL (including all aforementioned)
