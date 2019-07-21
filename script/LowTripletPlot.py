@@ -55,7 +55,7 @@ g = sns.FacetGrid(
 g.map(sns.distplot, "Detour Difference", kde=False)
 
 plt.savefig(
-    "inverse-minimum-low-score-distribution.pdf",
+    "inverse-minimum-low-triplet-plot.pdf",
     transparent=True
 )
 
@@ -68,7 +68,7 @@ g = sns.FacetGrid(
 g.map(sns.distplot, "Detour Difference", kde=False)
 
 plt.savefig(
-    "inverse-mean-low-score-distribution.pdf",
+    "inverse-mean-low-triplet-plot.pdf",
     transparent=True
 )
 
@@ -82,7 +82,7 @@ g = sns.FacetGrid(
 g.map(sns.distplot, "Detour Difference", kde=False)
 
 plt.savefig(
-    "minimum-low-score-distribution.pdf",
+    "minimum-low-triplet-plot.pdf",
     transparent=True
 )
 
@@ -95,6 +95,6 @@ g = sns.FacetGrid(
 g.map(sns.distplot, "Detour Difference", kde=False)
 
 plt.savefig(
-    "mean-low-score-distribution.pdf",
+    "mean-low-triplet-plot.pdf",
     transparent=True
 )
