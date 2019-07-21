@@ -11,21 +11,90 @@ import numpy as np
 # open-type fonts
 matplotlib.rcParams['pdf.fonttype'] = 42
 
-df = pd.read_csv(sys.argv[1])
+df_key = pd.read_csv(sys.argv[1])
 
-sns.distplot(
-    df[df["Metric"] == "Streak Distance"]["Detour Difference"],
-    color="skyblue",
-    label="Streak Distance"
+df_data = pd.read_csv(sys.argv[2])
+
+key = {
+    row['Metric'] : {
+        col : row[col]
+        for col, val in row.iteritems() if col != 'Metric'
+    }
+    for idx, row in df_key.iterrows()
+}
+
+df_data['Dimension'] = df_data.apply(
+    lambda x: key[x['Metric']]['Dimension'],
+    axis=1
 )
-sns.distplot(
-    df[df["Metric"] == "Hamming Distance"]["Detour Difference"],
-    color="red",
-    label="Hamming Distance"
+
+df_data['Dimension Type'] = df_data.apply(
+    lambda x: key[x['Metric']]['Dimension Type'],
+    axis=1
 )
-# sns.plt.legend()
+
+df_data['Inverse'] = df_data.apply(
+    lambda x: key[x['Metric']]['Inverse'],
+    axis=1
+)
+
+df_data['Metric'] = df_data.apply(
+    lambda x: (
+        ('Sliding ' if key[x['Metric']]['Sliding'] else '')
+        + key[x['Metric']]['Base Metric']
+    ),
+    axis=1
+)
+
+g = sns.FacetGrid(
+    df_data[(df_data['Dimension Type'] == 'Minimum') & df_data['Inverse']],
+    col='Metric',
+    row='Dimension',
+    margin_titles=True
+).set(xlim=(-1, 2))
+g.map(sns.distplot, "Detour Difference", kde=False)
 
 plt.savefig(
-    "detour-dists.pdf",
+    "inverse-minimum-low-score-distribution.pdf",
+    transparent=True
+)
+
+g = sns.FacetGrid(
+    df_data[(df_data['Dimension Type'] == 'Mean') & df_data['Inverse']],
+    col='Metric',
+    row='Dimension',
+    margin_titles=True
+).set(xlim=(-1, 2))
+g.map(sns.distplot, "Detour Difference", kde=False)
+
+plt.savefig(
+    "inverse-mean-low-score-distribution.pdf",
+    transparent=True
+)
+
+
+g = sns.FacetGrid(
+    df_data[(df_data['Dimension Type'] == 'Minimum') & ~df_data['Inverse']],
+    col='Metric',
+    row='Dimension',
+    margin_titles=True
+).set(xlim=(-1, 2))
+g.map(sns.distplot, "Detour Difference", kde=False)
+
+plt.savefig(
+    "minimum-low-score-distribution.pdf",
+    transparent=True
+)
+
+g = sns.FacetGrid(
+    df_data[(df_data['Dimension Type'] == 'Mean') & ~df_data['Inverse']],
+    col='Metric',
+    row='Dimension',
+    margin_titles=True
+).set(xlim=(-1, 2))
+g.map(sns.distplot, "Detour Difference", kde=False)
+
+plt.savefig(
+    "mean-low-score-distribution.pdf",
     transparent=True
 )
