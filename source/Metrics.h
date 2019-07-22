@@ -30,8 +30,10 @@ struct AddDim {
   using base_pack_t = typename emp::TypePack<
     emp::HammingMetric<32/Dim>,
     emp::StreakMetric<32/Dim>,
+    emp::HashMetric<32/Dim>,
     emp::SlideMod<emp::HammingMetric<32/Dim>>,
     emp::SlideMod<emp::StreakMetric<32/Dim>>,
+    emp::SlideMod<emp::HashMetric<32/Dim>>,
     emp::AsymmetricWrapMetric<32/Dim>,
     emp::AsymmetricNoWrapMetric<32/Dim>,
     emp::SymmetricWrapMetric<32/Dim>,
