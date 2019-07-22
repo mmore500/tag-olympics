@@ -46,13 +46,17 @@ df_data['Metric'] = df_data.apply(
     axis=1
 )
 
+df_data['Detour Difference'] = df_data.apply(
+    lambda x: x['Detour Difference'] + np.random.normal(0, 1e-8)
+)
+
 g = sns.FacetGrid(
     df_data[(df_data['Dimension Type'] == 'Minimum') & df_data['Inverse']],
     col='Metric',
     row='Dimension',
     margin_titles=True
 ).set(xlim=(-1, 2))
-g.map(sns.distplot, "Detour Difference", kde=False)
+g.map(sns.distplot, "Detour Difference", hist=False, rug=True)
 
 plt.savefig(
     "inverse-minimum-low-triplet-plot.pdf",
@@ -65,7 +69,7 @@ g = sns.FacetGrid(
     row='Dimension',
     margin_titles=True
 ).set(xlim=(-1, 2))
-g.map(sns.distplot, "Detour Difference", kde=False)
+g.map(sns.distplot, "Detour Difference", hist=False, rug=True)
 
 plt.savefig(
     "inverse-mean-low-triplet-plot.pdf",
@@ -79,7 +83,7 @@ g = sns.FacetGrid(
     row='Dimension',
     margin_titles=True
 ).set(xlim=(-1, 2))
-g.map(sns.distplot, "Detour Difference", kde=False)
+g.map(sns.distplot, "Detour Difference", hist=False, rug=True)
 
 plt.savefig(
     "minimum-low-triplet-plot.pdf",
@@ -92,7 +96,7 @@ g = sns.FacetGrid(
     row='Dimension',
     margin_titles=True
 ).set(xlim=(-1, 2))
-g.map(sns.distplot, "Detour Difference", kde=False)
+g.map(sns.distplot, "Detour Difference", hist=False, rug=True)
 
 plt.savefig(
     "mean-low-triplet-plot.pdf",
