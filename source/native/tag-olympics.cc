@@ -10,7 +10,7 @@
 
 #include "../Config.h"
 #include "../LowMutationalWalk.h"
-#include "../LowGraphAnalysis.h"
+#include "../LowMakeGraph.h"
 #include "../LowTripletAnalysis.h"
 #include "../LowSpecificityAnalysis.h"
 #include "../LowScoreDistribution.h"
@@ -52,9 +52,9 @@ int main(int argc, char* argv[])
   } else if (res->at(0) == "LMW") {
     std::cout << "running mode: " << res->at(0) << std::endl;
     LowMutationalWalk(metrics, cfg);
-  } else if (res->at(0) == "LGA") {
+  } else if (res->at(0) == "LMG") {
     std::cout << "running mode: " << res->at(0) << std::endl;
-    LowGraphAnalysis(metrics, cfg);
+    LowMakeGraph(metrics, cfg);
   } else if (res->at(0) == "LTA") {
     std::cout << "running mode: " << res->at(0) << std::endl;
     LowTripletAnalysis(metrics, cfg);

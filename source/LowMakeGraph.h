@@ -12,7 +12,7 @@
 #include "Config.h"
 #include "Metrics.h"
 
-void LowGraphAnalysis(const Metrics &metrics, const Config &cfg) {
+void LowMakeGraph(const Metrics &metrics, const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
@@ -27,7 +27,7 @@ void LowGraphAnalysis(const Metrics &metrics, const Config &cfg) {
   df.AddVar(from, "From");
   df.AddVar(to, "To");
   df.AddVar(name, "Metric");
-  df.AddVar(match, "Match Distance");
+  df.AddVar(match, "Match Score");
   df.PrintHeaderKeys();
 
   for(s = 0; s < cfg.LGA_NSAMPLES(); ++s) {
@@ -40,18 +40,18 @@ void LowGraphAnalysis(const Metrics &metrics, const Config &cfg) {
       bs.emplace_back(rand);
     }
 
-    for(from = 0; from < cfg.LGA_NNODES(); ++from) {
-      for(to = from; to < cfg.LGA_NNODES(); ++to) {
+    for (const auto & mptr : metrics.mets) {
+      const auto & metric = *mptr;
+      name = metric.name() + " Distance";
 
-        for (const auto & mptr : metrics.mets) {
-          const auto & metric = *mptr;
-          name = metric.name() + " Distance";
+      for (from = 0; from < cfg.LGA_NNODES(); ++from) {
+        for (to = from; to < cfg.LGA_NNODES(); ++to) {
           match = metric(bs[from], bs[to]);
           df.Update();
         }
-
       }
-    }
-  }
 
+    }
+
+  }
 }

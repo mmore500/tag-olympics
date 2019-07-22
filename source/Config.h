@@ -18,10 +18,10 @@ EMP_BUILD_CONFIG(
   VALUE(LMW_NSAMPLES, size_t, 20000, "Number of sample walks to conduct"),
   VALUE(LMW_FILE, std::string, "low-mutational-walk.csv", "Default out filename"),
 
-  GROUP(LOW_GRAPH_ANALYSIS, "Settings for low-graph-analysis experiment"),
-  VALUE(LGA_NNODES, size_t, 100, "Number of nodes in each graph"),
-  VALUE(LGA_NSAMPLES, size_t, 100, "Number of sample graphs to study"),
-  VALUE(LGA_FILE, std::string, "low-graph-analysis.csv", "Default out filename"),
+  GROUP(LOW_MAKE_GRAPH, "Settings to generate weighted graph from match scores"),
+  VALUE(LMG_NNODES, size_t, 100, "Number of nodes in each graph"),
+  VALUE(LMG_NSAMPLES, size_t, 100, "Number of sample graphs to study"),
+  VALUE(LMG_FILE, std::string, "low-graph-analysis.csv", "Default out filename"),
 
   GROUP(LOW_TRIPLET_ANALYSIS, "Settings for low-triplet-analysis experiment"),
   VALUE(LTA_NSAMPLES, size_t, 20000, "Number of sample graphs to study"),
