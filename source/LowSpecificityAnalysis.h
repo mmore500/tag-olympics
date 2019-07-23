@@ -10,6 +10,7 @@
 #include "config/ArgManager.h"
 #include "data/DataFile.h"
 #include "data/DataNode.h"
+#include "tools/string_utils.h"
 
 #include "Config.h"
 #include "Metrics.h"
@@ -25,7 +26,25 @@ void LowSpecificityAnalysis(const Metrics &metrics, const Config &cfg) {
     emp::data::Range
   > match_node;
 
-  emp::DataFile df(cfg.LSA_FILE());
+  emp::DataFile df(
+    std::string()
+    + "bitweight="
+    + emp::to_string(cfg.LSA_BITWEIGHT())
+    + "title="
+    + cfg.LSA_TITLE()
+    + "+"
+    + "seed="
+    + emp::to_string(cfg.SEED())
+    // + "+"
+    // + "_emp_hash="
+    // + STRINGIFY(EMPIRICAL_HASH_)
+    // + "+"
+    // + "_source_hash="
+    // + STRINGIFY(DISHTINY_HASH_)
+    + "+"
+    + "ext="
+    + ".csv"
+  );
   df.AddVar(s, "Sample");
   df.AddVar(name, "Metric");
   df.AddMean(match_node, "Tag Mean Match Score", "TODO", true);

@@ -8,6 +8,7 @@
 #include "tools/Random.h"
 #include "config/ArgManager.h"
 #include "data/DataFile.h"
+#include "tools/string_utils.h"
 
 #include "Config.h"
 #include "Metrics.h"
@@ -22,7 +23,20 @@ void MakeMetricKey(const Metrics &metrics, const Config &cfg) {
   std::string base;
   std::string dim_type;
 
-  emp::DataFile df(cfg.MMK_FILE());
+  emp::DataFile df(
+    std::string()
+    + "title="
+    + cfg.MMK_TITLE()
+    // + "+"
+    // + "_emp_hash="
+    // + STRINGIFY(EMPIRICAL_HASH_)
+    // + "+"
+    // + "_source_hash="
+    // + STRINGIFY(DISHTINY_HASH_)
+    + "+"
+    + "ext="
+    + ".csv"
+  );
   df.AddVar(name, "Metric");
   df.AddVar(base, "Base Metric");
   df.AddVar(dim, "Dimension");

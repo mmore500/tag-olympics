@@ -8,6 +8,7 @@
 #include "tools/Random.h"
 #include "config/ArgManager.h"
 #include "data/DataFile.h"
+#include "tools/string_utils.h"
 
 #include "Config.h"
 #include "Metrics.h"
@@ -20,7 +21,25 @@ void LowScoreDistribution(const Metrics &metrics, const Config &cfg) {
   std::string name;
   double score;
 
-  emp::DataFile df(cfg.LSD_FILE());
+  emp::DataFile df(
+    std::string()
+    + "bitweight="
+    + emp::to_string(cfg.LSD_BITWEIGHT())
+    + "title="
+    + cfg.LSD_TITLE()
+    + "+"
+    + "seed="
+    + emp::to_string(cfg.SEED())
+    // + "+"
+    // + "_emp_hash="
+    // + STRINGIFY(EMPIRICAL_HASH_)
+    // + "+"
+    // + "_source_hash="
+    // + STRINGIFY(DISHTINY_HASH_)
+    + "+"
+    + "ext="
+    + ".csv"
+  );
   df.AddVar(s, "Sample");
   df.AddVar(name, "Metric");
   df.AddVar(score, "Match Score");
