@@ -22,7 +22,7 @@ void LowMakeGraph(const Metrics &metrics, const Config &cfg) {
   std::string name;
   double match;
 
-  emp::DataFile df(cfg.LGA_FILE());
+  emp::DataFile df(cfg.LMG_FILE());
   df.AddVar(s, "Sample");
   df.AddVar(from, "From");
   df.AddVar(to, "To");
@@ -30,22 +30,22 @@ void LowMakeGraph(const Metrics &metrics, const Config &cfg) {
   df.AddVar(match, "Match Score");
   df.PrintHeaderKeys();
 
-  for(s = 0; s < cfg.LGA_NSAMPLES(); ++s) {
+  for(s = 0; s < cfg.LMG_NSAMPLES(); ++s) {
     std::cout << "sample " << s << std::endl;
 
     emp::vector<emp::BitSet<32>> bs;
-    bs.reserve(cfg.LGA_NNODES());
+    bs.reserve(cfg.LMG_NNODES());
 
-    for(size_t n = 0; n < cfg.LGA_NNODES(); ++n) {
-      bs.emplace_back(rand);
+    for(size_t n = 0; n < cfg.LMG_NNODES(); ++n) {
+      bs.emplace_back(rand, 0.5);
     }
 
     for (const auto & mptr : metrics.mets) {
       const auto & metric = *mptr;
       name = metric.name() + " Distance";
 
-      for (from = 0; from < cfg.LGA_NNODES(); ++from) {
-        for (to = from; to < cfg.LGA_NNODES(); ++to) {
+      for (from = 0; from < cfg.LMG_NNODES(); ++from) {
+        for (to = from; to < cfg.LMG_NNODES(); ++to) {
           match = metric(bs[from], bs[to]);
           df.Update();
         }
