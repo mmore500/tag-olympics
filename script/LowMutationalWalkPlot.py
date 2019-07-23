@@ -7,13 +7,17 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 import pandas as pd
 import numpy as np
+from keyname import keyname as kn
+from fileshash import fileshash as fsh
 
 # open-type fonts
 matplotlib.rcParams['pdf.fonttype'] = 42
 
+dataframe_filename = sys.argv[2]
+
 df_key = pd.read_csv(sys.argv[1])
 
-df_data = pd.read_csv(sys.argv[2])
+df_data = pd.read_csv(dataframe_filename)
 
 print("data loaded!")
 
@@ -35,6 +39,11 @@ df_data['Dimension Type'] = df_data.apply(
     axis=1
 )
 
+df_data['Dimension'] = df_data.apply(
+    lambda x:  x['Dimension Type'] + " " + str(x['Dimension']),
+    axis=1
+)
+
 df_data['Metric'] = df_data.apply(
     lambda x: (
         ('Sliding ' if key[x['Metric']]['Sliding'] else '')
@@ -46,27 +55,37 @@ df_data['Metric'] = df_data.apply(
 print("data crunched!")
 
 g = sns.FacetGrid(
-    df_data[df_data['Dimension Type'] == 'Minimum'],
+    df_data,
     col='Metric',
     row='Dimension',
-    margin_titles=True
+    hue='Dimension Type',
+    margin_titles=True,
+    row_order=(
+        sorted(
+            [x for x in df_data['Dimension'].unique() if 'Mean' in x],
+            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
+        ) + sorted(
+            [x for x in df_data['Dimension'].unique() if 'Minimum' in x],
+            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
+        )
+    )
 ).set(ylim=(0, 1))
 g.map(sns.lineplot, "Mutational Step",  "Match Score", ci="sd")
 
 plt.savefig(
-    "minimum-low-mutational-walk.pdf",
-    transparent=True
-)
-
-g = sns.FacetGrid(
-    df_data[df_data['Dimension Type'] == 'Mean'],
-    col='Metric',
-    row='Dimension',
-    margin_titles=True
-).set(ylim=(0, 1))
-g.map(sns.lineplot, "Mutational Step",  "Match Score", ci="sd")
-
-plt.savefig(
-    "mean-low-mutational-walk.pdf",
-    transparent=True
+    kn.pack({
+        'title' : kn.unpack(dataframe_filename)['title'],
+        'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
+        'seed' : kn.unpack(dataframe_filename)['seed'],
+        '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
+        '_script_fullcat_hash' : fsh.FilesHash(
+                                    file_parcel="full_parcel",
+                                    files_join="cat_join"
+                                ).hash_files([sys.argv[0]]),
+        # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+        'ext' : '.pdf'
+    }),
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
 )
