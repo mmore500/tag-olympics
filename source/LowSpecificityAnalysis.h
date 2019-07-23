@@ -30,6 +30,7 @@ void LowSpecificityAnalysis(const Metrics &metrics, const Config &cfg) {
     std::string()
     + "bitweight="
     + emp::to_string(cfg.LSA_BITWEIGHT())
+    + "+"
     + "title="
     + cfg.LSA_TITLE()
     + "+"

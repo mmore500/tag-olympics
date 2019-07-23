@@ -24,7 +24,8 @@ void LowTripletAnalysis(const Metrics &metrics, const Config &cfg) {
   emp::DataFile df(
     std::string()
     + "bitweight="
-    +emp::to_string(cfg.LTA_BITWEIGHT())
+    + emp::to_string(cfg.LTA_BITWEIGHT())
+    + "+"
     + "title="
     + cfg.LTA_TITLE()
     + "+"

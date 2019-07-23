@@ -27,6 +27,7 @@ void LowMakeGraph(const Metrics &metrics, const Config &cfg) {
     std::string()
     + "bitweight="
     + emp::to_string(cfg.LMG_BITWEIGHT())
+    + "+"
     + "title="
     + cfg.LMG_TITLE()
     + "+"

@@ -28,6 +28,7 @@ void LowMutationalWalk(const Metrics &metrics, const Config &cfg) {
     std::string()
     + "bitweight="
     + emp::to_string(cfg.LMW_BITWEIGHT())
+    + "+"
     + "title="
     + cfg.LMW_TITLE()
     + "+"

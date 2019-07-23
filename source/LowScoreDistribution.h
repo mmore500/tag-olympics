@@ -25,6 +25,7 @@ void LowScoreDistribution(const Metrics &metrics, const Config &cfg) {
     std::string()
     + "bitweight="
     + emp::to_string(cfg.LSD_BITWEIGHT())
+    + "+"
     + "title="
     + cfg.LSD_TITLE()
     + "+"
