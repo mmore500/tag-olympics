@@ -29,9 +29,9 @@ void LowTripletAnalysis(const Metrics &metrics, const Config &cfg) {
   for(s = 0; s < cfg.LTA_NSAMPLES(); ++s) {
     if (s % 10 == 0)  std::cout << "sample " << s << std::endl;
 
-    emp::BitSet<32> bs_x(rand);
-    emp::BitSet<32> bs_y(rand);
-    emp::BitSet<32> bs_z(rand);
+    emp::BitSet<32> bs_x(rand, cfg.LTA_BITWEIGHT());
+    emp::BitSet<32> bs_y(rand, cfg.LTA_BITWEIGHT());
+    emp::BitSet<32> bs_z(rand, cfg.LTA_BITWEIGHT());
 
     for (const auto & mptr : metrics.mets) {
       const auto & metric = *mptr;

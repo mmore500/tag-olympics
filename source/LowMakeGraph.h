@@ -37,7 +37,7 @@ void LowMakeGraph(const Metrics &metrics, const Config &cfg) {
     bs.reserve(cfg.LMG_NNODES());
 
     for(size_t n = 0; n < cfg.LMG_NNODES(); ++n) {
-      bs.emplace_back(rand, 0.5);
+      bs.emplace_back(rand, cfg.LMG_BITWEIGHT());
     }
 
     for (const auto & mptr : metrics.mets) {

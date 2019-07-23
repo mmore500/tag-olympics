@@ -40,7 +40,7 @@ void LowMutationalWalk(const Metrics &metrics, const Config &cfg) {
 
     for (s = 0; s < cfg.LMW_NSAMPLES(); ++s) {
 
-      const emp::BitSet<32> orig_bs(rand);
+      const emp::BitSet<32> orig_bs(rand, cfg.LMW_BITWEIGHT());
 
       for (r = 0; r < cfg.LMW_NREPS(); ++r) {
 
@@ -53,7 +53,39 @@ void LowMutationalWalk(const Metrics &metrics, const Config &cfg) {
 
           df.Update();
 
-          walker.Toggle(rand.GetUInt(32));
+          // no mutations are possible in an absolute regime
+          if (cfg.LMW_BITWEIGHT() == 0.0 || cfg.LMW_BITWEIGHT() == 1.0) {
+            continue;
+          }
+
+          const size_t num_ones = walker.CountOnes();
+
+          if (
+            num_ones * (1.0 - cfg.LMW_BITWEIGHT())
+            <
+            rand.GetDouble() * (
+              num_ones * (1.0 - cfg.LMW_BITWEIGHT())
+              + (walker.GetSize() - num_ones) * cfg.LMW_BITWEIGHT()
+            )
+          ) {
+            // toggle a randomly chosen 1
+            const size_t targetone = rand.GetUInt(num_ones);
+            size_t onecount = 0;
+            size_t pos;
+            for (pos = 0; onecount < targetone; ++pos) {
+              if (walker[pos]) ++onecount;
+            }
+            walker.Toggle(pos);
+          } else {
+            // togggle a randomly chosen 0
+            const size_t targetzero = rand.GetUInt(walker.GetSize() - num_ones);
+            size_t zerocount = 0;
+            size_t pos;
+            for (pos = 0; zerocount < targetzero; ++pos) {
+              if (!walker[pos]) ++zerocount;
+            }
+            walker.Toggle(pos);
+          }
 
         }
 
