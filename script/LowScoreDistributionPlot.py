@@ -52,6 +52,11 @@ df_data['Metric'] = df_data.apply(
     axis=1
 )
 
+df_data['Match Score'] = df_data.apply(
+    lambda x: x['Match Score'] + np.random.normal(0, 1e-8),
+    axis=1
+)
+
 print("data crunched!")
 
 g = sns.FacetGrid(
@@ -59,6 +64,7 @@ g = sns.FacetGrid(
     col='Metric',
     row='Dimension',
     hue='Dimension Type',
+    sharey=False,
     margin_titles=True,
     row_order=(
         sorted(
@@ -70,7 +76,7 @@ g = sns.FacetGrid(
         )
     )
 ).set(xlim=(0, 1))
-g.map(sns.distplot, "Match Score", kde=False)
+g.map(sns.distplot, "Match Score", hist=False, rug=True)
 
 plt.savefig(
     kn.pack({
