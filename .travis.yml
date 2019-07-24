@@ -23,6 +23,8 @@ install:
 script:
 - (for i in {1..8}; do echo "keep travis alive" && sleep 300; done) &
 - make test
+# kill forked keep-alive process after compilation complete
+- pkill -P $$
 
 after_success:
 - git config --global user.email "travis@travis-ci.org"
