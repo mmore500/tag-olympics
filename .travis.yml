@@ -21,6 +21,7 @@ install:
 - git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && git pull && ./emsdk install latest && ./emsdk activate latest && . ./emsdk_env.sh && cd ..
 
 script:
+- (for i in {1..8}; do echo "keep travis alive" && sleep 300; done) &
 - make test
 
 after_success:
