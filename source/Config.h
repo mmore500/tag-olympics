@@ -25,6 +25,12 @@ EMP_BUILD_CONFIG(
   VALUE(LMG_NSAMPLES, size_t, 100, "Number of sample graphs to study"),
   VALUE(LMG_TITLE, std::string, "low-graph-analysis", "Default out filename"),
 
+  GROUP(LOW_MAKE_DIGRAPH, "Settings to generate weighted directed graph from match scores"),
+  VALUE(LMD_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a BitSet"),
+  VALUE(LMD_NNODES, size_t, 50, "Number of nodes in each graph"),
+  VALUE(LMD_NSAMPLES, size_t, 100, "Number of sample graphs to study"),
+  VALUE(LMD_TITLE, std::string, "low-digraph-analysis", "Default out filename"),
+
   GROUP(LOW_TRIPLET_ANALYSIS, "Settings for low-triplet-analysis experiment"),
   VALUE(LTA_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a bitstring"),
   VALUE(LTA_NSAMPLES, size_t, 20000, "Number of sample graphs to study"),

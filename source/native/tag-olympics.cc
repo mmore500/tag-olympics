@@ -10,6 +10,7 @@
 
 #include "../Config.h"
 #include "../LowMutationalWalk.h"
+#include "../LowMakeDigraph.h"
 #include "../LowMakeGraph.h"
 #include "../LowTripletAnalysis.h"
 #include "../LowSpecificityAnalysis.h"
@@ -52,6 +53,9 @@ int main(int argc, char* argv[])
   } else if (res->at(0) == "LMW") {
     std::cout << "running mode: " << res->at(0) << std::endl;
     LowMutationalWalk(metrics, cfg);
+  } else if (res->at(0) == "LMD") {
+    std::cout << "running mode: " << res->at(0) << std::endl;
+    LowMakeDigraph(metrics, cfg);
   } else if (res->at(0) == "LMG") {
     std::cout << "running mode: " << res->at(0) << std::endl;
     LowMakeGraph(metrics, cfg);
