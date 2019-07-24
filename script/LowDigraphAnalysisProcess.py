@@ -73,51 +73,56 @@ for (metric, sample), df in tqdm(in_df.groupby(["Metric", "Sample"])):
         "Minimum Spanning Weight" : nx.minimum_spanning_tree(G.to_undirected()).size(weight='weight')
     })
 
-
+outfile = kn.pack({
+    'title' : kn.unpack(dataframe_filename)['title'] + "-stats",
+    'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
+    'seed' : kn.unpack(dataframe_filename)['seed'],
+    '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.csv'
+})
 pd.DataFrame.from_records(out).to_csv(
-    kn.pack({
-        'title' : kn.unpack(dataframe_filename)['title'] + "-stats",
-        'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
-        'seed' : kn.unpack(dataframe_filename)['seed'],
-        '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
-        '_script_fullcat_hash' : fsh.FilesHash(
-                                    file_parcel="full_parcel",
-                                    files_join="cat_join"
-                                ).hash_files([sys.argv[0]]),
-        # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
-        'ext' : '.csv'
-    }),
+    outfile,
     index=False
 )
+print("output saved to", outfile)
 
+outfile = kn.pack({
+    'title' : kn.unpack(dataframe_filename)['title'] + "-eigenvector-centralities",
+    'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
+    'seed' : kn.unpack(dataframe_filename)['seed'],
+    '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.csv'
+})
 pd.DataFrame.from_records(out_egv_centralities).to_csv(
-    kn.pack({
-        'title' : kn.unpack(dataframe_filename)['title'] + "-eigenvector-centralities",
-        'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
-        'seed' : kn.unpack(dataframe_filename)['seed'],
-        '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
-        '_script_fullcat_hash' : fsh.FilesHash(
-                                    file_parcel="full_parcel",
-                                    files_join="cat_join"
-                                ).hash_files([sys.argv[0]]),
-        # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
-        'ext' : '.csv'
-    }),
+    outfile,
     index=False
 )
+print("output saved to", outfile)
 
+outfile = kn.pack({
+    'title' : kn.unpack(dataframe_filename)['title'] + "-load-centralities",
+    'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
+    'seed' : kn.unpack(dataframe_filename)['seed'],
+    '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.csv'
+})
 pd.DataFrame.from_records(out_load_centralities).to_csv(
-    kn.pack({
-        'title' : kn.unpack(dataframe_filename)['title'] + "-load-centralities",
-        'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
-        'seed' : kn.unpack(dataframe_filename)['seed'],
-        '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
-        '_script_fullcat_hash' : fsh.FilesHash(
-                                    file_parcel="full_parcel",
-                                    files_join="cat_join"
-                                ).hash_files([sys.argv[0]]),
-        # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
-        'ext' : '.csv'
-    }),
+    outfile,
     index=False
 )
+print("output saved to", outfile)

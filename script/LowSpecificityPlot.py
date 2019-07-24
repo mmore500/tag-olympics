@@ -73,20 +73,22 @@ g = sns.FacetGrid(
 ).set(xlim=(0, 1))
 g.map(sns.distplot, "Tag Mean Match Score", kde=False)
 
+outfile = kn.pack({
+    'title' : kn.unpack(dataframe_filename)['title'],
+    'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
+    'seed' : kn.unpack(dataframe_filename)['seed'],
+    '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
 plt.savefig(
-    kn.pack({
-        'title' : kn.unpack(dataframe_filename)['title'],
-        'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
-        'seed' : kn.unpack(dataframe_filename)['seed'],
-        '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
-        '_script_fullcat_hash' : fsh.FilesHash(
-                                    file_parcel="full_parcel",
-                                    files_join="cat_join"
-                                ).hash_files([sys.argv[0]]),
-        # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
-        'ext' : '.pdf'
-    }),
+    outfile,
     transparent=True,
     bbox_inches='tight',
     pad_inches=0
 )
+print("output saved to", outfile)
