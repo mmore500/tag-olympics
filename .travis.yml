@@ -8,7 +8,7 @@ node_js:
 before_install:
 - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 - sudo apt-get update -qq
-- sudo fallocate -l 4G /swapfile
+- sudo fallocate -l 16G /swapfile
 - sudo chmod 600 /swapfile
 - sudo mkswap /swapfile
 - sudo swapon /swapfile
