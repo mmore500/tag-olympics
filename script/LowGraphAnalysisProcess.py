@@ -13,6 +13,7 @@ in_df = pd.read_csv(dataframe_filename)
 out = list()
 out_egv_centralities = list()
 out_load_centralities = list()
+out_clusterings = list()
 
 for (metric, sample), df in tqdm(in_df.groupby(["Metric", "Sample"])):
 
@@ -32,9 +33,11 @@ for (metric, sample), df in tqdm(in_df.groupby(["Metric", "Sample"])):
 
     egv_cs = nx.katz_centrality(G, weight="weight")
     load_cs = nx.load_centrality(G, weight="weight")
+    clusterings = nx.clustering(G, weight="weight")
 
     egv_cvals = list(egv_cs.values())
     load_cvals = list(load_cs.values())
+    clustering_vals = list(clusterings.values())
 
     for node, val in egv_cs.items():
         out_egv_centralities.append({
@@ -52,6 +55,14 @@ for (metric, sample), df in tqdm(in_df.groupby(["Metric", "Sample"])):
             "Centrality" : val
         })
 
+    for node, val in clusterings.items():
+        out_clusterings.append({
+            "Metric" : metric,
+            "Sample" : sample,
+            "Node" : node,
+            "Clustering" : val
+        })
+
     out.append({
         "Metric" : metric,
         "Sample" : sample,
@@ -60,6 +71,9 @@ for (metric, sample), df in tqdm(in_df.groupby(["Metric", "Sample"])):
         "Maximum Load Centrality" : np.max(load_cvals),
         "Median Load Centrality" : np.median(load_cvals),
         "Load Centrality Variance" : np.var(load_cvals),
+        "Maximum Clustering" : np.max(clustering_vals),
+        "Median Clustering" : np.median(clustering_vals),
+        "Clustering Variance" : np.var(clustering_vals),
         "Minimum Spanning Weight" : nx.minimum_spanning_tree(G).size(weight='weight')
     })
 
@@ -112,6 +126,24 @@ outfile = kn.pack({
     'ext' : '.csv'
 })
 pd.DataFrame.from_records(out_load_centralities).to_csv(
+    outfile,
+    index=False
+)
+print("output saved to", outfile)
+
+outfile = kn.pack({
+    'title' : kn.unpack(dataframe_filename)['title'] + "-clusterings",
+    'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
+    'seed' : kn.unpack(dataframe_filename)['seed'],
+    '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.csv'
+})
+pd.DataFrame.from_records(out_clusterings).to_csv(
     outfile,
     index=False
 )

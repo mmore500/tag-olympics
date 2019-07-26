@@ -14,6 +14,8 @@ from fileshash import fileshash as fsh
 # open-type fonts
 matplotlib.rcParams['pdf.fonttype'] = 42
 
+name = sys.argv[3]
+
 dataframe_filename = sys.argv[2]
 
 df_key = pd.read_csv(sys.argv[1])
@@ -61,8 +63,8 @@ df_data['Metric'] = df_data.apply(
     axis=1
 )
 
-df_data['Centrality'] = df_data.apply(
-    lambda x: x['Centrality'] + np.random.normal(0, 1e-8),
+df_data[name] = df_data.apply(
+    lambda x: x[name] + np.random.normal(0, 1e-8),
     axis=1
 )
 
@@ -98,7 +100,7 @@ g = sns.FacetGrid(
         )
     )
 )
-g.map(sns.distplot, "Centrality", hist=False, rug=True)
+g.map(sns.distplot, name, hist=False, rug=True)
 
 outfile = kn.pack({
     'title' : kn.unpack(dataframe_filename)['title'],
