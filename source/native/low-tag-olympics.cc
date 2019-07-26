@@ -17,6 +17,7 @@
 #include "../LowScoreDistribution.h"
 #include "../MakeMetricKey.h"
 #include "../Metrics.h"
+#include "../MetricsAll.h"
 
 // This is the main function for the NATIVE version of Tag Olympics.
 
@@ -44,7 +45,8 @@ int main(int argc, char* argv[])
 
   const auto res = am.UseArg("_positional");
 
-  const Metrics metrics;
+  const MetricsAll m;
+  const Metrics::collection_t & metrics = m.mets;
 
   if (!res) {
     std::cout << "no run type provided" << std::endl;

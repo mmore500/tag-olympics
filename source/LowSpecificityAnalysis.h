@@ -15,7 +15,7 @@
 #include "Config.h"
 #include "Metrics.h"
 
-void LowSpecificityAnalysis(const Metrics &metrics, const Config &cfg) {
+void LowSpecificityAnalysis(const Metrics::collection_t &metrics, const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
@@ -51,7 +51,7 @@ void LowSpecificityAnalysis(const Metrics &metrics, const Config &cfg) {
   df.AddMean(match_node, "Tag Mean Match Score", "TODO", true);
   df.PrintHeaderKeys();
 
-  for (const auto & mptr : metrics.mets) {
+  for (const auto & mptr : metrics) {
     const auto & metric = *mptr;
 
     // filter out non-interesting data

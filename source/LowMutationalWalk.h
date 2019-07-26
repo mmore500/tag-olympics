@@ -14,7 +14,7 @@
 #include "Config.h"
 #include "Metrics.h"
 
-void LowMutationalWalk(const Metrics &metrics, const Config &cfg) {
+void LowMutationalWalk(const Metrics::collection_t &metrics, const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
@@ -51,7 +51,7 @@ void LowMutationalWalk(const Metrics &metrics, const Config &cfg) {
   df.AddVar(match, "Match Score");
   df.PrintHeaderKeys();
 
-  for (const auto & mptr : metrics.mets) {
+  for (const auto & mptr : metrics) {
     const auto & metric = *mptr;
 
     // filter out non-interesting data

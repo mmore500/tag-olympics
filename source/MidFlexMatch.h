@@ -12,11 +12,13 @@
 #include "tools/File.h"
 
 #include "Config.h"
+#include "Metrics.h"
 #include "MidOrganism.h"
 
-void MidFlexMatch(const Config &cfg) {
+void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
-  emp::StreakMetric<32> metric;
+  for (const auto & mptr : metrics) {
+  const auto & metric = *mptr;
 
   emp::Random rand(cfg.SEED());
 
@@ -111,6 +113,9 @@ void MidFlexMatch(const Config &cfg) {
     + "bitweight="
     + emp::to_string(cfg.MO_BITWEIGHT())
     + "+"
+    + "metric="
+    + emp::slugify(metric.name())
+    + "+"
     + "title="
     + cfg.MFM_TITLE()
     + "-systematics"
@@ -177,6 +182,7 @@ void MidFlexMatch(const Config &cfg) {
     grid_world.InjectAt(org, i);
   }
 
+  std::cout << "Metric " << metric.name() << std::endl;
   for (size_t g = 0; g < cfg.MFM_GENS(); ++g) {
     grid_world.Update();
     std::cout << ".";
@@ -184,6 +190,6 @@ void MidFlexMatch(const Config &cfg) {
   }
 
   std::cout << std::endl;
-  grid_world.PrintGrid();
 
+  }
 }

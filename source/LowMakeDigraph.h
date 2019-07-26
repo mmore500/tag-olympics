@@ -13,7 +13,7 @@
 #include "Config.h"
 #include "Metrics.h"
 
-void LowMakeDigraph(const Metrics &metrics, const Config &cfg) {
+void LowMakeDigraph(const Metrics::collection_t &metrics, const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
@@ -63,7 +63,7 @@ void LowMakeDigraph(const Metrics &metrics, const Config &cfg) {
       rights.emplace_back(rand, cfg.LMD_BITWEIGHT());
     }
 
-    for (const auto & mptr : metrics.mets) {
+    for (const auto & mptr : metrics) {
       const auto & metric = *mptr;
       name = metric.name() + " Distance";
 

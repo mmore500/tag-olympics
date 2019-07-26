@@ -13,7 +13,7 @@
 #include "Config.h"
 #include "Metrics.h"
 
-void LowTripletAnalysis(const Metrics &metrics, const Config &cfg) {
+void LowTripletAnalysis(const Metrics::collection_t &metrics, const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
@@ -53,7 +53,7 @@ void LowTripletAnalysis(const Metrics &metrics, const Config &cfg) {
     emp::BitSet<32> bs_y(rand, cfg.LTA_BITWEIGHT());
     emp::BitSet<32> bs_z(rand, cfg.LTA_BITWEIGHT());
 
-    for (const auto & mptr : metrics.mets) {
+    for (const auto & mptr : metrics) {
       const auto & metric = *mptr;
       name = metric.name() + " Distance";
       detdiff = (metric(bs_x, bs_y) + metric(bs_y, bs_z) - metric(bs_x, bs_z));

@@ -11,9 +11,12 @@
 #include "tools/string_utils.h"
 
 #include "Config.h"
-// #include "Metrics.h"
+#include "Metrics.h"
 
-void MakeMetricKey(const Metrics &metrics, const Config &cfg) {
+void MakeMetricKey(
+  const Metrics::collection_t &metrics,
+  const Config &cfg
+) {
 
   std::string name;
   size_t dim;
@@ -46,7 +49,7 @@ void MakeMetricKey(const Metrics &metrics, const Config &cfg) {
   df.AddVar(dim_type, "Dimension Type");
   df.PrintHeaderKeys();
 
-  for (const auto & mptr : metrics.mets) {
+  for (const auto & mptr : metrics) {
     const auto & metric = *mptr;
 
     name = metric.name() + " Distance";

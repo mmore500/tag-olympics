@@ -13,7 +13,7 @@
 #include "Config.h"
 #include "Metrics.h"
 
-void LowScoreDistribution(const Metrics &metrics, const Config &cfg) {
+void LowScoreDistribution(const Metrics::collection_t &metrics, const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
@@ -51,7 +51,7 @@ void LowScoreDistribution(const Metrics &metrics, const Config &cfg) {
     emp::BitSet<32> bs_a(rand, cfg.LSD_BITWEIGHT());
     emp::BitSet<32> bs_b(rand, cfg.LSD_BITWEIGHT());
 
-    for (const auto & mptr : metrics.mets) {
+    for (const auto & mptr : metrics) {
       const auto & metric = *mptr;
 
       // filter out non-interesting data

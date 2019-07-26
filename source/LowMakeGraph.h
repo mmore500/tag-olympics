@@ -13,7 +13,7 @@
 #include "Config.h"
 #include "Metrics.h"
 
-void LowMakeGraph(const Metrics &metrics, const Config &cfg) {
+void LowMakeGraph(const Metrics::collection_t &metrics, const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
@@ -60,7 +60,7 @@ void LowMakeGraph(const Metrics &metrics, const Config &cfg) {
       bs.emplace_back(rand, cfg.LMG_BITWEIGHT());
     }
 
-    for (const auto & mptr : metrics.mets) {
+    for (const auto & mptr : metrics) {
       const auto & metric = *mptr;
       name = metric.name() + " Distance";
 
