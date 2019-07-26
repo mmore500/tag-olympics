@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cmath>
 
+#include "base/Ptr.h"
+
 #include "Evolve/World.h"
 #include "tools/BitSet.h"
 #include "tools/Random.h"
@@ -50,38 +52,43 @@ void MidFlexMatch(const Config &cfg) {
     + ".csv"
   );
 
-  // grid_world.AddSystematics(
-  //   emp::NewPtr<emp::Systematics<MidOrganism<32>,MidOrganism<32>>>(
-  //     [](MidOrganism<32> & o){return o;},
-  //     true,
-  //     true,
-  //     false
-  //   ),
-  //   "systematics"
-  // );
-  //
-  // grid_world.SetupSystematicsFile(
-  //   "systematics",
-  //   std::string()
-  //   + "bitweight="
-  //   + emp::to_string(cfg.MO_BITWEIGHT())
-  //   + "+"
-  //   + "title="
-  //   + cfg.MFM_TITLE()
-  //   + "-systematics"
-  //   + "+"
-  //   + "seed="
-  //   + emp::to_string(cfg.SEED())
-  //   // + "+"
-  //   // + "_emp_hash="
-  //   // + STRINGIFY(EMPIRICAL_HASH_)
-  //   // + "+"
-  //   // + "_source_hash="
-  //   // + STRINGIFY(DISHTINY_HASH_)
-  //   + "+"
-  //   + "ext="
-  //   + ".csv"
-  // );
+  grid_world.AddSystematics(
+    emp::NewPtr<
+      emp::Systematics<
+        MidOrganism<32>,
+        MidOrganism<32>
+      >
+    >(
+      [](MidOrganism<32> & o){ return o; },
+      true,
+      true,
+      false
+    ),
+    "systematics"
+  );
+
+  grid_world.SetupSystematicsFile(
+    "systematics",
+    std::string()
+    + "bitweight="
+    + emp::to_string(cfg.MO_BITWEIGHT())
+    + "+"
+    + "title="
+    + cfg.MFM_TITLE()
+    + "-systematics"
+    + "+"
+    + "seed="
+    + emp::to_string(cfg.SEED())
+    // + "+"
+    // + "_emp_hash="
+    // + STRINGIFY(EMPIRICAL_HASH_)
+    // + "+"
+    // + "_source_hash="
+    // + STRINGIFY(DISHTINY_HASH_)
+    + "+"
+    + "ext="
+    + ".csv"
+  );
 
   const size_t side = (size_t) std::sqrt(cfg.MFM_POP_SIZE());
 
