@@ -9,6 +9,7 @@
 #include "tools/BitSet.h"
 #include "tools/Random.h"
 #include "tools/matchbin_utils.h"
+#include "tools/File.h"
 
 #include "Config.h"
 #include "MidOrganism.h"
@@ -19,12 +20,49 @@ void MidFlexMatch(const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
-  emp::vector<emp::vector<double>> target;
-  target.resize(cfg.MO_LENGTH());
+  emp::File f(
+    std::string()
+    + "title="
+    + "graph"
+    + "+"
+    + "seed="
+    + emp::to_string(cfg.SEED())
+    // + "+"
+    // + "_emp_hash="
+    // + STRINGIFY(EMPIRICAL_HASH_)
+    // + "+"
+    // + "_source_hash="
+    // + STRINGIFY(DISHTINY_HASH_)
+    + "+"
+    + "ext="
+    + ".csv"
+  );
 
-  for (size_t i = 0; i < cfg.MO_LENGTH(); ++i) {
-    for (size_t j = 0; j < cfg.MO_LENGTH(); ++j) {
-      target[i].push_back(rand.GetDouble());
+  f.RemoveComments('#');
+
+  emp_assert(f.size() == cfg.MO_LENGTH());
+
+  emp::vector<emp::vector<double>> target(
+    cfg.MO_LENGTH(),
+    emp::vector<double>(cfg.MO_LENGTH(), 1.0)
+  );
+  for (size_t i = 0; i < target.size(); ++i) {
+    // mark self loops and duplicate non-edges to be ignored
+    target[i][i] = -1.0;
+    for (size_t j = i; j < target.size(); ++j) target[i][j] = -1.0;
+  }
+
+  size_t edge_count = 0;
+  while (f.size()) {
+    auto res = f.ExtractRowAs<size_t>();
+    for (size_t i = 1; i < res.size(); ++i) {
+      target[res[0]][i] = rand.GetDouble(cfg.MFM_TARGET_MAX());
+      target[i][res[0]] = -1.0;
+
+      // randomly choose edge direction
+      if (rand.P(0.5)) std::swap(target[res[0]][i], target[i][res[0]]);
+
+      ++edge_count;
     }
   }
 
@@ -95,17 +133,31 @@ void MidFlexMatch(const Config &cfg) {
   grid_world.SetPopStruct_Grid(side, side);
   grid_world.SetFitFun([&target, &cfg, &metric](MidOrganism<32> & org){
 
-    double res = 1.0;
+    double res = 0.0;
+    double worst = 0.0;
 
     for (size_t i = 0; i < cfg.MO_LENGTH(); ++i) {
       for (size_t j = 0; j < cfg.MO_LENGTH(); ++j) {
-        if (i != j) res -= std::abs(
+
+        if (target[i][j] == -1.0) continue;
+
+        worst += 1.0 - (
+          target[i][j] == 1.0
+          ? cfg.MFM_NOMATCH_THRESH()
+          : cfg.MFM_MATCH_THRESH()
+        );
+
+        res += (target[i][j] == 1.0)
+        ? std::max(0.0, std::abs(
           target[i][j] - metric(org.Get(i), org.Get(j))
-        ) / (cfg.MO_LENGTH() * cfg.MO_LENGTH() - cfg.MO_LENGTH());
+        ) - cfg.MFM_NOMATCH_THRESH())
+        : std::max(0.0, std::abs(
+          target[i][j] - metric(org.Get(i), org.Get(j))
+        ) - cfg.MFM_MATCH_THRESH());
       }
     }
 
-    return res;
+    return 1.0 - res/worst;
 
   });
   grid_world.SetAutoMutate();

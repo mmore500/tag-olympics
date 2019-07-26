@@ -60,6 +60,25 @@ EMP_BUILD_CONFIG(
   VALUE(MFM_POP_SIZE, size_t, 100, "TODO"),
   VALUE(MFM_TOURNEY_SIZE, size_t, 2, "TODO"),
   VALUE(MFM_TOURNEY_REPS, size_t, 50, "TODO"),
+  VALUE(MFM_EDGES_PER_NODE, size_t, 5, "TODO"),
+  VALUE(
+    MFM_TARGET_MAX,
+    double,
+    0.0,
+    "What should the maximum randomly generated match target be?"
+  ),
+  VALUE(
+    MFM_MATCH_THRESH,
+    double,
+    0.1,
+    "Any match score under this threshold is considered a perfect match"
+  ),
+  VALUE(
+    MFM_NOMATCH_THRESH,
+    double,
+    0.5,
+    "Any match score under this threshold is considered a perfect non-match"
+  ),
   VALUE(MFM_TITLE, std::string, "mid-flex-match", "Default out filename")
 
 )
