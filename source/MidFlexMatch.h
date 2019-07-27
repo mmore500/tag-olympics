@@ -2,18 +2,51 @@
 
 #include <iostream>
 #include <cmath>
+#include <unordered_map>
+#include <filesystem>
+#include <cstdlib>
 
 #include "base/Ptr.h"
 
 #include "Evolve/World.h"
 #include "tools/BitSet.h"
 #include "tools/Random.h"
+#include "tools/MatchBin.h"
 #include "tools/matchbin_utils.h"
 #include "tools/File.h"
+#include "tools/keyname_utils.h"
 
 #include "Config.h"
 #include "Metrics.h"
 #include "MidOrganism.h"
+
+template<size_t Width>
+struct WrapperMetric : public emp::BaseMetric<
+  emp::BitSet<Width>, emp::BitSet<Width>
+> {
+
+  emp::Ptr<const emp::BaseMetric<
+    emp::BitSet<Width>, emp::BitSet<Width>
+  >> metric;
+
+  using query_t = emp::BitSet<Width>;
+  using tag_t = emp::BitSet<Width>;
+
+  size_t dim() const override { return metric->dim(); }
+
+  size_t width() const override { return metric->width(); }
+
+  std::string name() const override {
+    return metric->name();
+  }
+
+  std::string base() const override { return metric->base(); }
+
+  double operator()(const query_t& a, const tag_t& b) const override {
+    return (*metric)(a,b);
+  }
+
+};
 
 void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
@@ -22,23 +55,36 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
-  emp::File f(
-    std::string()
-    + "title="
-    + "graph"
-    + "+"
-    + "seed="
-    + emp::to_string(cfg.SEED())
-    // + "+"
-    // + "_emp_hash="
-    // + STRINGIFY(EMPIRICAL_HASH_)
-    // + "+"
-    // + "_source_hash="
-    // + STRINGIFY(DISHTINY_HASH_)
-    + "+"
-    + "ext="
-    + ".csv"
-  );
+  std::string graph_source;
+  for(auto& p: std::filesystem::directory_iterator(".")) {
+    if (
+      const auto res = emp::keyname::unpack(p.path());
+      res.count("title") && res.at("title") == "mid-graph"
+      && res.count("ext") && res.at("ext") == ".csv"
+      && res.count("seed") && res.at("seed") == emp::to_string(cfg.SEED())
+      && res.count("node-count")
+        && res.at("node-count") == emp::to_string(cfg.MO_LENGTH())
+      && res.count("base-degree")
+      && res.count("extra-edges")
+    ) {
+      if (graph_source.size()) {
+        std::cerr << "conflicting graph source files" << std::endl;
+        std::cerr << graph_source << std::endl;
+        std::cerr << p.path() << std::endl;
+        std::cerr << "exiting..." << std::endl;
+        std::exit(EXIT_FAILURE);
+      }
+      graph_source = p.path();
+    }
+  }
+
+  if (!graph_source.size()) {
+    std::cerr << "no graph source file found" << std::endl;
+    std::cerr << "exiting..." << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  emp::File f(graph_source);
 
   f.RemoveComments('#');
 
@@ -55,6 +101,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   }
 
   size_t edge_count = 0;
+  std::unordered_map<size_t, size_t> incoming_edge_counts;
   while (f.size()) {
     auto res = f.ExtractRowAs<size_t>();
     for (size_t i = 1; i < res.size(); ++i) {
@@ -62,7 +109,12 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
       target[i][res[0]] = -1.0;
 
       // randomly choose edge direction
-      if (rand.P(0.5)) std::swap(target[res[0]][i], target[i][res[0]]);
+      if (rand.P(0.5)) {
+        std::swap(target[res[0]][i], target[i][res[0]]);
+        incoming_edge_counts[res[0]]++;
+      } else {
+        incoming_edge_counts[i]++;
+      }
 
       ++edge_count;
     }
@@ -70,27 +122,18 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
   emp::World<MidOrganism<32>> grid_world(rand);
 
-  grid_world.SetupFitnessFile(
-    std::string()
-    + "bitweight="
-    + emp::to_string(cfg.MO_BITWEIGHT())
-    + "+"
-    + "title="
-    + cfg.MFM_TITLE()
-    + "-fitness"
-    + "+"
-    + "seed="
-    + emp::to_string(cfg.SEED())
-    // + "+"
-    // + "_emp_hash="
-    // + STRINGIFY(EMPIRICAL_HASH_)
-    // + "+"
-    // + "_source_hash="
-    // + STRINGIFY(DISHTINY_HASH_)
-    + "+"
-    + "ext="
-    + ".csv"
-  );
+  grid_world.SetupFitnessFile(emp::keyname::pack({
+    {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
+    {"metric", emp::slugify(metric.name())},
+    {"title", cfg.MFM_TITLE() + "-fitness"},
+    {"seed", emp::to_string(cfg.SEED())},
+    {"node-count", emp::keyname::unpack(graph_source).at("node-count")},
+    {"base-degree", emp::keyname::unpack(graph_source).at("base-degree")},
+    {"extra-edges", emp::keyname::unpack(graph_source).at("extra-edges")},
+    // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
+    // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
+    {"ext", ".csv"}
+  }));
 
   grid_world.AddSystematics(
     emp::NewPtr<
@@ -109,62 +152,88 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
   grid_world.SetupSystematicsFile(
     "systematics",
-    std::string()
-    + "bitweight="
-    + emp::to_string(cfg.MO_BITWEIGHT())
-    + "+"
-    + "metric="
-    + emp::slugify(metric.name())
-    + "+"
-    + "title="
-    + cfg.MFM_TITLE()
-    + "-systematics"
-    + "+"
-    + "seed="
-    + emp::to_string(cfg.SEED())
-    // + "+"
-    // + "_emp_hash="
-    // + STRINGIFY(EMPIRICAL_HASH_)
-    // + "+"
-    // + "_source_hash="
-    // + STRINGIFY(DISHTINY_HASH_)
-    + "+"
-    + "ext="
-    + ".csv"
+    emp::keyname::pack({
+      {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
+      {"metric", emp::slugify(metric.name())},
+      {"title", cfg.MFM_TITLE() + "-systematics"},
+      {"seed", emp::to_string(cfg.SEED())},
+      {"node-count", emp::keyname::unpack(graph_source).at("node-count")},
+      {"base-degree", emp::keyname::unpack(graph_source).at("base-degree")},
+      {"extra-edges", emp::keyname::unpack(graph_source).at("extra-edges")},
+      {"extra-edges", emp::keyname::unpack(graph_source).at("extra-edges")},
+      {"fitness", cfg.MFM_RANKED() ? "ranked" : "scored"},
+      // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
+      // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
+      {"ext", ".csv"}
+    })
   );
 
   const size_t side = (size_t) std::sqrt(cfg.MFM_POP_SIZE());
 
   grid_world.SetPopStruct_Grid(side, side);
-  grid_world.SetFitFun([&target, &cfg, &metric](MidOrganism<32> & org){
+  if (cfg.MFM_RANKED()) {
+    grid_world.SetFitFun(
+      [&target, &cfg, &metric, &incoming_edge_counts](MidOrganism<32> & org){
 
-    double res = 0.0;
-    double worst = 0.0;
+        emp::MatchBin<size_t, WrapperMetric<32>, emp::RankedSelector<>> mb;
+        mb.metric.metric = &metric;
 
-    for (size_t i = 0; i < cfg.MO_LENGTH(); ++i) {
-      for (size_t j = 0; j < cfg.MO_LENGTH(); ++j) {
+        for(size_t i = 0; i < cfg.MO_LENGTH(); ++i) {
+          mb.Put(i, org.Get(i));
+        }
 
-        if (target[i][j] == -1.0) continue;
+        size_t worst = 0;
+        double res = 0.0;
 
-        worst += 1.0 - (
-          target[i][j] == 1.0
-          ? cfg.MFM_NOMATCH_THRESH()
-          : cfg.MFM_MATCH_THRESH()
-        );
+        for (size_t i = 0; i < cfg.MO_LENGTH(); ++i) {
+          for (size_t j = 0; j < cfg.MO_LENGTH(); ++j) {
+            if (target[i][j] == -1.0) continue;
 
-        res += (target[i][j] == 1.0)
-        ? std::max(0.0, std::abs(
-          target[i][j] - metric(org.Get(i), org.Get(j))
-        ) - cfg.MFM_NOMATCH_THRESH())
-        : std::max(0.0, std::abs(
-          target[i][j] - metric(org.Get(i), org.Get(j))
-        ) - cfg.MFM_MATCH_THRESH());
+            ++worst;
+
+            if (auto resp = mb.GetVals(
+                    mb.Match(org.Get(i), incoming_edge_counts[j])
+                  ); !std::count(resp.begin(), resp.end(), j)
+                ) res += metric(org.Get(i), org.Get(j));
+
+          }
+        }
+
+        return 1.0 - res/worst;
       }
-    }
+    );
+  } else {
+    grid_world.SetFitFun(
+      [&target, &cfg, &metric](MidOrganism<32> & org){
 
-    return 1.0 - res/worst;
+        double res = 0.0;
+        double worst = 0.0;
 
-  });
+        for (size_t i = 0; i < cfg.MO_LENGTH(); ++i) {
+          for (size_t j = 0; j < cfg.MO_LENGTH(); ++j) {
+
+            if (target[i][j] == -1.0) continue;
+
+            worst += 1.0 - (
+              target[i][j] == 1.0
+              ? cfg.MFM_NOMATCH_THRESH()
+              : cfg.MFM_MATCH_THRESH()
+            );
+
+            res += (target[i][j] == 1.0)
+            ? std::max(0.0, std::abs(
+              target[i][j] - metric(org.Get(i), org.Get(j))
+            ) - cfg.MFM_NOMATCH_THRESH())
+            : std::max(0.0, std::abs(
+              target[i][j] - metric(org.Get(i), org.Get(j))
+            ) - cfg.MFM_MATCH_THRESH());
+          }
+        }
+
+        return 1.0 - res/worst;
+      }
+    );
+  }
   grid_world.SetAutoMutate();
   grid_world.OnUpdate([&grid_world, &cfg](size_t upd){
     emp::TournamentSelect(
