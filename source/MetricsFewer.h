@@ -70,7 +70,7 @@ struct AddDim {
 
     } else if constexpr (Dim < 4) {
 
-      AddDim<Dim*2>::template append<typename AddDim<Dim*2>::pack_t>(c);
+      AddDim<Dim*4>::template append<typename AddDim<Dim*4>::pack_t>(c);
 
     }
 
