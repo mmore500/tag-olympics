@@ -10,6 +10,7 @@
 #include "config/ArgManager.h"
 #include "data/DataFile.h"
 #include "tools/string_utils.h"
+#include "tools/keyname_utils.h"
 
 #include "Config.h"
 #include "Metrics.h"
@@ -24,26 +25,14 @@ void LowMutationalWalk(const Metrics::collection_t &metrics, const Config &cfg) 
   std::string name;
   double match;
 
-  emp::DataFile df(
-    std::string()
-    + "bitweight="
-    + emp::to_string(cfg.LMW_BITWEIGHT())
-    + "+"
-    + "title="
-    + cfg.LMW_TITLE()
-    + "+"
-    + "seed="
-    + emp::to_string(cfg.SEED())
-    // + "+"
-    // + "_emp_hash="
-    // + STRINGIFY(EMPIRICAL_HASH_)
-    // + "+"
-    // + "_source_hash="
-    // + STRINGIFY(DISHTINY_HASH_)
-    + "+"
-    + "ext="
-    + ".csv"
-  );
+  emp::DataFile df(emp::keyname::pack({
+    {"bitweight", emp::to_string(cfg.LMW_BITWEIGHT())},
+    {"title", cfg.LMW_TITLE()},
+    {"seed", emp::to_string(cfg.SEED())},
+    // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
+    // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
+    {"ext", ".csv"}
+  }));
   df.AddVar(s, "Sample");
   df.AddVar(r, "Replicate");
   df.AddVar(step, "Mutational Step");
