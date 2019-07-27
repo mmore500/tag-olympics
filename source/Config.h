@@ -56,10 +56,10 @@ EMP_BUILD_CONFIG(
   VALUE(MO_MUT_BIT_REDRAW_PER_BIT, double, 0.001, "TODO"),
 
   GROUP(MID_FLEX_MATCH, "Settings for mid-flex-match experiment"),
-  VALUE(MFM_GENS, size_t, 4000, "TODO"),
+  VALUE(MFM_GENS, size_t, 200, "TODO"),
   VALUE(MFM_POP_SIZE, size_t, 100, "TODO"),
   VALUE(MFM_TOURNEY_SIZE, size_t, 2, "TODO"),
-  VALUE(MFM_TOURNEY_REPS, size_t, 100, "TODO"),
+  VALUE(MFM_TOURNEY_REPS, size_t, 2000, "TODO"),
   VALUE(MFM_EDGES_PER_NODE, size_t, 5, "TODO"),
   VALUE(
     MFM_TARGET_MAX,
