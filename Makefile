@@ -7,7 +7,7 @@ CFLAGS_all := -Wall -Wno-unused-function -std=c++17 -I$(EMP_DIR)/
 
 # Native compiler information
 CXX_nat := g++
-CFLAGS_nat := -Og -DNDEBUG $(CFLAGS_all)
+CFLAGS_nat := -O3 -DNDEBUG $(CFLAGS_all)
 CFLAGS_nat_debug := -g -v $(CFLAGS_all)
 
 # Emscripten compiler information
