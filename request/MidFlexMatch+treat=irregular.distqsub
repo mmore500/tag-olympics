@@ -7,4 +7,4 @@ set beacon_priority y
 set config_dir /mnt/scratch/mmore500/mfm/config
 set dest_dir /mnt/scratch/mmore500/mfm/data
 
-1001..1020 mfm-irregular module purge; module load gcc/7.3.0-2.30; singularity exec -B $(pwd):/pwd tag-olympics.simg bash -c "cd /pwd && python3 /opt/tag-olympics/script/MidGenerateGraph.py  $seed 16 0 16" && ./mid-tag-olympics MFM -SEED $seed
+1001..1020 mfm-irregular singularity exec -B $(pwd):/pwd tag-olympics.simg bash -c "cd /pwd && python3 /opt/tag-olympics/script/MidGenerateGraph.py $seed 16 0 16 && mid-tag-olympics MFM -SEED $seed"

@@ -25,6 +25,9 @@ native: low-$(PROJECT) mid-$(PROJECT)
 web: $(PROJECT).js
 all: $(PROJECT) $(PROJECT).js
 
+static: CFLAGS_nat := -static $(CFLAGS_nat)
+static: low mid
+
 low: low-$(PROJECT)
 mid: mid-$(PROJECT)
 
@@ -37,11 +40,11 @@ debug-web:	$(PROJECT).js
 web-debug:	debug-web
 
 low-$(PROJECT):	source/native/low-$(PROJECT).cc
-	$(CXX_nat) $(CFLAGS_nat) source/native/low-$(PROJECT).cc -o low-$(PROJECT)
+	$(CXX_nat) $(CFLAGS_nat) source/native/low-$(PROJECT).cc -lstdc++fs -o low-$(PROJECT)
 	@echo To build the web version use: make web
 
 mid-$(PROJECT):	source/native/low-$(PROJECT).cc
-	$(CXX_nat) $(CFLAGS_nat) source/native/mid-$(PROJECT).cc -o mid-$(PROJECT)
+	$(CXX_nat) $(CFLAGS_nat) source/native/mid-$(PROJECT).cc -lstdc++fs -o mid-$(PROJECT)
 	@echo To build the web version use: make web
 
 $(PROJECT).js: source/web/$(PROJECT)-web.cc
