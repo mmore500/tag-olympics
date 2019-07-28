@@ -1,0 +1,10 @@
+set email mmore500@msu.edu
+set freq_email Crash
+set description mfm-irregular
+set mem_request 12
+set walltime 160
+set beacon_priority y
+set config_dir /mnt/scratch/mmore500/mfm/config
+set dest_dir /mnt/scratch/mmore500/mfm/data
+
+1001..1020 mfm-irregular module purge; module load gcc/7.3.0-2.30; python script/MidGenerateGraph.py $seed 16 0 16 && ./mid-tag-olympics MFM -SEED $seed
