@@ -29,7 +29,7 @@ low: low-$(PROJECT)
 mid: mid-$(PROJECT)
 
 debug:	CFLAGS_nat := $(CFLAGS_nat_debug)
-debug:	$(PROJECT)
+debug:	native
 
 debug-web:	CFLAGS_web := $(CFLAGS_web_debug)
 debug-web:	$(PROJECT).js
