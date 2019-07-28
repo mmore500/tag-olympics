@@ -1,7 +1,7 @@
 import networkx as nx
 import sys
 import random
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 from keyname import keyname as kn
 
 seed, nodes, degree, extra = map(int, sys.argv[1:])
@@ -14,9 +14,8 @@ nonedges = list(nx.non_edges(G))
 
 G.add_edges_from( random.sample(nonedges, extra) )
 
-nx.draw(G)
-
-plt.show()
+# nx.draw(G)
+# plt.show()
 
 outfile = kn.pack({
     'seed' : seed,
