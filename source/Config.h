@@ -11,6 +11,7 @@ EMP_BUILD_CONFIG(
   GROUP(BASE, "Base settings for all experiments"),
   VALUE(SEED, int, 1, "Random number seed"),
   VALUE(FILENAME, std::string, "configs.cfg", "Default config filename"),
+  VALUE(TREATMENT, std::string, "unspecified", "Treatment specifier"),
 
   GROUP(LOW_MUTATIONAL_WALK, "Settings for low-mutational-walk experiment"),
   VALUE(LMW_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a bitstring"),

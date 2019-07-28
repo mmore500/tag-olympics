@@ -20,6 +20,7 @@ void MakeMetricKey(
 ) {
 
   std::string name;
+  std::string slug;
   size_t dim;
   size_t width;
   bool slide_mod;
@@ -34,6 +35,7 @@ void MakeMetricKey(
     {"ext", ".csv"}
   }));
   df.AddVar(name, "Metric");
+  df.AddVar(slug, "Slug");
   df.AddVar(base, "Base Metric");
   df.AddVar(dim, "Dimension");
   df.AddVar(width, "Width");
@@ -46,6 +48,7 @@ void MakeMetricKey(
     const auto & metric = *mptr;
 
     name = metric.name() + " Distance";
+    slug = emp::slugify(metric.name());
     dim = metric.dim();
     width = metric.width();
     slide_mod = metric.name().find("Sliding") != std::string::npos;
