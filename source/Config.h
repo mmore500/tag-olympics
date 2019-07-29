@@ -52,16 +52,15 @@ EMP_BUILD_CONFIG(
   VALUE(MMK_TITLE, std::string, "metric-key", "Default out filename"),
 
   GROUP(MID_ORGANISM, "Settings for mid-level organism"),
-  VALUE(MO_LENGTH, size_t, 16, "TODO"),
+  VALUE(MO_LENGTH, size_t, 48, "TODO"),
   VALUE(MO_BITWEIGHT, double, 0.5, "TODO"),
   VALUE(MO_MUT_BIT_REDRAW_PER_BIT, double, 0.001, "TODO"),
 
   GROUP(MID_FLEX_MATCH, "Settings for mid-flex-match experiment"),
-  VALUE(MFM_GENS, size_t, 200, "TODO"),
+  VALUE(MFM_GENS, size_t, 100, "TODO"),
   VALUE(MFM_POP_SIZE, size_t, 100, "TODO"),
   VALUE(MFM_TOURNEY_SIZE, size_t, 2, "TODO"),
-  VALUE(MFM_TOURNEY_REPS, size_t, 2000, "TODO"),
-  VALUE(MFM_EDGES_PER_NODE, size_t, 5, "TODO"),
+  VALUE(MFM_TOURNEY_REPS, size_t, 4000, "TODO"),
   VALUE(
     MFM_TARGET_MAX,
     double,
@@ -71,7 +70,7 @@ EMP_BUILD_CONFIG(
   VALUE(
     MFM_MATCH_THRESH,
     double,
-    0.1,
+    0.25,
     "Any match score under this threshold is considered a perfect match"
   ),
   VALUE(
