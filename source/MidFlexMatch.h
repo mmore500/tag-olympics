@@ -181,6 +181,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
         emp::MatchBin<size_t, WrapperMetric<32>, emp::RankedSelector<>> mb;
         mb.metric.metric = &metric;
+        const bool anti = metric.name().find("Inverse") != std::string::npos;
 
         for(size_t i = 0; i < cfg.MO_LENGTH(); ++i) {
           mb.Put(i, org.Get(i));
@@ -196,7 +197,8 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
             ++worst;
 
             if (auto resp = mb.GetVals(
-                    mb.Match(org.Get(i), incoming_edge_counts[j])
+                    // +1 to allow for self-matching in non-anti metrics
+                    mb.Match(org.Get(i), incoming_edge_counts[j] + !anti)
                   );
                 !std::count(resp.begin(), resp.end(), j)
               ) res += metric(org.Get(i), org.Get(j));
