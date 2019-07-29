@@ -10,7 +10,8 @@ random.seed(seed)
 
 G = nx.random_regular_graph(degree, nodes, seed)
 
-nonedges = list(nx.non_edges(G))
+# exclude self-loops
+nonedges = list((a, b) for (a,b) in nx.non_edges(G) if a != b)
 
 G.add_edges_from( random.sample(nonedges, extra) )
 
