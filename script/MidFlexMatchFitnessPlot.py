@@ -143,6 +143,60 @@ assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
 outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
     'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
+    'viz' : 'history',
+    '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
+
+g = sns.FacetGrid(
+    df_data[df_data["Generation"] == df_data["Generation"].max()],
+    col='Metric',
+    row='Dimension',
+    hue='Treatment',
+    margin_titles=True,
+    col_order=(
+        sorted(
+            [x for x in df_data['Metric'].unique() if 'Inverse' in x]
+        ) + sorted(
+            [x for x in df_data['Metric'].unique() if 'Inverse' not in x],
+        )
+    ),
+    row_order=(
+        sorted(
+            [x for x in df_data['Dimension'].unique() if 'Mean' in x],
+            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
+        ) + sorted(
+            [x for x in df_data['Dimension'].unique() if 'Minimum' in x],
+            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
+        )
+    )
+).set(ylim=(0, 1))
+g.map(
+    sns.barplot,
+    'Treatment',
+    'Best Fitness',
+    order=df_data["Treatment"].unique()
+)
+
+assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
+
+outfile = kn.pack({
+    'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
+    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
+    'viz' : 'endstate',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
     '_script_fullcat_hash' : fsh.FilesHash(
                                 file_parcel="full_parcel",
