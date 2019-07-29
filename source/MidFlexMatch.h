@@ -197,8 +197,9 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
             if (auto resp = mb.GetVals(
                     mb.Match(org.Get(i), incoming_edge_counts[j])
-                  ); !std::count(resp.begin(), resp.end(), j)
-                ) res += metric(org.Get(i), org.Get(j));
+                  );
+                !std::count(resp.begin(), resp.end(), j)
+              ) res += metric(org.Get(i), org.Get(j));
 
           }
         }
