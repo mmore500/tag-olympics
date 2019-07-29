@@ -70,7 +70,7 @@ EMP_BUILD_CONFIG(
   VALUE(
     MFM_MATCH_THRESH,
     double,
-    0.1,
+    0.0,
     "Any match score under this threshold is considered a perfect match"
   ),
   VALUE(
