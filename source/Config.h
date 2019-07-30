@@ -63,6 +63,18 @@ EMP_BUILD_CONFIG(
   VALUE(MFM_TOURNEY_SIZE, size_t, 2, "TODO"),
   VALUE(MFM_TOURNEY_REPS, size_t, 4000, "TODO"),
   VALUE(
+    MFM_COMPONENT_WALK_LENGTH,
+    size_t,
+    32,
+    "How many mutational steps to take while tracking cross-component activation?"
+  ),
+  VALUE(
+    MFM_COMPONENT_WALK_REPS,
+    size_t,
+    100,
+    "How many mutational walk reps to perform?"
+  ),
+  VALUE(
     MFM_TARGET_MAX,
     double,
     0.0,

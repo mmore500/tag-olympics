@@ -313,45 +313,170 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
   std::cout << std::endl;
 
-  emp::DataFile df(emp::keyname::pack({
-    {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
-    {"metric-slug", emp::slugify(metric.name())},
-    {"experiment", cfg.MFM_TITLE()},
-    {"datafile", "end-census"},
-    {"treatment", cfg.TREATMENT()},
-    {"seed", emp::to_string(cfg.SEED())},
-    {"node-count", emp::keyname::unpack(graph_source).at("node-count")},
-    {"nodes-per-component", emp::keyname::unpack(graph_source).at("nodes-per-component")},
-    {"base-degree", emp::keyname::unpack(graph_source).at("base-degree")},
-    {"extra-edges", emp::keyname::unpack(graph_source).at("extra-edges")},
-    {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
-    // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
-    // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
-    {"ext", ".csv"}
-  }));
+  [&cfg, &rand, &grid_world, &metric, &graph_source](){
+    emp::DataFile df(emp::keyname::pack({
+      {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
+      {"metric-slug", emp::slugify(metric.name())},
+      {"experiment", cfg.MFM_TITLE()},
+      {"datafile", "end-census"},
+      {"treatment", cfg.TREATMENT()},
+      {"seed", emp::to_string(cfg.SEED())},
+      {"node-count", emp::keyname::unpack(graph_source).at("node-count")},
+      {"nodes-per-component", emp::keyname::unpack(graph_source).at("nodes-per-component")},
+      {"base-degree", emp::keyname::unpack(graph_source).at("base-degree")},
+      {"extra-edges", emp::keyname::unpack(graph_source).at("extra-edges")},
+      {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
+      // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
+      // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
+      {"ext", ".csv"}
+    }));
 
-  size_t pop_id;
-  size_t pos;
-  df.AddVar(pop_id, "Population ID");
-  df.AddVar(pos, "Genome Position");
-  df.AddFun<double>(
-    [&cfg, &rand, &grid_world, &metric, &pop_id, &pos](){
-      const auto & target = grid_world.GetOrg(pop_id).Get(pos);
-      double res = 0.0;
-      for (size_t r = 0; r < cfg.LSA_NREPS(); ++r) {
-        const decltype(target) sample{rand, cfg.MO_BITWEIGHT()};
-        res += metric(target, sample);
+    size_t pop_id;
+    size_t pos;
+    df.AddVar(pop_id, "Population ID");
+    df.AddVar(pos, "Genome Position");
+    df.AddFun<double>(
+      [&cfg, &rand, &grid_world, &metric, &pop_id, &pos](){
+        const auto & target = grid_world.GetOrg(pop_id).Get(pos);
+        double res = 0.0;
+        for (size_t r = 0; r < cfg.LSA_NREPS(); ++r) {
+          const decltype(target) sample{rand, cfg.MO_BITWEIGHT()};
+          res += metric(target, sample);
+        }
+        return res / cfg.LSA_NREPS();
+      },
+      "Specificity"
+    );
+
+    df.PrintHeaderKeys();
+
+    for (pop_id = 0; pop_id < grid_world.size(); ++pop_id) {
+      for (pos = 0; pos < cfg.MO_LENGTH(); ++pos) df.Update();
+    }
+  }();
+
+  [&cfg, &metric, &graph_source, &grid_world, &target, &incoming_edge_counts, nodes_per_component](){
+
+    const MidOrganism<32> & best = [&grid_world](){
+      double best_fit = grid_world.CalcFitnessID(0);
+      size_t best_id = 0;
+
+      // Search for a higher fit org in the tournament.
+      for (size_t i = 1; i < grid_world.size(); i++) {
+        const double cur_fit = grid_world.CalcFitnessID(i);
+        if (cur_fit > best_fit) {
+          best_fit = cur_fit;
+          best_id = i;
+        }
       }
-      return res / cfg.LSA_NREPS();
-    },
-    "Specificity"
-  );
 
-  df.PrintHeaderKeys();
+      return grid_world.GetOrg(best_id);
+    }();
 
-  for (pop_id = 0; pop_id < grid_world.size(); ++pop_id) {
-    for (pos = 0; pos < cfg.MO_LENGTH(); ++pos) df.Update();
-  }
+    emp::DataFile df(emp::keyname::pack({
+      {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
+      {"metric-slug", emp::slugify(metric.name())},
+      {"experiment", cfg.MFM_TITLE()},
+      {"datafile", "cross-component-activation"},
+      {"treatment", cfg.TREATMENT()},
+      {"seed", emp::to_string(cfg.SEED())},
+      {"node-count", emp::keyname::unpack(graph_source).at("node-count")},
+      {"nodes-per-component", emp::keyname::unpack(graph_source).at("nodes-per-component")},
+      {"base-degree", emp::keyname::unpack(graph_source).at("base-degree")},
+      {"extra-edges", emp::keyname::unpack(graph_source).at("extra-edges")},
+      {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
+      // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
+      // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
+      {"ext", ".csv"}
+    }));
+
+    size_t rep;
+    size_t step;
+    double res;
+    std::string measure;
+    df.AddVar(rep, "Replicate");
+    df.AddVar(step, "Mutational Step");
+    df.AddVar(measure, "Cross-Component Activation Measure");
+    df.AddVar(res, "Cross-Component Activation");
+
+    df.PrintHeaderKeys();
+
+    for (rep = 0; rep < cfg.MFM_COMPONENT_WALK_REPS(); ++rep) {
+      MidOrganism<32> walker = best;
+      for (step = 0; step < cfg.MFM_COMPONENT_WALK_LENGTH(); ++step) {
+        measure = "Ranked";
+        res = [&cfg, &metric, &walker, &target, &incoming_edge_counts, nodes_per_component](){
+          emp::MatchBin<size_t, WrapperMetric<32>, emp::RankedSelector<>> mb;
+          mb.metric.metric = &metric;
+          mb.SetCacheOn(false);
+          const bool anti = metric.name().find("Inverse") != std::string::npos;
+
+          for(size_t i = 0; i < cfg.MO_LENGTH(); ++i) mb.Put(i, walker.Get(i));
+
+          size_t res = 0;
+          size_t worst = 0;
+
+          for (size_t i = 0; i < cfg.MO_LENGTH(); ++i) {
+            const size_t component = i / nodes_per_component;
+
+            for (size_t j = 0; j < cfg.MO_LENGTH(); ++j) {
+              // ignore self-loops
+              if (i == j) continue;
+              // non-edges cause fitness harm by inadvertently showing up
+              // in another tag's match list
+              if (target[i][j] == 1.0) continue;
+
+              worst += incoming_edge_counts[j];
+              const auto resp = mb.GetVals(
+                // +1 to allow for self-matching in non-anti metrics
+                mb.Match(walker.Get(i), incoming_edge_counts[j] + !anti)
+              );
+              res += std::count_if(
+                resp.begin(),
+                resp.end(),
+                [component, nodes_per_component](size_t node){
+                  return node / nodes_per_component != component;
+                }
+              );
+            }
+          }
+
+          return static_cast<double>(res)/worst;
+        }();
+        df.Update();
+
+        measure = "Scored";
+        res = [&cfg, &metric, &walker, &target, nodes_per_component](){
+          double res = 0.0;
+          double worst = 0.0;
+          for (size_t i = 0; i < cfg.MO_LENGTH(); ++i) {
+
+            const size_t source_component = i / nodes_per_component;
+
+            for (size_t j = 0; j < cfg.MO_LENGTH(); ++j) {
+
+              const size_t dest_component = j / nodes_per_component;
+
+              if (source_component == dest_component) continue;
+
+              worst += cfg.MFM_NOMATCH_THRESH();
+              res += std::max(
+                0.0,
+                cfg.MFM_NOMATCH_THRESH() - metric(walker.Get(i), walker.Get(j))
+              );
+            }
+          }
+
+          return res/worst;
+        }();
+        df.Update();
+
+        grid_world.DoMutationsOrg(walker);
+
+      }
+
+    }
+  }();
 
   }
 }
