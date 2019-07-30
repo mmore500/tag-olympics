@@ -41,6 +41,7 @@ pip3 install pandas
 pip3 install seaborn
 pip3 install networkx
 pip3 install keyname
+pip3 install fileshash
 
 git clone https://github.com/devosoft/Empirical /opt/Empirical -b match-bin
 
