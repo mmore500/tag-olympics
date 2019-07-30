@@ -286,5 +286,44 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
   std::cout << std::endl;
 
+  emp::DataFile df(emp::keyname::pack({
+    {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
+    {"metric-slug", emp::slugify(metric.name())},
+    {"experiment", cfg.MFM_TITLE()},
+    {"datafile", "end-census"},
+    {"treatment", cfg.TREATMENT()},
+    {"seed", emp::to_string(cfg.SEED())},
+    {"node-count", emp::keyname::unpack(graph_source).at("node-count")},
+    {"base-degree", emp::keyname::unpack(graph_source).at("base-degree")},
+    {"extra-edges", emp::keyname::unpack(graph_source).at("extra-edges")},
+    {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
+    // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
+    // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
+    {"ext", ".csv"}
+  }));
+
+  size_t pop_id;
+  size_t pos;
+  df.AddVar(pop_id, "Population ID");
+  df.AddVar(pos, "Genome Position");
+  df.AddFun<double>(
+    [&cfg, &rand, &grid_world, &metric, &pop_id, &pos](){
+      const auto & target = grid_world.GetOrg(pop_id).Get(pos);
+      double res = 0.0;
+      for (size_t r = 0; r < cfg.LSA_NREPS(); ++r) {
+        const decltype(target) sample{rand, cfg.MO_BITWEIGHT()};
+        res += metric(target, sample);
+      }
+      return res / cfg.LSA_NREPS();
+    },
+    "Specificity"
+  );
+
+  df.PrintHeaderKeys();
+
+  for (pop_id = 0; pop_id < grid_world.size(); ++pop_id) {
+    for (pos = 0; pos < cfg.MO_LENGTH(); ++pos) df.Update();
+  }
+
   }
 }
