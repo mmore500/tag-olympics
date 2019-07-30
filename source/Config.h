@@ -85,6 +85,12 @@ EMP_BUILD_CONFIG(
     true,
     "Should fitness be evaluated by tag match ranking instead of by match score?"
   ),
+  VALUE(
+    MFM_SWAPS_PER_GEN,
+    size_t,
+    0,
+    "How many target edges should be swapped between each generation?"
+  ),
   VALUE(MFM_TITLE, std::string, "mid-flex-match", "Default out filename")
 
 )

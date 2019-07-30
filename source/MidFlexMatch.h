@@ -15,6 +15,7 @@
 #include "tools/matchbin_utils.h"
 #include "tools/File.h"
 #include "tools/keyname_utils.h"
+#include "tools/random_utils.h"
 
 #include "Config.h"
 #include "Metrics.h"
@@ -242,6 +243,29 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
       cfg.MFM_TOURNEY_SIZE(),
       cfg.MFM_TOURNEY_REPS()
     );
+  });
+  // swap edges
+  // note: incoming edge counts won't change
+  grid_world.OnUpdate([&cfg, &target, &edges, &rand](size_t upd){
+    for (size_t s = 0; s < cfg.MFM_SWAPS_PER_GEN(); ++s) {
+      auto edge_ids = emp::Choose(rand, edges.size(), 2);
+
+      auto & edge_a = edges[edge_ids[0]];
+      auto & from_a = edge_a[0];
+      auto & to_a = edge_a[1];
+
+      auto & edge_b = edges[edge_ids[1]];
+      auto & from_b = edge_b[0];
+      auto & to_b = edge_b[1];
+
+      std::swap(target[from_a][to_a], target[from_a][to_b]);
+      std::swap(target[to_a][from_a], target[to_b][from_a]);
+
+      std::swap(target[from_b][to_b], target[from_b][to_a]);
+      std::swap(target[to_b][from_b], target[to_a][from_b]);
+
+      std::swap(from_a, from_b);
+    }
   });
 
   // POP_SIZE needs to be a perfect square.
