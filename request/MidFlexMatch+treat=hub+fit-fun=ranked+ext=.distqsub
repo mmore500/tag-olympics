@@ -7,4 +7,4 @@ set beacon_priority y
 set config_dir /mnt/scratch/mmore500/mfm/config
 set dest_dir /mnt/scratch/mmore500/mfm/data
 
-1001..1020 mfm-hub-ranked singularity exec -B $(pwd):/pwd tag-olympics.simg bash -c "cd /pwd && python3 /opt/tag-olympics/script/MidGenerateGraph.py $seed 48 1 0 2 12 && mid-tag-olympics MFM -SEED $seed -TREATMENT hub"
+1001..1020 mfm-hub-ranked singularity exec -B $(pwd):/pwd tag-olympics.simg bash -c "cd /pwd && python3 /opt/tag-olympics/script/MidGenerateGraph.py $seed 48 2 0 1 36 && mid-tag-olympics MFM -SEED $seed -TREATMENT hub -MO_BITWEIGHT 0.75"

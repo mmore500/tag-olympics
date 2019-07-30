@@ -7,4 +7,4 @@ set beacon_priority y
 set config_dir /mnt/scratch/mmore500/mfm/config
 set dest_dir /mnt/scratch/mmore500/mfm/data
 
-1001..1020 mfm-irregular-ranked singularity exec -B $(pwd):/pwd tag-olympics.simg bash -c "cd /pwd && python3 /opt/tag-olympics/script/MidGenerateGraph.py $seed 48 1 24 && mid-tag-olympics MFM -SEED $seed -TREATMENT irregular"
+1001..1020 mfm-irregular-ranked singularity exec -B $(pwd):/pwd tag-olympics.simg bash -c "cd /pwd && python3 /opt/tag-olympics/script/MidGenerateGraph.py $seed 48 1 60 && mid-tag-olympics MFM -SEED $seed -TREATMENT irregular -MO_BITWEIGHT 0.75"
