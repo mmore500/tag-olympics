@@ -94,29 +94,19 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     cfg.MO_LENGTH(),
     emp::vector<double>(cfg.MO_LENGTH(), 1.0)
   );
-  for (size_t i = 0; i < target.size(); ++i) {
-    // mark self loops and duplicate non-edges to be ignored
-    target[i][i] = -1.0;
-    for (size_t j = i; j < target.size(); ++j) target[i][j] = -1.0;
-  }
 
-  size_t edge_count = 0;
   std::unordered_map<size_t, size_t> incoming_edge_counts;
+  emp::vector<std::array<size_t, 2>> edges;
   while (f.size()) {
-    auto res = f.ExtractRowAs<size_t>();
+    const auto res = f.ExtractRowAs<size_t>();
     for (size_t i = 1; i < res.size(); ++i) {
-      target[res[0]][i] = rand.GetDouble(cfg.MFM_TARGET_MAX());
-      target[i][res[0]] = -1.0;
+      target[res[0]][res[i]] = rand.GetDouble(cfg.MFM_TARGET_MAX());
+      target[res[i]][res[0]] = target[res[i]][res[0]];
+      edges.push_back({res[0], res[i]});
 
-      // randomly choose edge direction
-      if (rand.P(0.5)) {
-        std::swap(target[res[0]][i], target[i][res[0]]);
-        incoming_edge_counts[res[0]]++;
-      } else {
-        incoming_edge_counts[i]++;
-      }
+      incoming_edge_counts[res[0]]++;
+      incoming_edge_counts[res[i]]++;
 
-      ++edge_count;
     }
   }
 
@@ -192,11 +182,15 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
         for (size_t i = 0; i < cfg.MO_LENGTH(); ++i) {
           for (size_t j = 0; j < cfg.MO_LENGTH(); ++j) {
-            if (target[i][j] == -1.0) continue;
+            // ignore self-loops
+            if (i == j) continue;
+            // non-edges cause fitness harm by inadvertently showing up
+            // in another tag's match list
+            if (target[i][j] == 1.0) continue;
 
             ++worst;
 
-            if (auto resp = mb.GetVals(
+            if (const auto resp = mb.GetVals(
                     // +1 to allow for self-matching in non-anti metrics
                     mb.Match(org.Get(i), incoming_edge_counts[j] + !anti)
                   );
@@ -219,7 +213,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
         for (size_t i = 0; i < cfg.MO_LENGTH(); ++i) {
           for (size_t j = 0; j < cfg.MO_LENGTH(); ++j) {
 
-            if (target[i][j] == -1.0) continue;
+            if (i == j) continue;
 
             worst += 1.0 - (
               target[i][j] == 1.0
