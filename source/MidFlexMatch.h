@@ -172,6 +172,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
         emp::MatchBin<size_t, WrapperMetric<32>, emp::RankedSelector<>> mb;
         mb.metric.metric = &metric;
+        mb.SetCacheOn(false);
         const bool anti = metric.name().find("Inverse") != std::string::npos;
 
         for(size_t i = 0; i < cfg.MO_LENGTH(); ++i) {
