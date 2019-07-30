@@ -7,15 +7,6 @@
 
 #include "Metrics.h"
 
-template<
-  template<typename, size_t> typename DimMod,
-  size_t W
->
-struct CurryDimMod {
-  template<typename Metric>
-  using t = DimMod<Metric, W>;
-};
-
 template <size_t Dim>
 struct AddDim {
 

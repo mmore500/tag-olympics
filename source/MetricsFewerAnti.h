@@ -7,19 +7,8 @@
 
 #include "Metrics.h"
 
-namespace internal {
-
-template<
-  template<typename, size_t> typename DimMod,
-  size_t W
->
-struct CurryDimMod {
-  template<typename Metric>
-  using t = DimMod<Metric, W>;
-};
-
 template <size_t Dim>
-struct AddDim {
+struct AddAntiDim {
 
   using collection_t = emp::vector<
     emp::Ptr<
@@ -75,15 +64,13 @@ struct AddDim {
 
     } else if constexpr (Dim < 4) {
 
-      AddDim<Dim*4>::template append<typename AddDim<Dim*4>::pack_t>(c);
+      AddAntiDim<Dim*4>::template append<typename AddAntiDim<Dim*4>::pack_t>(c);
 
     }
 
   }
 
 };
-
-}
 
 struct MetricsFewerAnti {
 
@@ -92,8 +79,8 @@ struct MetricsFewerAnti {
   collection_t mets;
 
   MetricsFewerAnti() {
-    internal::AddDim<1>::append<AddDim<1>::pack_t>(mets);
-    std::cout << mets.size() << std::endl;
+    AddAntiDim<1>::append<AddAntiDim<1>::pack_t>(mets);
+    std::cout << "anti " <<mets.size() << std::endl;
   }
 
 
