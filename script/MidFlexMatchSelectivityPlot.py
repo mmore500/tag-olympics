@@ -107,7 +107,7 @@ g = sns.FacetGrid(
     df_data,
     col='Metric',
     row='Dimension',
-    # hue='Treatment',
+    hue='Treatment',
     margin_titles=True,
     col_order=(
         sorted(
@@ -130,7 +130,8 @@ g.map(
     sns.barplot,
     'Node Type',
     'Specificity',
-)
+    order=df_data['Treatment'].unique()
+).add_legend()
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1

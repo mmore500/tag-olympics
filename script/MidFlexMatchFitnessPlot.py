@@ -97,18 +97,14 @@ g = sns.FacetGrid(
     df_data,
     col='Metric',
     row='Dimension',
-    # hue='Treatment',
-    # hue_kws={
-    #     'ls' : list(itertools.islice(
-    #         itertools.cycle(['-', '--', '-.', ':']),
-    #         len(df_data['Treatment'].unique())
-    #     )),
-    #     'marker' : list(itertools.islice(
-    #         itertools.cycle(['^', 'v']),
-    #         len(df_data['Treatment'].unique())
-    #     )),
-    #     'color' : sns.color_palette()
-    # },
+    hue='Treatment',
+    hue_kws={
+        'ls' : list(itertools.islice(
+            itertools.cycle(['-', '--', '-.', ':']),
+            len(df_data['Treatment'].unique())
+        )),
+        'color' : sns.color_palette()
+    },
     margin_titles=True,
     col_order=(
         sorted(
@@ -131,11 +127,8 @@ g.map(
     sns.lineplot,
     'Generation',
     'Best Fitness',
-    'Treatment',
-    'Treatment', # line thickness
-    'Treatment',
     style_order=list(df_data['Treatment'].unique())
-)
+).add_legend()
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
@@ -189,7 +182,7 @@ g.map(
     sns.barplot,
     'Treatment',
     'Best Fitness',
-    order=df_data["Treatment"].unique()
+    order=list(df_data["Treatment"].unique())
 )
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
