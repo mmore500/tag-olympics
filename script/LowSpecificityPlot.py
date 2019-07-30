@@ -52,6 +52,11 @@ df_data['Metric'] = df_data.apply(
     axis=1
 )
 
+df_data['Tag Mean Match Score'] = df_data.apply(
+    lambda x: x['Tag Mean Match Score'] + np.random.normal(0, 1e-8),
+    axis=1
+)
+
 print("data crunched!")
 
 g = sns.FacetGrid(
@@ -71,7 +76,7 @@ g = sns.FacetGrid(
         )
     )
 ).set(xlim=(0, 1))
-g.map(sns.distplot, "Tag Mean Match Score", kde=False)
+g.map(sns.distplot, "Tag Mean Match Score", rug=True, hist=False)
 
 outfile = kn.pack({
     'title' : kn.unpack(dataframe_filename)['title'],
