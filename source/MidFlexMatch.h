@@ -88,6 +88,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   emp::File f(graph_source);
 
   f.RemoveComments('#');
+  f.RemoveEmpty();
 
   emp_assert(f.size() == cfg.MO_LENGTH());
 
