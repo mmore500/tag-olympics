@@ -56,34 +56,39 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
-  std::string graph_source;
-  for(auto& p: std::filesystem::directory_iterator(".")) {
-    if (
-      const auto res = emp::keyname::unpack(p.path());
-      res.count("title") && res.at("title") == "mid-graph"
-      && res.count("ext") && res.at("ext") == ".csv"
-      && res.count("seed") && res.at("seed") == emp::to_string(cfg.SEED())
-      && res.count("node-count")
-        && res.at("node-count") == emp::to_string(cfg.MO_LENGTH())
-      && res.count("base-degree")
-      && res.count("extra-edges")
-    ) {
-      if (graph_source.size()) {
-        std::cerr << "conflicting graph source files" << std::endl;
-        std::cerr << graph_source << std::endl;
-        std::cerr << p.path() << std::endl;
-        std::cerr << "exiting..." << std::endl;
-        std::exit(EXIT_FAILURE);
+  const std::string graph_source = [&cfg](){
+    std::string graph_source;
+    for(auto& p: std::filesystem::directory_iterator(".")) {
+      if (
+        const auto res = emp::keyname::unpack(p.path());
+        res.count("title") && res.at("title") == "mid-graph"
+        && res.count("ext") && res.at("ext") == ".csv"
+        && res.count("seed") && res.at("seed") == emp::to_string(cfg.SEED())
+        && res.count("node-count")
+          && res.at("node-count") == emp::to_string(cfg.MO_LENGTH())
+        && res.count("nodes-per-component")
+        && res.count("base-degree")
+        && res.count("extra-edges")
+      ) {
+        if (graph_source.size()) {
+          std::cerr << "conflicting graph source files" << std::endl;
+          std::cerr << graph_source << std::endl;
+          std::cerr << p.path() << std::endl;
+          std::cerr << "exiting..." << std::endl;
+          std::exit(EXIT_FAILURE);
+        }
+        graph_source = p.path();
       }
-      graph_source = p.path();
     }
-  }
 
-  if (!graph_source.size()) {
-    std::cerr << "no graph source file found" << std::endl;
-    std::cerr << "exiting..." << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
+    if (!graph_source.size()) {
+      std::cerr << "no graph source file found" << std::endl;
+      std::cerr << "exiting..." << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    return graph_source;
+  }();
 
   emp::File f(graph_source);
 
