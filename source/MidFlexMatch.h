@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <filesystem>
 #include <cstdlib>
+#include <sstream>
 
 #include "base/Ptr.h"
 
@@ -102,14 +103,25 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     emp::vector<double>(cfg.MO_LENGTH(), 1.0)
   );
 
+  const size_t nodes_per_component = [&graph_source](){
+    size_t res;
+    std::istringstream(
+      emp::keyname::unpack(graph_source).at("nodes-per-component")
+    ) >> res;
+    return res;
+  }();
+  const size_t num_components = cfg.MO_LENGTH() / nodes_per_component;
+
   std::unordered_map<size_t, size_t> incoming_edge_counts;
-  emp::vector<std::array<size_t, 2>> edges;
+  emp::vector<emp::vector<std::array<size_t, 2>>> edges(num_components);
   while (f.size()) {
     const auto res = f.ExtractRowAs<size_t>();
     for (size_t i = 1; i < res.size(); ++i) {
       target[res[0]][res[i]] = rand.GetDouble(cfg.MFM_TARGET_MAX());
       target[res[i]][res[0]] = target[res[i]][res[0]];
-      edges.push_back({res[0], res[i]});
+      edges[res[0]/nodes_per_component].push_back(
+        std::array<size_t, 2>{res[0], res[i]}
+      );
 
       incoming_edge_counts[res[0]]++;
       incoming_edge_counts[res[i]]++;
@@ -127,6 +139,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     {"treatment", cfg.TREATMENT()},
     {"seed", emp::to_string(cfg.SEED())},
     {"node-count", emp::keyname::unpack(graph_source).at("node-count")},
+    {"nodes-per-component", emp::keyname::unpack(graph_source).at("nodes-per-component")},
     {"base-degree", emp::keyname::unpack(graph_source).at("base-degree")},
     {"extra-edges", emp::keyname::unpack(graph_source).at("extra-edges")},
     {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
@@ -160,6 +173,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
       {"treatment", cfg.TREATMENT()},
       {"seed", emp::to_string(cfg.SEED())},
       {"node-count", emp::keyname::unpack(graph_source).at("node-count")},
+      {"nodes-per-component", emp::keyname::unpack(graph_source).at("nodes-per-component")},
       {"base-degree", emp::keyname::unpack(graph_source).at("base-degree")},
       {"extra-edges", emp::keyname::unpack(graph_source).at("extra-edges")},
       {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
@@ -251,29 +265,36 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
       cfg.MFM_TOURNEY_REPS()
     );
   });
+
   // swap edges
   // note: incoming edge counts won't change
-  grid_world.OnUpdate([&cfg, &target, &edges, &rand](size_t upd){
-    for (size_t s = 0; s < cfg.MFM_SWAPS_PER_GEN(); ++s) {
-      auto edge_ids = emp::Choose(rand, edges.size(), 2);
+  grid_world.OnUpdate(
+    [&cfg, &target, &edges, &rand, nodes_per_component, num_components]
+    (size_t upd){
+      for (size_t c = 0; c < num_components; ++c) {
+        for (size_t s = 0; s < cfg.MFM_SWAPS_PER_GEN(); ++s) {
 
-      auto & edge_a = edges[edge_ids[0]];
-      auto & from_a = edge_a[0];
-      auto & to_a = edge_a[1];
+          const auto edge_ids = emp::Choose(rand, edges[c].size(), 2);
 
-      auto & edge_b = edges[edge_ids[1]];
-      auto & from_b = edge_b[0];
-      auto & to_b = edge_b[1];
+          auto & edge_a = edges[c][edge_ids[0]];
+          auto & from_a = edge_a[0];
+          auto & to_a = edge_a[1];
 
-      std::swap(target[from_a][to_a], target[from_a][to_b]);
-      std::swap(target[to_a][from_a], target[to_b][from_a]);
+          auto & edge_b = edges[c][edge_ids[1]];
+          auto & from_b = edge_b[0];
+          auto & to_b = edge_b[1];
 
-      std::swap(target[from_b][to_b], target[from_b][to_a]);
-      std::swap(target[to_b][from_b], target[to_a][from_b]);
+          std::swap(target[from_a][to_a], target[from_a][to_b]);
+          std::swap(target[to_a][from_a], target[to_b][from_a]);
 
-      std::swap(from_a, from_b);
+          std::swap(target[from_b][to_b], target[from_b][to_a]);
+          std::swap(target[to_b][from_b], target[to_a][from_b]);
+
+          std::swap(from_a, from_b);
+        }
+      }
     }
-  });
+  );
 
   // POP_SIZE needs to be a perfect square.
   emp_assert(grid_world.GetSize() == cfg.MFM_POP_SIZE());
@@ -300,6 +321,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     {"treatment", cfg.TREATMENT()},
     {"seed", emp::to_string(cfg.SEED())},
     {"node-count", emp::keyname::unpack(graph_source).at("node-count")},
+    {"nodes-per-component", emp::keyname::unpack(graph_source).at("nodes-per-component")},
     {"base-degree", emp::keyname::unpack(graph_source).at("base-degree")},
     {"extra-edges", emp::keyname::unpack(graph_source).at("extra-edges")},
     {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},

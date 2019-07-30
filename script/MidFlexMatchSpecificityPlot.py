@@ -87,7 +87,9 @@ df_data['Metric'] = df_data.apply(
 
 df_data['Node Type'] = df_data.apply(
     lambda x: (
-        'Hub' if x['Genome Position'] == 0 else 'Non-Hub'
+        'Hub'
+        if x['Genome Position'] % x['nodes-per-component'] == 0
+        else 'Non-Hub'
     ),
     axis = 1
 )
