@@ -115,7 +115,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
   grid_world.SetupFitnessFile(emp::keyname::pack({
     {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
-    {"metric", emp::slugify(metric.name())},
+    {"metric-slug", emp::slugify(metric.name())},
     {"experiment", cfg.MFM_TITLE()},
     {"datafile", "fitness"},
     {"treatment", cfg.TREATMENT()},
