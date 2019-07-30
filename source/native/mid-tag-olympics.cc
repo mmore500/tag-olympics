@@ -13,6 +13,7 @@
 #include "../MakeMetricKey.h"
 #include "../Metrics.h"
 #include "../MetricsFewer.h"
+#include "../MetricsFewerAnti.h"
 
 // This is the main function for the NATIVE version of Tag Olympics.
 
@@ -40,8 +41,11 @@ int main(int argc, char* argv[])
 
   const auto res = am.UseArg("_positional");
 
+  const MetricsFewerAnti m_anti;
   const MetricsFewer m;
-  const Metrics::collection_t & metrics = m.mets;
+  const Metrics::collection_t & metrics = (
+    cfg.MID_ANTI_METRICS() ? m_anti.mets : m.mets
+  );
 
   if (!res) {
     std::cout << "no run type provided" << std::endl;
