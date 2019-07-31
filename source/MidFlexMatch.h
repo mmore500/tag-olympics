@@ -188,9 +188,14 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   grid_world.SetPopStruct_Grid(side, side);
   if (cfg.MFM_RANKED()) {
     grid_world.SetFitFun(
-      [&target, &cfg, &metric, &incoming_edge_counts](MidOrganism<32> & org){
+      [&target, &cfg, &metric, &incoming_edge_counts, &rand]
+      (MidOrganism<32> & org){
 
-        emp::MatchBin<size_t, WrapperMetric<32>, emp::RankedSelector<>> mb;
+        emp::MatchBin<
+          size_t,
+          WrapperMetric<32>,
+          emp::RankedSelector<>
+        > mb(rand);
         mb.metric.metric = &metric;
         mb.SetCacheOn(false);
         const bool anti = metric.name().find("Inverse") != std::string::npos;
@@ -355,7 +360,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     }
   }();
 
-  [&cfg, &metric, &graph_source, &grid_world, &target, &incoming_edge_counts, nodes_per_component](){
+  [&](){
 
     const MidOrganism<32> & best = [&grid_world](){
       double best_fit = grid_world.CalcFitnessID(0);
@@ -405,8 +410,12 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
       MidOrganism<32> walker = best;
       for (step = 0; step < cfg.MFM_COMPONENT_WALK_LENGTH(); ++step) {
         measure = "Ranked";
-        res = [&cfg, &metric, &walker, &target, &incoming_edge_counts, nodes_per_component](){
-          emp::MatchBin<size_t, WrapperMetric<32>, emp::RankedSelector<>> mb;
+        res = [&](){
+          emp::MatchBin<
+            size_t,
+            WrapperMetric<32>,
+            emp::RankedSelector<>
+          > mb(rand);
           mb.metric.metric = &metric;
           mb.SetCacheOn(false);
           const bool anti = metric.name().find("Inverse") != std::string::npos;
