@@ -67,6 +67,9 @@ g = sns.FacetGrid(
         ) + sorted(
             [x for x in df_data['Dimension'].unique() if 'Minimum' in x],
             key=lambda str: next(int(s) for s in str.split() if s.isdigit())
+        ) + sorted(
+            [x for x in df_data['Dimension'].unique() if 'Euclidean' in x],
+            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
         )
     )
 ).set(ylim=(0, 1))

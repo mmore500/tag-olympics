@@ -48,9 +48,19 @@ struct AddDim {
     CurryDimMod<emp::MinDimMod, Dim>::template t
   >;
 
+  // make mean multidimensional variants
+  using euc_pack_t = typename with_anti_pack_t::template wrap<
+    CurryDimMod<emp::EuclideanDimMod, Dim>::template t
+  >;
+
   // merge together all multimntional variants
-  using nested_pack_t = typename mean_pack_t::template merge<
+  using min_mean_pack_t = typename mean_pack_t::template merge<
     min_pack_t
+  >;
+
+  // merge together all multimntional variants
+  using nested_pack_t = typename min_mean_pack_t::template merge<
+    euc_pack_t
   >;
 
   // flatten all multidimensional variatns

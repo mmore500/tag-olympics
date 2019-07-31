@@ -59,6 +59,8 @@ void MakeMetricKey(
       dim_type = "Minimum";
     } else if (metric.name().find("Mean") != std::string::npos) {
       dim_type = "Mean";
+    } else if (metric.name().find("Euclidean") != std::string::npos) {
+      dim_type = "Euclidean";
     } else {
       dim_type = "None";
     }
