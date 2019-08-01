@@ -132,9 +132,10 @@ g = sns.FacetGrid(
 ).set(ylim=(0, 1))
 g.map(
     sns.barplot,
-    'Node Type',
+    'Treatment',
     'Specificity',
-    'Treatment'
+    'Node Type',
+    palette="hls"
 ).add_legend()
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
