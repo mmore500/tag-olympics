@@ -135,7 +135,7 @@ g.map(
     sns.barplot,
     'Node Type',
     'Specificity',
-    order=df_data['Treatment'].unique()
+    hue_order=df_data['Treatment'].unique()
 ).add_legend()
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
