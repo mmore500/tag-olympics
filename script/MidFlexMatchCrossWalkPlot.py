@@ -99,7 +99,7 @@ g = sns.FacetGrid(
     hue_kws={
         'ls' : list(itertools.islice(
             itertools.cycle(['-', '--', '-.', ':']),
-            len(df_data['Treatment'].unique())
+            len(df_data['Cross-Component Activation Measure'].unique())
         )),
         'color' : sns.color_palette()
     },
@@ -128,7 +128,7 @@ g.map(
     sns.lineplot,
     'Mutational Step',
     'Cross-Component Activation',
-    style_order=list(df_data['Treatment'].unique())
+    style_order=list(df_data['Cross-Component Activation Measure'].unique())
 ).add_legend()
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
