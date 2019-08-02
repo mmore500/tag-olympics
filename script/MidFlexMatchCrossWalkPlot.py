@@ -33,7 +33,7 @@ for filename, df in dfs:
 
 df_data = pd.concat([df for filename, df in dfs])
 
-df_data = df_data[df_data['Mutational Step'] < 8]
+# df_data = df_data[df_data['Mutational Step'] < 8]
 
 df_data['Slug'] = df_data['metric-slug']
 
@@ -82,10 +82,6 @@ df_data['Metric'] = df_data.apply(
 )
 
 df_data['Treatment'] = df_data['treatment']
-
-df_data['Best Fitness'] = df_data['max_fitness']
-
-df_data['Generation'] = df_data['update']
 
 df_data['Dimension Count'] = df_data['Dimension']
 
