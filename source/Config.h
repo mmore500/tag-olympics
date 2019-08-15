@@ -105,6 +105,12 @@ EMP_BUILD_CONFIG(
     "How many target edges should be swapped"
     "within each component between each generation?"
   ),
+  VALUE(
+    MFM_GENS_PER_TARGET,
+    size_t,
+    0,
+    "After how many generations should we switch the target? If 0, never switch."
+  ),
   VALUE(MFM_TITLE, std::string, "mid-flex-match", "Default out filename")
 
 )

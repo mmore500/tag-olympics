@@ -10,6 +10,7 @@
 
 #include "../Config.h"
 #include "../MidFlexMatch.h"
+#include "../MidFlexBiMatch.h"
 #include "../MakeMetricKey.h"
 #include "../Metrics.h"
 #include "../MetricsFewer.h"
@@ -54,6 +55,9 @@ int main(int argc, char* argv[])
   } else if (res->at(0) == "MFM") {
     std::cout << "running mode: " << res->at(0) << std::endl;
     MidFlexMatch(metrics, cfg);
+  } else if (res->at(0) == "MBM") {
+    std::cout << "running mode: " << res->at(0) << std::endl;
+    MidFlexBiMatch(metrics, cfg);
   } else if (res->at(0) == "MMK") {
     std::cout << "running mode: " << res->at(0) << std::endl;
     MakeMetricKey(metrics, cfg);
