@@ -58,7 +58,6 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
   auto incr_instance = [&](){
     cur_instance = (cur_instance + 1) % graph_instances.size();
-    uids.clear();
     target.clear();
     lefts.clear();
     rights.clear();
@@ -75,7 +74,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     while (f.size()) {
       const auto res = f.ExtractRowAs<std::string>();
 
-      uids[res[0]] = uids.size();
+      if (!uids.count(res[0])) uids[res[0]] = uids.size();
 
       if (emp::keyname::unpack(res[0])["side"] == "left") {
         lefts.insert(res[0]);
@@ -341,11 +340,13 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     size_t rep;
     size_t step;
     double res;
+    double delta;
     std::string measure = cfg.MFM_RANKED() ? "ranked" : "scored";
     df.AddVar(rep, "Replicate");
     df.AddVar(step, "Mutational Step");
     df.AddVar(measure, "Cross-Component Activation Measure");
     df.AddVar(res, "Cross-Component Activation");
+    df.AddVar(delta, "Phenotypic Change");
 
     df.PrintHeaderKeys();
 
@@ -353,7 +354,122 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
       MidOrganism<32> walker = best;
       for (step = 0; step < cfg.MFM_COMPONENT_WALK_LENGTH(); ++step) {
 
-        res = grid_world.GetFitFun()(walker);
+        res = cfg.MFM_RANKED() ? [&](MidOrganism<32> & org){
+
+          emp::MatchBin<
+            std::string,
+            WrapperMetric<32>,
+            emp::RankedSelector<>
+          > mb(rand);
+          mb.metric.metric = &metric;
+          mb.SetCacheOn(false);
+
+          for (const auto & right : rights) {
+            mb.Put(right, org.Get(uids[right]));
+          }
+
+          size_t cca = 0;
+          size_t sca = 0;
+
+          for (const auto & left : lefts) {
+
+            const auto resp = mb.GetVals(
+                mb.Match(org.Get(uids[left]), outgoing_edge_counts[left])
+              );
+
+            for (const auto & right : resp) {
+              if (
+                emp::keyname::unpack(left)["module"]
+                !=
+                emp::keyname::unpack(right)["module"]
+              ) {
+                ++cca;
+              } else {
+                ++sca;
+              }
+            }
+
+          }
+
+          return static_cast<double>(cca) / static_cast<double>(cca + sca);
+        }(walker) : [&](MidOrganism<32> & org){
+
+          emp::DataNode<double, emp::data::Range> cca;
+          emp::DataNode<double, emp::data::Range> sca;
+
+          for (const auto & left : lefts) {
+            for (const auto & right : rights) {
+
+              if (
+                emp::keyname::unpack(left)["module"]
+                !=
+                emp::keyname::unpack(right)["module"]
+              ) {
+                cca.Add(metric(org.Get(uids[left]), org.Get(uids[right])));
+              } else {
+                sca.Add(metric(org.Get(uids[left]), org.Get(uids[right])));
+              }
+            }
+          }
+
+          return cca.GetMean() - sca.GetMean();
+
+        }(walker);
+
+        delta = cfg.MFM_RANKED() ? [&](
+          MidOrganism<32> & org, const MidOrganism<32> & orig
+        ){
+
+          emp::MatchBin<
+            std::string,
+            WrapperMetric<32>,
+            emp::RankedSelector<>
+          > mb(rand);
+          mb.metric.metric = &metric;
+          mb.SetCacheOn(false);
+
+          emp::MatchBin<
+            std::string,
+            WrapperMetric<32>,
+            emp::RankedSelector<>
+          > mb_orig(rand);
+          mb_orig.metric.metric = &metric;
+          mb_orig.SetCacheOn(false);
+
+          for (const auto & right : rights) {
+            mb.Put(right, org.Get(uids[right]));
+            mb_orig.Put(right, orig.Get(uids[right]));
+          }
+
+          size_t changed = 0;
+          size_t max = 0;
+
+          for (const auto & left : lefts) {
+
+            const auto resp = mb.GetVals(
+                mb.Match(org.Get(uids[left]), outgoing_edge_counts[left])
+              );
+            const auto resp_orig = mb.GetVals(
+                mb_orig.Match(orig.Get(uids[left]), outgoing_edge_counts[left])
+              );
+            const std::unordered_set<std::string> set_orig(
+              std::begin(resp_orig), std::end(resp_orig)
+            );
+
+            for (const auto & right : resp) {
+              ++max;
+              if (!set_orig.count(right)) ++changed;
+            }
+
+          }
+
+          return static_cast<double>(changed) / static_cast<double>(max);
+        }(walker, best) : [&](
+          MidOrganism<32> & org, const MidOrganism<32> & orig
+        ){
+          emp_assert(false, "unimplemented");
+          return 0;
+        }(walker, best);
 
         df.Update();
 
