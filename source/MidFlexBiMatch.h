@@ -351,12 +351,14 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     size_t count_cca = 0; // what num of phenotypic changes are cross-component
     size_t count_sca = 0; // what num of phenotypic change are same-component
     double prop_cca; // what num of phenotypic change are same-component
+    double prop_sca; // what num of phenotypic change are same-component
 
     size_t opp_cca = 0; // what num of phenotypic change opportunities
                         // are cross-component
     size_t opp_sca = 0; // what num of phenotypic change opportunities
                         // are same-component
     double scaled_prop_cca; // scaled by possible scas vs ccas
+    double scaled_prop_sca; // scaled by possible scas vs ccas
 
     std::string measure = cfg.MFM_RANKED() ? "ranked" : "scored";
 
@@ -369,9 +371,11 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     df.AddVar(count_cca, "Cross-Component Phenotypic Changes");
     df.AddVar(count_sca, "Same-Component Phenotypic Changes");
     df.AddVar(prop_cca, "Proportion Cross-Component Phenotypic Change");
+    df.AddVar(prop_sca, "Proportion Same-Component Phenotypic Change");
     df.AddVar(opp_cca, "Opportunities for Cross-Component Phenotypic Change");
     df.AddVar(opp_sca, "Opportunities for Same-Component Phenotypic Change");
     df.AddVar(scaled_prop_cca, "Per-Possibility Proportion Cross-Component Phenotypic Change");
+    df.AddVar(scaled_prop_sca, "Per-Possibility Proportion Same-Component Phenotypic Change");
 
     df.PrintHeaderKeys();
 
@@ -573,8 +577,14 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
       prop_cca = (
         static_cast<double>(count_cca) / static_cast<double>(phen_diff)
       );
+      prop_sca = (
+        static_cast<double>(count_sca) / static_cast<double>(phen_diff)
+      );
       scaled_prop_cca = (
         prop_cca * (opp_cca + opp_sca) / opp_cca
+      );
+      scaled_prop_sca = (
+        prop_sca * (opp_cca + opp_sca) / opp_sca
       );
       df.Update();
 
