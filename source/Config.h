@@ -12,7 +12,7 @@ EMP_BUILD_CONFIG(
   VALUE(SEED, int, 1, "Random number seed"),
   VALUE(FILENAME, std::string, "configs.cfg", "Default config filename"),
   VALUE(TREATMENT, std::string, "unspecified", "Treatment specifier"),
-  VALUE(MID_ANTI_METRICS, bool, true, "Use anti version of metrics?"),
+  VALUE(MID_ANTI_METRICS, bool, false, "Use anti version of metrics?"),
 
   GROUP(LOW_MUTATIONAL_WALK, "Settings for low-mutational-walk experiment"),
   VALUE(LMW_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a bitstring"),
@@ -56,22 +56,23 @@ EMP_BUILD_CONFIG(
   VALUE(MO_LENGTH, size_t, 48, "TODO"),
   VALUE(MO_BITWEIGHT, double, 0.5, "TODO"),
   VALUE(MO_MUT_BIT_REDRAW_PER_BIT, double, 0.001, "TODO"),
+  VALUE(MO_MUT_PROB, double, 0.5, "TODO"),
 
   GROUP(MID_FLEX_MATCH, "Settings for mid-flex-match experiment"),
   VALUE(MFM_GENS, size_t, 100, "TODO"),
-  VALUE(MFM_POP_SIZE, size_t, 100, "TODO"),
-  VALUE(MFM_TOURNEY_SIZE, size_t, 2, "TODO"),
-  VALUE(MFM_TOURNEY_REPS, size_t, 4000, "TODO"),
+  VALUE(MFM_POP_SIZE, size_t, 400, "TODO"),
+  VALUE(MFM_TOURNEY_SIZE, size_t, 8, "TODO"),
+  VALUE(MFM_TOURNEY_REPS, size_t, 1024, "TODO"),
   VALUE(
     MFM_COMPONENT_WALK_LENGTH,
     size_t,
-    32,
+    200,
     "How many mutational steps to take while tracking cross-component activation?"
   ),
   VALUE(
     MFM_COMPONENT_WALK_REPS,
     size_t,
-    100,
+    512,
     "How many mutational walk reps to perform?"
   ),
   VALUE(

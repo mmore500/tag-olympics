@@ -30,6 +30,10 @@ print("Data loaded!")
 res = []
 for filename, df in dfs:
 
+    # assumes datafiles are each from one replicate
+    df['null'] = 'null';
+    df = df.groupby('null').mean().reset_index();
+
     for k, v in kn.unpack(filename).items():
         df[k] = v
 
@@ -92,29 +96,13 @@ df_data['Dimension'] = df_data.apply(
     axis=1
 )
 
-df_data['Difference'] = df_data.apply(
-    lambda x: x['Phenotypic Change'] - x['Cross-Component Activation'],
-    axis=1
-)
-
-df_data['Ratio'] = df_data.apply(
-    lambda x: 0 if not x['Phenotypic Change'] else x['Cross-Component Activation']/x['Phenotypic Change'],
-    axis=1
-)
-
 print("Data crunched!")
 
-g = sns.FacetGrid(
-    df_data,
-    hue='Metric',
-    margin_titles=True
-).set(xlim=(0, 25))
-
-g.map(
-    sns.lineplot,
-    'Mutational Step',
-    'Ratio',
-).add_legend()
+sns.barplot(
+    'Metric',
+    'Per-Possibility Proportion Cross-Component Phenotypic Change',
+    data=df_data
+)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1

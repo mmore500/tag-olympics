@@ -37,6 +37,8 @@ struct MidOrganism {
 
   size_t DoMutations(emp::Random & rand) {
 
+    if (rand.GetDouble() > cfg.MO_MUT_PROB()) return 0;
+
     size_t res = 0;
 
     for (auto & bs : bsets) res += bs.Mutate(

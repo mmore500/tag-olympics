@@ -234,7 +234,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   }
   grid_world.SetAutoMutate();
   grid_world.OnUpdate([&grid_world, &cfg](size_t upd){
-    emp::TournamentSelect(
+    emp::LocalTournamentSelect(
       grid_world,
       cfg.MFM_TOURNEY_SIZE(),
       cfg.MFM_TOURNEY_REPS()
@@ -338,87 +338,177 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     }));
 
     size_t rep;
-    size_t step;
-    double res;
-    double delta;
+    size_t step; // number of mutational steps to first phenotypic change
+
+    double cca_before; // cross-component activation
+                       // before first phenotypic chagne
+    double cca_after; // cross-component activation
+                      // after first phenotypic chagne
+
+    size_t phen_diff = 0; // total number of phenotypic changes
+    size_t phen_size; // number of phenotypic traits assessed
+
+    size_t count_cca = 0; // what num of phenotypic changes are cross-component
+    size_t count_sca = 0; // what num of phenotypic change are same-component
+    double prop_cca; // what num of phenotypic change are same-component
+
+    size_t opp_cca = 0; // what num of phenotypic change opportunities
+                        // are cross-component
+    size_t opp_sca = 0; // what num of phenotypic change opportunities
+                        // are same-component
+    double scaled_prop_cca; // scaled by possible scas vs ccas
+
     std::string measure = cfg.MFM_RANKED() ? "ranked" : "scored";
+
     df.AddVar(rep, "Replicate");
-    df.AddVar(step, "Mutational Step");
-    df.AddVar(measure, "Cross-Component Activation Measure");
-    df.AddVar(res, "Cross-Component Activation");
-    df.AddVar(delta, "Phenotypic Change");
+    df.AddVar(step, "Mutational Distance");
+    df.AddVar(cca_before, "Initial Cross-Component Activation");
+    df.AddVar(cca_after, "Final Cross-Component Activation");
+    df.AddVar(phen_diff, "Phenotypic Changes");
+    df.AddVar(phen_size, "Phenotypic Size");
+    df.AddVar(count_cca, "Cross-Component Phenotypic Changes");
+    df.AddVar(count_sca, "Same-Component Phenotypic Changes");
+    df.AddVar(prop_cca, "Proportion Cross-Component Phenotypic Change");
+    df.AddVar(opp_cca, "Opportunities for Cross-Component Phenotypic Change");
+    df.AddVar(opp_sca, "Opportunities for Same-Component Phenotypic Change");
+    df.AddVar(scaled_prop_cca, "Per-Possibility Proportion Cross-Component Phenotypic Change");
 
     df.PrintHeaderKeys();
 
+    std::unordered_map<std::string, size_t> module_left_counts;
+    std::unordered_map<std::string, size_t> module_right_counts;
+
+    for (const auto & left : lefts) {
+      module_left_counts[emp::keyname::unpack(left)["module"]]++;
+    }
+
+    for (const auto & right : rights) {
+      module_right_counts[emp::keyname::unpack(right)["module"]]++;
+    }
+
+    for (const auto & [module, val] : module_left_counts) {
+      opp_cca += val * (rights.size() - module_right_counts[module]);
+      opp_sca += val * module_right_counts[module];
+    }
+
+    emp::MatchBin<
+      std::string,
+      WrapperMetric<32>,
+      emp::RankedSelector<>
+    > mb(rand);
+    mb.metric.metric = &metric;
+    mb.SetCacheOn(false);
+
+    for (const auto & right : rights) mb.Put(right, best.Get(uids[right]));
+
+    for (const auto & left : lefts) {
+
+      const auto resp = mb.GetVals(
+          mb.Match(best.Get(uids[left]), outgoing_edge_counts[left])
+        );
+
+      for (const auto & right : resp) {
+        if (
+          emp::keyname::unpack(left)["module"]
+          !=
+          emp::keyname::unpack(right)["module"]
+        ) {
+          opp_cca--;
+        } else {
+          opp_sca--;
+        }
+      }
+
+    }
+
+    auto calc_cca = cfg.MFM_RANKED()
+    ? std::function([&](const MidOrganism<32> & org){
+
+      emp::MatchBin<
+        std::string,
+        WrapperMetric<32>,
+        emp::RankedSelector<>
+      > mb(rand);
+      mb.metric.metric = &metric;
+      mb.SetCacheOn(false);
+
+      for (const auto & right : rights) mb.Put(right, org.Get(uids[right]));
+
+      size_t cca = 0;
+      size_t sca = 0;
+
+      for (const auto & left : lefts) {
+
+        const auto resp = mb.GetVals(
+            mb.Match(org.Get(uids[left]), outgoing_edge_counts[left])
+          );
+
+        for (const auto & right : resp) {
+          if (
+            emp::keyname::unpack(left)["module"]
+            !=
+            emp::keyname::unpack(right)["module"]
+          ) {
+            ++cca;
+          } else {
+            ++sca;
+          }
+        }
+
+      }
+
+      return static_cast<double>(cca) / static_cast<double>(cca + sca);
+    }) : std::function([&](const MidOrganism<32> & org){
+
+      emp::DataNode<double, emp::data::Range> cca;
+      emp::DataNode<double, emp::data::Range> sca;
+
+      for (const auto & left : lefts) {
+        for (const auto & right : rights) {
+
+          if (
+            emp::keyname::unpack(left)["module"]
+            !=
+            emp::keyname::unpack(right)["module"]
+          ) {
+            cca.Add(metric(org.Get(uids[left]), org.Get(uids[right])));
+          } else {
+            sca.Add(metric(org.Get(uids[left]), org.Get(uids[right])));
+          }
+        }
+      }
+
+      return cca.GetMean() - sca.GetMean();
+
+    });
+
+    cca_before = calc_cca(best);
+
     for (rep = 0; rep < cfg.MFM_COMPONENT_WALK_REPS(); ++rep) {
-      MidOrganism<32> walker = best;
-      for (step = 0; step < cfg.MFM_COMPONENT_WALK_LENGTH(); ++step) {
 
-        res = cfg.MFM_RANKED() ? [&](MidOrganism<32> & org){
+      phen_diff = 0; // total number of phenotypic changes
+      count_cca = 0; // what num of phenotypic changes are cross-component
+      count_sca = 0; // what num of phenotypic change are same-component
 
-          emp::MatchBin<
-            std::string,
-            WrapperMetric<32>,
-            emp::RankedSelector<>
-          > mb(rand);
-          mb.metric.metric = &metric;
-          mb.SetCacheOn(false);
+      MidOrganism<32> walker(best);
 
-          for (const auto & right : rights) {
-            mb.Put(right, org.Get(uids[right]));
-          }
+      for (step = 1; !phen_diff; ++step) {
 
-          size_t cca = 0;
-          size_t sca = 0;
+        // perform one mutational step
+        for (bool flip = false; !flip; ) {
+          const size_t target_bs = rand.GetUInt(walker.bsets.size());
+          const size_t target_bit = rand.GetUInt(
+            walker.bsets[target_bs].size()
+          );
+          flip = (
+            rand.P(cfg.MO_BITWEIGHT())
+            !=
+            walker.bsets[target_bs].Get(target_bit)
+          );
+          if (flip) { walker.bsets[target_bs].Toggle(target_bit); }
+        }
 
-          for (const auto & left : lefts) {
-
-            const auto resp = mb.GetVals(
-                mb.Match(org.Get(uids[left]), outgoing_edge_counts[left])
-              );
-
-            for (const auto & right : resp) {
-              if (
-                emp::keyname::unpack(left)["module"]
-                !=
-                emp::keyname::unpack(right)["module"]
-              ) {
-                ++cca;
-              } else {
-                ++sca;
-              }
-            }
-
-          }
-
-          return static_cast<double>(cca) / static_cast<double>(cca + sca);
-        }(walker) : [&](MidOrganism<32> & org){
-
-          emp::DataNode<double, emp::data::Range> cca;
-          emp::DataNode<double, emp::data::Range> sca;
-
-          for (const auto & left : lefts) {
-            for (const auto & right : rights) {
-
-              if (
-                emp::keyname::unpack(left)["module"]
-                !=
-                emp::keyname::unpack(right)["module"]
-              ) {
-                cca.Add(metric(org.Get(uids[left]), org.Get(uids[right])));
-              } else {
-                sca.Add(metric(org.Get(uids[left]), org.Get(uids[right])));
-              }
-            }
-          }
-
-          return cca.GetMean() - sca.GetMean();
-
-        }(walker);
-
-        delta = cfg.MFM_RANKED() ? [&](
-          MidOrganism<32> & org, const MidOrganism<32> & orig
-        ){
+        if (cfg.MFM_RANKED()) {
 
           emp::MatchBin<
             std::string,
@@ -437,45 +527,56 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
           mb_orig.SetCacheOn(false);
 
           for (const auto & right : rights) {
-            mb.Put(right, org.Get(uids[right]));
-            mb_orig.Put(right, orig.Get(uids[right]));
+            mb.Put(right, walker.Get(uids[right]));
+            mb_orig.Put(right, best.Get(uids[right]));
           }
 
-          size_t changed = 0;
-          size_t max = 0;
+          phen_size = 0;
 
           for (const auto & left : lefts) {
 
             const auto resp = mb.GetVals(
-                mb.Match(org.Get(uids[left]), outgoing_edge_counts[left])
+                mb.Match(walker.Get(uids[left]), outgoing_edge_counts[left])
               );
-            const auto resp_orig = mb.GetVals(
-                mb_orig.Match(orig.Get(uids[left]), outgoing_edge_counts[left])
+            const auto resp_orig = mb_orig.GetVals(
+                mb_orig.Match(best.Get(uids[left]), outgoing_edge_counts[left])
               );
             const std::unordered_set<std::string> set_orig(
               std::begin(resp_orig), std::end(resp_orig)
             );
 
             for (const auto & right : resp) {
-              ++max;
-              if (!set_orig.count(right)) ++changed;
+              ++phen_size;
+              if (!set_orig.count(right)) {
+                ++phen_diff;
+                if (
+                  emp::keyname::unpack(left)["module"]
+                  !=
+                  emp::keyname::unpack(right)["module"]
+                ) {
+                  ++count_cca;
+                } else {
+                  ++count_sca;
+                }
+              }
             }
 
           }
 
-          return static_cast<double>(changed) / static_cast<double>(max);
-        }(walker, best) : [&](
-          MidOrganism<32> & org, const MidOrganism<32> & orig
-        ){
+        } else {
           emp_assert(false, "unimplemented");
-          return 0;
-        }(walker, best);
-
-        df.Update();
-
-        grid_world.DoMutationsOrg(walker);
+        }
 
       }
+
+      cca_after = calc_cca(walker);
+      prop_cca = (
+        static_cast<double>(count_cca) / static_cast<double>(phen_diff)
+      );
+      scaled_prop_cca = (
+        prop_cca * (opp_cca + opp_sca) / opp_cca
+      );
+      df.Update();
 
     }
   }();

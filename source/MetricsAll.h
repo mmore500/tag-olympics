@@ -94,7 +94,7 @@ struct MetricsAll {
   collection_t mets;
 
   MetricsAll() {
-    AddDim<32>::append<AddDim<32>::pack_t>(mets);
+    AddDim<4>::append<AddDim<4>::pack_t>(mets);
     std::cout << mets.size() << std::endl;
   }
 

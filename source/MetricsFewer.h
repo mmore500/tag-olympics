@@ -20,36 +20,36 @@ struct AddDim {
   >;
 
   // base metrics
-  using base_pack_t = typename emp::TypePack<
+  using pack_t = typename emp::TypePack<
     emp::HammingMetric<32/Dim>,
     emp::StreakMetric<32/Dim>,
     emp::HashMetric<32/Dim>,
-    emp::AsymmetricWrapMetric<32/Dim>,
-    emp::AsymmetricNoWrapMetric<32/Dim>,
-    emp::SymmetricWrapMetric<32/Dim>,
-    emp::SymmetricNoWrapMetric<32/Dim>
+    // emp::AsymmetricWrapMetric<32/Dim>,
+    // emp::AsymmetricNoWrapMetric<32/Dim>,
+    emp::SymmetricWrapMetric<32/Dim>//
+    // emp::SymmetricNoWrapMetric<32/Dim>
   >;
 
-  // make mean multidimensional variants
-  using mean_pack_t = typename base_pack_t::template wrap<
-    CurryDimMod<emp::MeanDimMod, Dim>::template t
-  >;
+  // // make mean multidimensional variants
+  // using mean_pack_t = typename base_pack_t::template wrap<
+  //   CurryDimMod<emp::MeanDimMod, Dim>::template t
+  // >;
 
-  // make mean multidimensional variants
-  using min_pack_t = typename base_pack_t::template wrap<
-    CurryDimMod<emp::MinDimMod, Dim>::template t
-  >;
-
-  // merge together all multimntional variants
-  using nested_pack_t = typename mean_pack_t::template merge<
-    min_pack_t
-  >;
+  // // make mean multidimensional variants
+  // using min_pack_t = typename base_pack_t::template wrap<
+  //   CurryDimMod<emp::MinDimMod, Dim>::template t
+  // >;
+  //
+  // // merge together all multimntional variants
+  // using nested_pack_t = typename mean_pack_t::template merge<
+  //   min_pack_t
+  // >;
 
   // flatten all multidimensional variatns
   // should yield 32 metrics
-  using pack_t = typename nested_pack_t::template wrap<
-    emp::FlatMod
-  >;
+  // using pack_t = typename nested_pack_t::template wrap<
+  //   emp::FlatMod
+  // >;
 
   template<typename Pack>
   static void append(collection_t & c) {
@@ -59,7 +59,7 @@ struct AddDim {
 
       append<typename Pack::pop>(c);
 
-    } else if constexpr (Dim < 4) {
+    } else if constexpr (Dim < 1) {
 
       AddDim<Dim*4>::template append<typename AddDim<Dim*4>::pack_t>(c);
 
