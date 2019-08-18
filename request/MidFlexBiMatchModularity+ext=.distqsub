@@ -7,8 +7,8 @@ set beacon_priority y
 set config_dir /mnt/scratch/mmore500/mbm/config
 set dest_dir /mnt/scratch/mmore500/mbm/data
 
-1001..1050 mbm-modularity-a singularity exec -B $(pwd):/pwd tag-olympics.simg bash -c "cd /pwd && python3 /opt/tag-olympics/script/MidGenerateBiGraph.py -s $seed --lefts 4 --rights 4 --regular 4 -m 2 -x 512 && mid-tag-olympics MBM -SEED $seed -TREATMENT mbm-modularity-a -MFM_GENS_PER_TARGET 16 -MFM_GENS 4096 -MO_LENGTH 16"
+1001..1050 mbm-modularity-a singularity exec -B $(pwd):/pwd tag-olympics.simg bash -c "cd /pwd && python3 /opt/tag-olympics/script/MidGenerateBiGraph.py -s $seed --lefts 4 --rights 4 --regular 4 -m 2 -x 512" && ./mid-tag-olympics MBM -SEED $seed -TREATMENT mbm-modularity-a -MFM_GENS_PER_TARGET 16 -MFM_GENS 4096 -MO_LENGTH 16
 
-1001..1050 mbm-modularity-b singularity exec -B $(pwd):/pwd tag-olympics.simg bash -c "cd /pwd && python3 /opt/tag-olympics/script/MidGenerateBiGraph.py -s $seed --lefts 4 --rights 4 --regular 4 -m 2 -x 256 && mid-tag-olympics MBM -SEED $seed -TREATMENT mbm-modularity-b -MFM_GENS_PER_TARGET 32 -MFM_GENS 4096 -MO_LENGTH 16"
+1001..1050 mbm-modularity-b singularity exec -B $(pwd):/pwd tag-olympics.simg bash -c "cd /pwd && python3 /opt/tag-olympics/script/MidGenerateBiGraph.py -s $seed --lefts 4 --rights 4 --regular 4 -m 2 -x 256" && ./mid-tag-olympics MBM -SEED $seed -TREATMENT mbm-modularity-b -MFM_GENS_PER_TARGET 32 -MFM_GENS 4096 -MO_LENGTH 16"
 
-1001..1050 mbm-modularity-c singularity exec -B $(pwd):/pwd tag-olympics.simg bash -c "cd /pwd && python3 /opt/tag-olympics/script/MidGenerateBiGraph.py -s $seed --lefts 4 --rights 4 --regular 4 -m 2 -x 128 && mid-tag-olympics MBM -SEED $seed -TREATMENT mbm-modularity-c -MFM_GENS_PER_TARGET 64 -MFM_GENS 4096 -MO_LENGTH 16"
+1001..1050 mbm-modularity-c singularity exec -B $(pwd):/pwd tag-olympics.simg bash -c "cd /pwd && python3 /opt/tag-olympics/script/MidGenerateBiGraph.py -s $seed --lefts 4 --rights 4 --regular 4 -m 2 -x 128" && ./mid-tag-olympics MBM -SEED $seed -TREATMENT mbm-modularity-c -MFM_GENS_PER_TARGET 64 -MFM_GENS 4096 -MO_LENGTH 16"
