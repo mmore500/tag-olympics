@@ -270,7 +270,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
   grid_world.SetAutoMutate();
   grid_world.OnUpdate([&grid_world, &cfg](size_t upd){
-    emp::LocalTournamentSelect(
+    emp::TournamentSelect(
       grid_world,
       cfg.MFM_TOURNEY_SIZE(),
       cfg.MFM_TOURNEY_REPS()
@@ -350,29 +350,15 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   //   }
   // }();
 
+
+  // evaluate modularity
   [&](){
-
-    const MidOrganism<32> & best = [&grid_world](){
-      double best_fit = grid_world.CalcFitnessID(0);
-      size_t best_id = 0;
-
-      // Search for a higher fit org in the tournament.
-      for (size_t i = 1; i < grid_world.size(); i++) {
-        const double cur_fit = grid_world.CalcFitnessID(i);
-        if (cur_fit > best_fit) {
-          best_fit = cur_fit;
-          best_id = i;
-        }
-      }
-
-      return grid_world.GetOrg(best_id);
-    }();
 
     emp::DataFile df(emp::keyname::pack({
       {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
       {"metric-slug", emp::slugify(metric.name())},
       {"experiment", cfg.MFM_TITLE()},
-      {"datafile", "cross-component-activation"},
+      {"datafile", "modularity-census"},
       {"treatment", cfg.TREATMENT()},
       {"seed", emp::to_string(cfg.SEED())},
       {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
@@ -381,96 +367,92 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
       {"ext", ".csv"}
     }));
 
-    size_t rep;
-    size_t step; // number of mutational steps to first phenotypic change
+    size_t pop_id;
+    df.AddVar(pop_id, "Individual");
 
-    double cca_before; // cross-component activation
-                       // before first phenotypic chagne
-    double cca_after; // cross-component activation
-                      // after first phenotypic chagne
+    // number of mutational steps to first phenotypic change
+    emp::DataNode<size_t, emp::data::Range> step;
+    df.AddMean(step, "Mutational Distance", "TODO", true);
 
-    size_t phen_diff = 0; // total number of phenotypic changes
-    size_t phen_size; // number of phenotypic traits assessed
-
-    size_t count_cca = 0; // what num of phenotypic changes are cross-component
-    size_t count_sca = 0; // what num of phenotypic change are same-component
-    double prop_cca; // what num of phenotypic change are same-component
-    double prop_sca; // what num of phenotypic change are same-component
-
-    size_t opp_cca = 0; // what num of phenotypic change opportunities
-                        // are cross-component
-    size_t opp_sca = 0; // what num of phenotypic change opportunities
-                        // are same-component
-    double scaled_prop_cca; // scaled by possible scas vs ccas
-    double scaled_prop_sca; // scaled by possible scas vs ccas
-
-    std::string measure = cfg.MFM_RANKED() ? "ranked" : "scored";
-
-    df.AddVar(rep, "Replicate");
-    df.AddVar(step, "Mutational Distance");
+    // cross-component activation before first phenotypic chagne
+    double cca_before;
     df.AddVar(cca_before, "Initial Cross-Component Activation");
-    df.AddVar(cca_after, "Final Cross-Component Activation");
-    df.AddVar(phen_diff, "Phenotypic Changes");
+
+    // cross-component activation before first phenotypic chagne
+    double scaled_cca_before;
+    df.AddVar(scaled_cca_before, "Initial Per-Possibility Cross-Component Activation");
+
+    // cross-component activation after first phenotypic chagne
+    emp::DataNode<double, emp::data::Range> cca_after;
+    df.AddMean(cca_after, "Final Cross-Component Activation", "TODO", true);
+
+    emp::DataNode<double, emp::data::Range> scaled_cca_after;
+    df.AddMean(scaled_cca_after, "Final Per-Possibility Cross-Component Activation", "TODO", true);
+
+    // total number of phenotypic changes that occur at once
+    emp::DataNode<size_t, emp::data::Range> phen_diff;
+    df.AddMean(phen_diff, "Phenotypic Changes", "TODO", true);
+
+    // number of phenotypic traits assessed
+    // (a.k.a. number of phenotypic change opportunities)
+    size_t phen_size = 0;
     df.AddVar(phen_size, "Phenotypic Size");
-    df.AddVar(count_cca, "Cross-Component Phenotypic Changes");
-    df.AddVar(count_sca, "Same-Component Phenotypic Changes");
-    df.AddVar(prop_cca, "Proportion Cross-Component Phenotypic Change");
-    df.AddVar(prop_sca, "Proportion Same-Component Phenotypic Change");
+
+    // what num of phenotypic change opportunities are cross-component
+    size_t opp_cca = 0;
     df.AddVar(opp_cca, "Opportunities for Cross-Component Phenotypic Change");
+
+    // what num of phenotypic change opportunities are same-component
+    size_t opp_sca = 0;
     df.AddVar(opp_sca, "Opportunities for Same-Component Phenotypic Change");
-    df.AddVar(scaled_prop_cca, "Per-Possibility Proportion Cross-Component Phenotypic Change");
-    df.AddVar(scaled_prop_sca, "Per-Possibility Proportion Same-Component Phenotypic Change");
+
+    // what num of phenotypic changes are cross-component
+    emp::DataNode<size_t, emp::data::Range> count_cca;
+    df.AddMean(count_cca, "Cross-Component Phenotypic Changes", "TODO", true);
+
+    // what num of phenotypic change are same-component
+    emp::DataNode<size_t, emp::data::Range> count_sca;
+    df.AddMean(count_sca, "Same-Component Phenotypic Changes", "TODO", true);
+
+    // what proportion of phenotypic change are cross-component
+    emp::DataNode<double, emp::data::Range> prop_cca;
+    df.AddMean(prop_cca, "Proportion Cross-Component Phenotypic Change", "TODO", true);
+
+    // what proportion of phenotypic change are same-component
+    emp::DataNode<double, emp::data::Range> prop_sca;
+    df.AddMean(prop_sca, "Proportion Same-Component Phenotypic Change", "TODO", true);
+
+    // what proportion of phenotypic change are cross-component
+    // scaled by possible scas vs ccas
+    emp::DataNode<double, emp::data::Range> scaled_prop_cca;
+    df.AddMean(scaled_prop_cca, "Per-Possibility Proportion Cross-Component Phenotypic Change");
+
+    // what proportion of phenotypic change are same-component
+    // scaled by possible scas vs ccas
+    emp::DataNode<double, emp::data::Range> scaled_prop_sca;
+    df.AddMean(scaled_prop_sca, "Per-Possibility Proportion Same-Component Phenotypic Change");
+
+    emp_assert(cfg.MFM_RANKED() == "ranked");
 
     df.PrintHeaderKeys();
 
-    std::unordered_map<std::string, size_t> module_left_counts;
-    std::unordered_map<std::string, size_t> module_right_counts;
+    for (pop_id = 0; pop_id < grid_world.GetSize(); ++pop_id) {
 
-    for (const auto & left : lefts) {
-      module_left_counts[emp::keyname::unpack(left)["module"]]++;
-    }
+      std::unordered_map<std::string, size_t> module_left_counts;
+      std::unordered_map<std::string, size_t> module_right_counts;
 
-    for (const auto & right : rights) {
-      module_right_counts[emp::keyname::unpack(right)["module"]]++;
-    }
-
-    for (const auto & [module, val] : module_left_counts) {
-      opp_cca += val * (rights.size() - module_right_counts[module]);
-      opp_sca += val * module_right_counts[module];
-    }
-
-    emp::MatchBin<
-      std::string,
-      WrapperMetric<32>,
-      emp::RankedSelector<>
-    > mb(rand);
-    mb.metric.metric = &metric;
-    mb.SetCacheOn(false);
-
-    for (const auto & right : rights) mb.Put(right, best.Get(uids[right]));
-
-    for (const auto & left : lefts) {
-
-      const auto resp = mb.GetVals(
-          mb.Match(best.Get(uids[left]), outgoing_edge_counts[left])
-        );
-
-      for (const auto & right : resp) {
-        if (
-          emp::keyname::unpack(left)["module"]
-          !=
-          emp::keyname::unpack(right)["module"]
-        ) {
-          opp_cca--;
-        } else {
-          opp_sca--;
-        }
+      for (const auto & left : lefts) {
+        module_left_counts[emp::keyname::unpack(left)["module"]]++;
       }
 
-    }
+      for (const auto & right : rights) {
+        module_right_counts[emp::keyname::unpack(right)["module"]]++;
+      }
 
-    auto calc_cca = cfg.MFM_RANKED()
-    ? std::function([&](const MidOrganism<32> & org){
+      for (const auto & [module, val] : module_left_counts) {
+        opp_cca += val * (rights.size() - module_right_counts[module]);
+        opp_sca += val * module_right_counts[module];
+      }
 
       emp::MatchBin<
         std::string,
@@ -480,84 +462,96 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
       mb.metric.metric = &metric;
       mb.SetCacheOn(false);
 
-      for (const auto & right : rights) mb.Put(right, org.Get(uids[right]));
-
-      size_t cca = 0;
-      size_t sca = 0;
+      for (const auto & right : rights) mb.Put(right, grid_world.GetOrg(pop_id).Get(uids[right]));
 
       for (const auto & left : lefts) {
 
         const auto resp = mb.GetVals(
-            mb.Match(org.Get(uids[left]), outgoing_edge_counts[left])
+            mb.Match(grid_world.GetOrg(pop_id).Get(uids[left]), outgoing_edge_counts[left])
           );
 
         for (const auto & right : resp) {
+          phen_size++;
           if (
             emp::keyname::unpack(left)["module"]
             !=
             emp::keyname::unpack(right)["module"]
           ) {
-            ++cca;
+            opp_cca--;
           } else {
-            ++sca;
+            opp_sca--;
           }
         }
 
       }
 
-      return static_cast<double>(cca) / static_cast<double>(cca + sca);
-    }) : std::function([&](const MidOrganism<32> & org){
+      auto calc_cca = [&](const MidOrganism<32> & org){
 
-      emp::DataNode<double, emp::data::Range> cca;
-      emp::DataNode<double, emp::data::Range> sca;
+        emp::MatchBin<
+          std::string,
+          WrapperMetric<32>,
+          emp::RankedSelector<>
+        > mb(rand);
+        mb.metric.metric = &metric;
+        mb.SetCacheOn(false);
 
-      for (const auto & left : lefts) {
-        for (const auto & right : rights) {
+        for (const auto & right : rights) mb.Put(right, org.Get(uids[right]));
 
-          if (
-            emp::keyname::unpack(left)["module"]
-            !=
-            emp::keyname::unpack(right)["module"]
-          ) {
-            cca.Add(metric(org.Get(uids[left]), org.Get(uids[right])));
-          } else {
-            sca.Add(metric(org.Get(uids[left]), org.Get(uids[right])));
+        size_t cca = 0;
+        size_t sca = 0;
+
+        for (const auto & left : lefts) {
+
+          const auto resp = mb.GetVals(
+              mb.Match(org.Get(uids[left]), outgoing_edge_counts[left])
+            );
+
+          for (const auto & right : resp) {
+            if (
+              emp::keyname::unpack(left)["module"]
+              !=
+              emp::keyname::unpack(right)["module"]
+            ) {
+              ++cca;
+            } else {
+              ++sca;
+            }
           }
-        }
-      }
 
-      return cca.GetMean() - sca.GetMean();
-
-    });
-
-    cca_before = calc_cca(best);
-
-    for (rep = 0; rep < cfg.MFM_COMPONENT_WALK_REPS(); ++rep) {
-
-      phen_diff = 0; // total number of phenotypic changes
-      count_cca = 0; // what num of phenotypic changes are cross-component
-      count_sca = 0; // what num of phenotypic change are same-component
-
-      MidOrganism<32> walker(best);
-
-      for (step = 1; !phen_diff; ++step) {
-
-        // perform one mutational step
-        for (bool flip = false; !flip; ) {
-          const size_t target_bs = rand.GetUInt(walker.bsets.size());
-          const size_t target_bit = rand.GetUInt(
-            walker.bsets[target_bs].size()
-          );
-          flip = (
-            rand.P(cfg.MO_BITWEIGHT())
-            !=
-            walker.bsets[target_bs].Get(target_bit)
-          );
-          if (flip) { walker.bsets[target_bs].Toggle(target_bit); }
         }
 
-        if (cfg.MFM_RANKED()) {
+        return static_cast<double>(cca) / static_cast<double>(cca + sca);
+      };
 
+      cca_before = calc_cca(grid_world.GetOrg(pop_id));
+      scaled_cca_before = scaled_cca_before / static_cast<double>(opp_cca);
+
+      for (size_t rep = 0; rep < cfg.MFM_COMPONENT_WALK_REPS(); ++rep) {
+
+        size_t phen_diff_tally = 0;
+        size_t count_cca_tally = 0;
+        size_t count_sca_tally = 0;
+        size_t step_tally = 0;
+
+        MidOrganism<32> walker(grid_world.GetOrg(pop_id));
+
+        for (step_tally = 1; !phen_diff_tally; ++step_tally) {
+
+          // perform one mutational step
+          for (bool flip = false; !flip; ) {
+            const size_t target_bs = rand.GetUInt(walker.bsets.size());
+            const size_t target_bit = rand.GetUInt(
+              walker.bsets[target_bs].size()
+            );
+            flip = (
+              rand.P(cfg.MO_BITWEIGHT())
+              !=
+              walker.bsets[target_bs].Get(target_bit)
+            );
+            if (flip) { walker.bsets[target_bs].Toggle(target_bit); }
+          }
+
+          // set up match bins
           emp::MatchBin<
             std::string,
             WrapperMetric<32>,
@@ -576,63 +570,76 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
           for (const auto & right : rights) {
             mb.Put(right, walker.Get(uids[right]));
-            mb_orig.Put(right, best.Get(uids[right]));
+            mb_orig.Put(right, grid_world.GetOrg(pop_id).Get(uids[right]));
           }
 
-          phen_size = 0;
-
+          // compare phenotypes, count changes
           for (const auto & left : lefts) {
 
             const auto resp = mb.GetVals(
                 mb.Match(walker.Get(uids[left]), outgoing_edge_counts[left])
               );
             const auto resp_orig = mb_orig.GetVals(
-                mb_orig.Match(best.Get(uids[left]), outgoing_edge_counts[left])
+                mb_orig.Match(grid_world.GetOrg(pop_id).Get(uids[left]), outgoing_edge_counts[left])
               );
             const std::unordered_set<std::string> set_orig(
               std::begin(resp_orig), std::end(resp_orig)
             );
 
             for (const auto & right : resp) {
-              ++phen_size;
               if (!set_orig.count(right)) {
-                ++phen_diff;
+                ++phen_diff_tally;
                 if (
                   emp::keyname::unpack(left)["module"]
                   !=
                   emp::keyname::unpack(right)["module"]
                 ) {
-                  ++count_cca;
+                  ++count_cca_tally;
                 } else {
-                  ++count_sca;
+                  ++count_sca_tally;
                 }
               }
             }
 
           }
 
-        } else {
-          emp_assert(false, "unimplemented");
-        }
+        } // mutational walk
 
-      }
+        phen_diff.Add(phen_diff_tally);
+        count_cca.Add(count_cca_tally);
+        count_sca.Add(count_sca_tally);
+        step.Add(step_tally);
 
-      cca_after = calc_cca(walker);
-      prop_cca = (
-        static_cast<double>(count_cca) / static_cast<double>(phen_diff)
-      );
-      prop_sca = (
-        static_cast<double>(count_sca) / static_cast<double>(phen_diff)
-      );
-      scaled_prop_cca = (
-        prop_cca * (opp_cca + opp_sca) / opp_cca
-      );
-      scaled_prop_sca = (
-        prop_sca * (opp_cca + opp_sca) / opp_sca
-      );
+        const double cca_after_res = calc_cca(walker);
+        cca_after.Add(cca_after_res);
+        scaled_cca_after.Add(
+          cca_after_res / static_cast<double>(opp_cca)
+        );
+
+        const double prop_cca_res = (
+          static_cast<double>(count_cca_tally)
+          / static_cast<double>(phen_diff_tally)
+        );
+        const double prop_sca_res = (
+          static_cast<double>(count_sca_tally)
+          / static_cast<double>(phen_diff_tally)
+        );
+
+        prop_cca.Add(prop_cca_res);
+        prop_sca.Add(prop_sca_res);
+
+        scaled_prop_cca.Add(
+          prop_cca_res * (opp_cca + opp_sca) / opp_cca
+        );
+        scaled_prop_sca.Add(
+          prop_sca_res * (opp_cca + opp_sca) / opp_sca
+        );
+
+      } // replicate mutational walk
+
       df.Update();
 
-    }
+    } // pop_id
   }();
 
   }

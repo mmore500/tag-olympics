@@ -112,7 +112,7 @@ outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
     'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
     'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
-    'viz' : 'modularity-bar',
+    'viz' : 'mutation-modularity-bar',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
     '_script_fullcat_hash' : fsh.FilesHash(
                                 file_parcel="full_parcel",
@@ -147,6 +147,74 @@ outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
     'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
     'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
+    'viz' : 'mutation-modularity-violin',
+    '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
+
+plt.clf()
+
+sns.barplot(
+    'Metric',
+    'Initial Per-Possibility Cross-Component Activation',
+    data=df_data,
+)
+
+assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
+
+outfile = kn.pack({
+    'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
+    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
+    'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
+    'viz' : 'modularity-bar',
+    '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
+
+plt.clf()
+
+sns.violinplot(
+    'Metric',
+    'Initial Per-Possibility Cross-Component Activation',
+    data=df_data,
+    scale="area",
+    inner="stick",
+)
+
+assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
+
+outfile = kn.pack({
+    'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
+    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
+    'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
     'viz' : 'modularity-violin',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
     '_script_fullcat_hash' : fsh.FilesHash(
@@ -163,3 +231,38 @@ plt.savefig(
     pad_inches=0
 )
 print("output saved to", outfile)
+
+plt.clf()
+
+sns.barplot(
+    'Metric',
+    'Mutational Distance',
+    data=df_data,
+)
+
+assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
+
+outfile = kn.pack({
+    'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
+    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
+    'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
+    'viz' : 'modularity-robustness',
+    '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
+
+plt.clf()
