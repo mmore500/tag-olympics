@@ -55,14 +55,16 @@ EMP_BUILD_CONFIG(
   GROUP(MID_ORGANISM, "Settings for mid-level organism"),
   VALUE(MO_LENGTH, size_t, 48, "TODO"),
   VALUE(MO_BITWEIGHT, double, 0.5, "TODO"),
-  VALUE(MO_MUT_BIT_REDRAW_PER_BIT, double, 0.001, "TODO"),
+  VALUE(MO_MUT_BIT_REDRAW_PER_BIT, double, 0.005, "TODO"),
   VALUE(MO_MUT_PROB, double, 0.5, "TODO"),
 
   GROUP(MID_FLEX_MATCH, "Settings for mid-flex-match experiment"),
   VALUE(MFM_GENS, size_t, 100, "TODO"),
-  VALUE(MFM_POP_SIZE, size_t, 400, "TODO"),
+  VALUE(MFM_POP_SIZE, size_t, 3600, "TODO"),
+  VALUE(MFM_SUBGRID_DIM, size_t, 20, "TODO"),
+  VALUE(MFM_SUBGRID_TRANSFERS, size_t, 81, "TODO"),
   VALUE(MFM_TOURNEY_SIZE, size_t, 8, "TODO"),
-  VALUE(MFM_TOURNEY_REPS, size_t, 1024, "TODO"),
+  VALUE(MFM_TOURNEY_REPS, size_t, 7200, "TODO"),
   VALUE(
     MFM_COMPONENT_WALK_LENGTH,
     size_t,
@@ -72,7 +74,7 @@ EMP_BUILD_CONFIG(
   VALUE(
     MFM_COMPONENT_WALK_REPS,
     size_t,
-    512,
+    8192,
     "How many mutational walk reps to perform?"
   ),
   VALUE(

@@ -232,6 +232,42 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
       }
     );
   }
+
+  // wrap up into subgrids
+  grid_world.SetGetNeighborFun([&](emp::WorldPosition pos){
+
+    const size_t size_x = grid_world.GetWidth();
+    const size_t size_y = grid_world.GetHeight();
+    const size_t id = pos.GetIndex();
+
+    const size_t orig_x = id%size_x;
+    const size_t orig_y = id/size_x;
+
+    // fancy footwork to exclude self (4) from consideration
+    const int offset = (rand.GetInt(8) * 5) % 9;
+    int rand_x = (int) orig_x + offset%3 - 1;
+    int rand_y = (int) orig_y + offset/3 - 1;
+
+    rand_x = (
+      orig_x - emp::Mod(orig_x, static_cast<int>(cfg.MFM_SUBGRID_DIM()))
+    ) + emp::Mod(rand_x, static_cast<int>(cfg.MFM_SUBGRID_DIM()));
+
+    rand_y = (
+      orig_y - emp::Mod(orig_y, static_cast<int>(cfg.MFM_SUBGRID_DIM()))
+    ) + emp::Mod(rand_y, static_cast<int>(cfg.MFM_SUBGRID_DIM()));
+
+    const auto neighbor_id = (
+      emp::Mod(rand_x, (int) size_x)
+      + emp::Mod(rand_y, (int) size_y) * (int)size_x
+    );
+
+    emp_assert((int)pos.GetIndex() != neighbor_id);
+
+    return pos.SetIndex(neighbor_id);
+
+  });
+
+
   grid_world.SetAutoMutate();
   grid_world.OnUpdate([&grid_world, &cfg](size_t upd){
     emp::LocalTournamentSelect(
@@ -247,6 +283,14 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     [&](size_t upd){
       if (cfg.MFM_GENS_PER_TARGET() && upd % cfg.MFM_GENS_PER_TARGET() == 0) {
         incr_instance();
+        for (size_t t = 0; t < cfg.MFM_SUBGRID_TRANSFERS(); ++t) {
+          const auto source = grid_world.GetRandomOrgID();
+          grid_world.AddOrgAt(
+            emp::NewPtr<MidOrganism<32>>(grid_world.GetOrg(source)),
+            grid_world.GetRandomOrgID(),
+            source
+          );
+        }
       }
     }
   );
@@ -268,43 +312,43 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
   std::cout << std::endl;
 
-  [&](){
-    emp::DataFile df(emp::keyname::pack({
-      {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
-      {"metric-slug", emp::slugify(metric.name())},
-      {"experiment", cfg.MFM_TITLE()},
-      {"datafile", "end-census"},
-      {"treatment", cfg.TREATMENT()},
-      {"seed", emp::to_string(cfg.SEED())},
-      {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
-      // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
-      // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
-      {"ext", ".csv"}
-    }));
-
-    size_t pop_id;
-    size_t pos;
-    df.AddVar(pop_id, "Population ID");
-    df.AddVar(pos, "Genome Position");
-    df.AddFun<double>(
-      [&](){
-        const auto & compare_to = grid_world.GetOrg(pop_id).Get(pos);
-        double res = 0.0;
-        for (size_t r = 0; r < cfg.LSA_NREPS(); ++r) {
-          const decltype(compare_to) sample{rand, cfg.MO_BITWEIGHT()};
-          res += metric(compare_to, sample);
-        }
-        return res / cfg.LSA_NREPS();
-      },
-      "Specificity"
-    );
-
-    df.PrintHeaderKeys();
-
-    for (pop_id = 0; pop_id < grid_world.size(); ++pop_id) {
-      for (pos = 0; pos < cfg.MO_LENGTH(); ++pos) df.Update();
-    }
-  }();
+  // [&](){
+  //   emp::DataFile df(emp::keyname::pack({
+  //     {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
+  //     {"metric-slug", emp::slugify(metric.name())},
+  //     {"experiment", cfg.MFM_TITLE()},
+  //     {"datafile", "end-census"},
+  //     {"treatment", cfg.TREATMENT()},
+  //     {"seed", emp::to_string(cfg.SEED())},
+  //     {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
+  //     // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
+  //     // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
+  //     {"ext", ".csv"}
+  //   }));
+  //
+  //   size_t pop_id;
+  //   size_t pos;
+  //   df.AddVar(pop_id, "Population ID");
+  //   df.AddVar(pos, "Genome Position");
+  //   df.AddFun<double>(
+  //     [&](){
+  //       const auto & compare_to = grid_world.GetOrg(pop_id).Get(pos);
+  //       double res = 0.0;
+  //       for (size_t r = 0; r < cfg.LSA_NREPS(); ++r) {
+  //         const decltype(compare_to) sample{rand, cfg.MO_BITWEIGHT()};
+  //         res += metric(compare_to, sample);
+  //       }
+  //       return res / cfg.LSA_NREPS();
+  //     },
+  //     "Specificity"
+  //   );
+  //
+  //   df.PrintHeaderKeys();
+  //
+  //   for (pop_id = 0; pop_id < grid_world.size(); ++pop_id) {
+  //     for (pos = 0; pos < cfg.MO_LENGTH(); ++pos) df.Update();
+  //   }
+  // }();
 
   [&](){
 
