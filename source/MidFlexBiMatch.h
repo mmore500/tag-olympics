@@ -285,6 +285,9 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
         incr_instance();
         for (size_t t = 0; t < cfg.MFM_SUBGRID_TRANSFERS(); ++t) {
           const auto source = grid_world.GetRandomOrgID();
+          auto dest = grid_world.GetRandomOrgID();
+          // if source == dest, systematics segfaults
+          while (source == dest) dest = grid_world.GetRandomOrgID();
           grid_world.AddOrgAt(
             emp::NewPtr<MidOrganism<32>>(grid_world.GetOrg(source)),
             grid_world.GetRandomOrgID(),
