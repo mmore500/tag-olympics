@@ -129,36 +129,36 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     {"ext", ".csv"}
   }));
 
-  grid_world.AddSystematics(
-    emp::NewPtr<
-      emp::Systematics<
-        MidOrganism<32>,
-        MidOrganism<32>
-      >
-    >(
-      [](MidOrganism<32> & o){ return o; },
-      true,
-      true,
-      false
-    ),
-    "systematics"
-  );
+  // grid_world.AddSystematics(
+  //   emp::NewPtr<
+  //     emp::Systematics<
+  //       MidOrganism<32>,
+  //       MidOrganism<32>
+  //     >
+  //   >(
+  //     [](MidOrganism<32> & o){ return o; },
+  //     true,
+  //     true,
+  //     false
+  //   ),
+  //   "systematics"
+  // );
 
-  grid_world.SetupSystematicsFile(
-    "systematics",
-    emp::keyname::pack({
-      {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
-      {"metric-slug", emp::slugify(metric.name())},
-      {"experiment", cfg.MFM_TITLE()},
-      {"datafile", "systematics"},
-      {"treatment", cfg.TREATMENT()},
-      {"seed", emp::to_string(cfg.SEED())},
-      {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
-      // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
-      // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
-      {"ext", ".csv"}
-    })
-  );
+  // grid_world.SetupSystematicsFile(
+  //   "systematics",
+  //   emp::keyname::pack({
+  //     {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
+  //     {"metric-slug", emp::slugify(metric.name())},
+  //     {"experiment", cfg.MFM_TITLE()},
+  //     {"datafile", "systematics"},
+  //     {"treatment", cfg.TREATMENT()},
+  //     {"seed", emp::to_string(cfg.SEED())},
+  //     {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
+  //     // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
+  //     // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
+  //     {"ext", ".csv"}
+  //   })
+  // );
 
   const size_t side = (size_t) std::sqrt(cfg.MFM_POP_SIZE());
 
