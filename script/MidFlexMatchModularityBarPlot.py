@@ -73,16 +73,8 @@ df_data['Inverse'] = df_data.apply(
 
 df_data['Metric'] = df_data.apply(
     lambda x: (
-        ('Sliding ' if key[x['Slug']]['Sliding'] else '')
+        ('Started ' if 'Started' in x['Metric'] else '')
         + key[x['Slug']]['Base Metric']
-    ),
-    axis=1
-)
-
-df_data['Metric'] = df_data.apply(
-    lambda x: (
-        ('Inverse ' if x['Inverse'] else '')
-        + x['Metric']
     ),
     axis=1
 )
@@ -98,11 +90,13 @@ df_data['Dimension'] = df_data.apply(
 
 print("Data crunched!")
 
-sns.barplot(
+res = sns.barplot(
     'Metric',
     'Per-Possibility Proportion Cross-Component Phenotypic Change',
     data=df_data
 )
+
+plt.setp(res.get_xticklabels(), rotation=45)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
@@ -131,13 +125,15 @@ print("output saved to", outfile)
 
 plt.clf()
 
-sns.violinplot(
+res = sns.violinplot(
     'Metric',
     'Per-Possibility Proportion Cross-Component Phenotypic Change',
     data=df_data,
     scale="area",
     inner="stick",
 )
+
+plt.setp(res.get_xticklabels(), rotation=45)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
@@ -166,11 +162,13 @@ print("output saved to", outfile)
 
 plt.clf()
 
-sns.barplot(
+res = sns.barplot(
     'Metric',
     'Initial Per-Possibility Cross-Component Activation',
     data=df_data,
 )
+
+plt.setp(res.get_xticklabels(), rotation=45)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
@@ -199,13 +197,15 @@ print("output saved to", outfile)
 
 plt.clf()
 
-sns.violinplot(
+res = sns.violinplot(
     'Metric',
     'Initial Per-Possibility Cross-Component Activation',
     data=df_data,
     scale="area",
     inner="stick",
 )
+
+plt.setp(res.get_xticklabels(), rotation=45)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
@@ -234,11 +234,13 @@ print("output saved to", outfile)
 
 plt.clf()
 
-sns.barplot(
+res = sns.barplot(
     'Metric',
     'Mutational Distance',
     data=df_data,
 )
+
+plt.setp(res.get_xticklabels(), rotation=45)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
