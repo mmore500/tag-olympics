@@ -42,8 +42,8 @@ void LowMakeDigraph(const Metrics::collection_t &metrics, const Config &cfg) {
   for(s = 0; s < cfg.LMD_NSAMPLES(); ++s) {
     std::cout << "sample " << s << std::endl;
 
-    emp::vector<emp::BitSet<32>> lefts;
-    emp::vector<emp::BitSet<32>> rights;
+    emp::vector<emp::BitSet<Config::BS_WIDTH()>> lefts;
+    emp::vector<emp::BitSet<Config::BS_WIDTH()>> rights;
     lefts.reserve(cfg.LMD_NNODES());
     rights.reserve(cfg.LMD_NNODES());
 

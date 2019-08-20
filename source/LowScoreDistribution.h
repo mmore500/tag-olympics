@@ -37,8 +37,8 @@ void LowScoreDistribution(const Metrics::collection_t &metrics, const Config &cf
 
   for(s = 0; s < cfg.LSD_NSAMPLES(); ++s) {
 
-    emp::BitSet<32> bs_a(rand, cfg.LSD_BITWEIGHT());
-    emp::BitSet<32> bs_b(rand, cfg.LSD_BITWEIGHT());
+    emp::BitSet<Config::BS_WIDTH()> bs_a(rand, cfg.LSD_BITWEIGHT());
+    emp::BitSet<Config::BS_WIDTH()> bs_b(rand, cfg.LSD_BITWEIGHT());
 
     for (const auto & mptr : metrics) {
       const auto & metric = *mptr;

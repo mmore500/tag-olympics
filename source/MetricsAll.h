@@ -13,24 +13,24 @@ struct AddDim {
   using collection_t = emp::vector<
     emp::Ptr<
       emp::BaseMetric<
-        emp::BitSet<32>,
-        emp::BitSet<32>
+        emp::BitSet<Config::BS_WIDTH()>,
+        emp::BitSet<Config::BS_WIDTH()>
       >
     >
   >;
 
   // base metrics
   using base_pack_t = typename emp::TypePack<
-    emp::HammingMetric<32/Dim>,
-    emp::StreakMetric<32/Dim>,
-    emp::HashMetric<32/Dim>,
-    emp::SlideMod<emp::HammingMetric<32/Dim>>,
-    emp::SlideMod<emp::StreakMetric<32/Dim>>,
-    emp::SlideMod<emp::HashMetric<32/Dim>>,
-    emp::AsymmetricWrapMetric<32/Dim>,
-    emp::AsymmetricNoWrapMetric<32/Dim>,
-    emp::SymmetricWrapMetric<32/Dim>,
-    emp::SymmetricNoWrapMetric<32/Dim>
+    emp::HammingMetric<Config::BS_WIDTH()/Dim>,
+    emp::StreakMetric<Config::BS_WIDTH()/Dim>,
+    emp::HashMetric<Config::BS_WIDTH()/Dim>,
+    emp::SlideMod<emp::HammingMetric<Config::BS_WIDTH()/Dim>>,
+    emp::SlideMod<emp::StreakMetric<Config::BS_WIDTH()/Dim>>,
+    emp::SlideMod<emp::HashMetric<Config::BS_WIDTH()/Dim>>,
+    emp::AsymmetricWrapMetric<Config::BS_WIDTH()/Dim>,
+    emp::AsymmetricNoWrapMetric<Config::BS_WIDTH()/Dim>,
+    emp::SymmetricWrapMetric<Config::BS_WIDTH()/Dim>,
+    emp::SymmetricNoWrapMetric<Config::BS_WIDTH()/Dim>
   >;
 
   // add anti versions
@@ -64,7 +64,7 @@ struct AddDim {
   >;
 
   // flatten all multidimensional variatns
-  // should yield 32 metrics
+  // should yield Config::BS_WIDTH() metrics
   using pack_t = typename nested_pack_t::template wrap<
     emp::FlatMod
   >;

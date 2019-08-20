@@ -102,7 +102,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     }
   }
 
-  emp::World<MidOrganism<32>> grid_world(rand);
+  emp::World<MidOrganism<Config::BS_WIDTH()>> grid_world(rand);
 
   grid_world.SetupFitnessFile(emp::keyname::pack({
     {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
@@ -124,11 +124,11 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   grid_world.AddSystematics(
     emp::NewPtr<
       emp::Systematics<
-        MidOrganism<32>,
-        MidOrganism<32>
+        MidOrganism<Config::BS_WIDTH()>,
+        MidOrganism<Config::BS_WIDTH()>
       >
     >(
-      [](MidOrganism<32> & o){ return o; },
+      [](MidOrganism<Config::BS_WIDTH()> & o){ return o; },
       true,
       true,
       false
@@ -162,11 +162,11 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   if (cfg.MFM_RANKED()) {
     grid_world.SetFitFun(
       [&target, &cfg, &metric, &incoming_edge_counts, &rand]
-      (MidOrganism<32> & org){
+      (MidOrganism<Config::BS_WIDTH()> & org){
 
         emp::MatchBin<
           size_t,
-          WrapperMetric<32>,
+          WrapperMetric<Config::BS_WIDTH()>,
           emp::RankedSelector<>
         > mb(rand);
         mb.metric.metric = &metric;
@@ -205,7 +205,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     );
   } else {
     grid_world.SetFitFun(
-      [&target, &cfg, &metric](MidOrganism<32> & org){
+      [&target, &cfg, &metric](MidOrganism<Config::BS_WIDTH()> & org){
 
         double res = 0.0;
         double worst = 0.0;
@@ -278,7 +278,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   emp_assert(grid_world.GetSize() == cfg.MFM_POP_SIZE());
 
   for (size_t i = 0; i < cfg.MFM_POP_SIZE(); ++i) {
-    MidOrganism<32> org(cfg, rand);
+    MidOrganism<Config::BS_WIDTH()> org(cfg, rand);
     grid_world.InjectAt(org, i);
   }
 
@@ -335,7 +335,7 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
   [&](){
 
-    const MidOrganism<32> & best = [&grid_world](){
+    const MidOrganism<Config::BS_WIDTH()> & best = [&grid_world](){
       double best_fit = grid_world.CalcFitnessID(0);
       size_t best_id = 0;
 
@@ -380,13 +380,13 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     df.PrintHeaderKeys();
 
     for (rep = 0; rep < cfg.MFM_COMPONENT_WALK_REPS(); ++rep) {
-      MidOrganism<32> walker = best;
+      MidOrganism<Config::BS_WIDTH()> walker = best;
       for (step = 0; step < cfg.MFM_COMPONENT_WALK_LENGTH(); ++step) {
         measure = "Ranked";
         res = [&](){
           emp::MatchBin<
             size_t,
-            WrapperMetric<32>,
+            WrapperMetric<Config::BS_WIDTH()>,
             emp::RankedSelector<>
           > mb(rand);
           mb.metric.metric = &metric;

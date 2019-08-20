@@ -51,11 +51,11 @@ void LowSpecificityAnalysis(const Metrics::collection_t &metrics, const Config &
 
     for(s = 0; s < cfg.LSA_NSAMPLES(); ++s) {
 
-      emp::BitSet<32> samp(rand, cfg.LSA_BITWEIGHT());
+      emp::BitSet<Config::BS_WIDTH()> samp(rand, cfg.LSA_BITWEIGHT());
 
       for(size_t r = 0; r < cfg.LSA_NREPS(); ++r) {
 
-        emp::BitSet<32> rep(rand, cfg.LSA_BITWEIGHT());
+        emp::BitSet<Config::BS_WIDTH()> rep(rand, cfg.LSA_BITWEIGHT());
 
         match_node.Add(metric(samp, rep));
 

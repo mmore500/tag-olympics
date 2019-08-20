@@ -10,8 +10,8 @@ struct Metrics {
   using collection_t = emp::vector<
     emp::Ptr<
       emp::BaseMetric<
-        emp::BitSet<32>,
-        emp::BitSet<32>
+        emp::BitSet<Config::BS_WIDTH()>,
+        emp::BitSet<Config::BS_WIDTH()>
       >
     >
   >;

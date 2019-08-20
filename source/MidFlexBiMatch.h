@@ -114,7 +114,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
   incr_instance();
 
-  emp::World<MidOrganism<32>> grid_world(rand);
+  emp::World<MidOrganism<Config::BS_WIDTH()>> grid_world(rand);
 
   grid_world.SetupFitnessFile(emp::keyname::pack({
     {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
@@ -132,11 +132,11 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   // grid_world.AddSystematics(
   //   emp::NewPtr<
   //     emp::Systematics<
-  //       MidOrganism<32>,
-  //       MidOrganism<32>
+  //       MidOrganism<Config::BS_WIDTH()>,
+  //       MidOrganism<Config::BS_WIDTH()>
   //     >
   //   >(
-  //     [](MidOrganism<32> & o){ return o; },
+  //     [](MidOrganism<Config::BS_WIDTH()> & o){ return o; },
   //     true,
   //     true,
   //     false
@@ -166,11 +166,11 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   if (cfg.MFM_RANKED()) {
     grid_world.SetFitFun(
       [&]
-      (MidOrganism<32> & org){
+      (MidOrganism<Config::BS_WIDTH()> & org){
 
         emp::MatchBin<
           std::string,
-          WrapperMetric<32>,
+          WrapperMetric<Config::BS_WIDTH()>,
           emp::RankedSelector<>
         > mb(rand);
         mb.metric.metric = &metric;
@@ -202,7 +202,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     );
   } else {
     grid_world.SetFitFun(
-      [&](MidOrganism<32> & org){
+      [&](MidOrganism<Config::BS_WIDTH()> & org){
 
         double res = 0.0;
         double worst = 0.0;
@@ -289,7 +289,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
           // if source == dest, systematics segfaults
           while (source == dest) dest = grid_world.GetRandomOrgID();
           grid_world.AddOrgAt(
-            emp::NewPtr<MidOrganism<32>>(grid_world.GetOrg(source)),
+            emp::NewPtr<MidOrganism<Config::BS_WIDTH()>>(grid_world.GetOrg(source)),
             grid_world.GetRandomOrgID(),
             source
           );
@@ -302,7 +302,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   emp_assert(grid_world.GetSize() == cfg.MFM_POP_SIZE());
 
   for (size_t i = 0; i < cfg.MFM_POP_SIZE(); ++i) {
-    MidOrganism<32> org(cfg, rand);
+    MidOrganism<Config::BS_WIDTH()> org(cfg, rand);
     grid_world.InjectAt(org, i);
   }
 
@@ -459,7 +459,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
       emp::MatchBin<
         std::string,
-        WrapperMetric<32>,
+        WrapperMetric<Config::BS_WIDTH()>,
         emp::RankedSelector<>
       > mb(rand);
       mb.metric.metric = &metric;
@@ -488,11 +488,11 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
       }
 
-      auto calc_cca = [&](const MidOrganism<32> & org){
+      auto calc_cca = [&](const MidOrganism<Config::BS_WIDTH()> & org){
 
         emp::MatchBin<
           std::string,
-          WrapperMetric<32>,
+          WrapperMetric<Config::BS_WIDTH()>,
           emp::RankedSelector<>
         > mb(rand);
         mb.metric.metric = &metric;
@@ -536,7 +536,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
         size_t count_sca_tally = 0;
         size_t step_tally = 0;
 
-        MidOrganism<32> walker(grid_world.GetOrg(pop_id));
+        MidOrganism<Config::BS_WIDTH()> walker(grid_world.GetOrg(pop_id));
 
         for (step_tally = 1; !phen_diff_tally; ++step_tally) {
 
@@ -557,7 +557,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
           // set up match bins
           emp::MatchBin<
             std::string,
-            WrapperMetric<32>,
+            WrapperMetric<Config::BS_WIDTH()>,
             emp::RankedSelector<>
           > mb(rand);
           mb.metric.metric = &metric;
@@ -565,7 +565,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
           emp::MatchBin<
             std::string,
-            WrapperMetric<32>,
+            WrapperMetric<Config::BS_WIDTH()>,
             emp::RankedSelector<>
           > mb_orig(rand);
           mb_orig.metric.metric = &metric;

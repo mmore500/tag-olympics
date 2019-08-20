@@ -13,6 +13,7 @@ EMP_BUILD_CONFIG(
   VALUE(FILENAME, std::string, "configs.cfg", "Default config filename"),
   VALUE(TREATMENT, std::string, "unspecified", "Treatment specifier"),
   VALUE(MID_ANTI_METRICS, bool, false, "Use anti version of metrics?"),
+  CONST(BS_WIDTH, size_t, 64, "BitSet width?"),
 
   GROUP(LOW_MUTATIONAL_WALK, "Settings for low-mutational-walk experiment"),
   VALUE(LMW_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a bitstring"),

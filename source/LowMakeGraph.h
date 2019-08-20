@@ -42,7 +42,7 @@ void LowMakeGraph(const Metrics::collection_t &metrics, const Config &cfg) {
   for(s = 0; s < cfg.LMG_NSAMPLES(); ++s) {
     std::cout << "sample " << s << std::endl;
 
-    emp::vector<emp::BitSet<32>> bs;
+    emp::vector<emp::BitSet<Config::BS_WIDTH()>> bs;
     bs.reserve(cfg.LMG_NNODES());
 
     for(size_t n = 0; n < cfg.LMG_NNODES(); ++n) {
