@@ -2,7 +2,7 @@ set email mmore500@msu.edu
 set freq_email Crash
 set description mbm-modularity
 set mem_request 4
-set walltime 4
+set walltime 8
 set beacon_priority y
 set config_dir /mnt/scratch/mmore500/mbm/config
 set dest_dir /mnt/scratch/mmore500/mbm/data
