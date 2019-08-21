@@ -50,11 +50,11 @@ void LowMutationalWalk(const Metrics::collection_t &metrics, const Config &cfg) 
 
     for (s = 0; s < cfg.LMW_NSAMPLES(); ++s) {
 
-      const emp::BitSet<Config:BS_WIDTH()> orig_bs(rand, cfg.LMW_BITWEIGHT());
+      const emp::BitSet<Config::BS_WIDTH()> orig_bs(rand, cfg.LMW_BITWEIGHT());
 
       for (r = 0; r < cfg.LMW_NREPS(); ++r) {
 
-        emp::BitSet<Config:BS_WIDTH()> walker(orig_bs);
+        emp::BitSet<Config::BS_WIDTH()> walker(orig_bs);
 
         for (step = 0; step < cfg.LMW_NSTEPS(); ++step) {
 

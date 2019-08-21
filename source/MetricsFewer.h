@@ -22,14 +22,20 @@ struct AddDim {
 
   // base metrics
   using pack_t = typename emp::TypePack<
-    emp::HierMetric<>,
+    // emp::HierMetric<>,
     emp::HammingMetric<Config::BS_WIDTH()/Dim>,
     emp::StreakMetric<Config::BS_WIDTH()/Dim>,
     emp::HashMetric<Config::BS_WIDTH()/Dim>,
+    emp::SymmetricWrapMetric<Config::BS_WIDTH()/Dim>,
+
+    emp::HardStartMod<emp::HammingMetric<Config::BS_WIDTH()/Dim>>,
+    emp::HardStartMod<emp::StreakMetric<Config::BS_WIDTH()/Dim>>,
+    emp::HardStartMod<emp::HashMetric<Config::BS_WIDTH()/Dim>>,
+    emp::HardStartMod<emp::SymmetricWrapMetric<Config::BS_WIDTH()/Dim>>//
+
+    // emp::SymmetricNoWrapMetric<Config::BS_WIDTH()/Dim>
     // emp::AsymmetricWrapMetric<Config::BS_WIDTH()/Dim>,
     // emp::AsymmetricNoWrapMetric<Config::BS_WIDTH()/Dim>,
-    emp::SymmetricWrapMetric<Config::BS_WIDTH()/Dim>//
-    // emp::SymmetricNoWrapMetric<Config::BS_WIDTH()/Dim>
   >;
 
   // // make mean multidimensional variants
