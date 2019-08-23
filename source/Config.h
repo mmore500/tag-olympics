@@ -73,6 +73,12 @@ EMP_BUILD_CONFIG(
     "How many mutational steps to take while tracking cross-component activation?"
   ),
   VALUE(
+    MFM_COMPONENT_FREQ,
+    size_t,
+    128,
+    "How often to take a modularity census?"
+  ),
+  VALUE(
     MFM_COMPONENT_WALK_REPS,
     size_t,
     512,

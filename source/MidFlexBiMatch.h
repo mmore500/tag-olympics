@@ -353,93 +353,148 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   //   }
   // }();
 
+  { // modularity setup
 
-  // evaluate modularity
-  [&](){
+  emp::DataManager<
+    double, emp::data::Range, emp::data::Log, emp::data::Pull
+  > mod_man;
 
-    emp::DataFile df(emp::keyname::pack({
-      {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
-      {"metric-slug", emp::slugify(metric.name())},
-      {"experiment", cfg.MFM_TITLE()},
-      {"datafile", "modularity-census"},
-      {"treatment", cfg.TREATMENT()},
-      {"seed", emp::to_string(cfg.SEED())},
-      {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
-      // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
-      // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
-      {"ext", ".csv"}
-    }));
+  // number of mutational steps to first phenotypic change
+  emp::DataNode<size_t, emp::data::Range> step;
+  mod_man.New("step").AddPull([&step](){
+    const double res = step.GetMean();
+    step.Reset();
+    return res;
+  });
 
-    size_t pop_id;
-    df.AddVar(pop_id, "Individual");
+  // cross-component activation before first phenotypic chagne
+  double cca_before;
+  mod_man.New("cca_before").AddPull([&cca_before](){ return cca_before; });
 
-    // number of mutational steps to first phenotypic change
-    emp::DataNode<size_t, emp::data::Range> step;
-    df.AddMean(step, "Mutational Distance", "TODO", true);
+  // cross-component activation before first phenotypic chagne
+  double scaled_cca_before;
+  mod_man.New("scaled_cca_before").AddPull([&scaled_cca_before](){
+    return scaled_cca_before;
+  });
 
-    // cross-component activation before first phenotypic chagne
-    double cca_before;
-    df.AddVar(cca_before, "Initial Cross-Component Activation");
+  // cross-component activation after first phenotypic chagne
+  emp::DataNode<double, emp::data::Range> cca_after;
+  mod_man.New("cca_after").AddPull([&cca_after](){
+    const double res = cca_after.GetMean();
+    cca_after.Reset();
+    return res;
+  });
 
-    // cross-component activation before first phenotypic chagne
-    double scaled_cca_before;
-    df.AddVar(scaled_cca_before, "Initial Per-Possibility Cross-Component Activation");
+  emp::DataNode<double, emp::data::Range> scaled_cca_after;
+  mod_man.New("scaled_cca_after").AddPull([&scaled_cca_after](){
+    const double res = scaled_cca_after.GetMean();
+    scaled_cca_after.Reset();
+    return res;
+  });
 
-    // cross-component activation after first phenotypic chagne
-    emp::DataNode<double, emp::data::Range> cca_after;
-    df.AddMean(cca_after, "Final Cross-Component Activation", "TODO", true);
+  // total number of phenotypic changes that occur at once
+  emp::DataNode<size_t, emp::data::Range> phen_diff;
+  mod_man.New("phen_diff").AddPull([&phen_diff](){
+    const double res = phen_diff.GetMean();
+    phen_diff.Reset();
+    return res;
+  });
 
-    emp::DataNode<double, emp::data::Range> scaled_cca_after;
-    df.AddMean(scaled_cca_after, "Final Per-Possibility Cross-Component Activation", "TODO", true);
+  // number of phenotypic traits assessed
+  // (a.k.a. number of phenotypic change opportunities)
+  size_t phen_size;
+  mod_man.New("phen_size").AddPull([&phen_size](){ return phen_size; });
 
-    // total number of phenotypic changes that occur at once
-    emp::DataNode<size_t, emp::data::Range> phen_diff;
-    df.AddMean(phen_diff, "Phenotypic Changes", "TODO", true);
+  // what num of phenotypic change opportunities are cross-component
+  size_t opp_cca;
+  mod_man.New("opp_cca").AddPull([&opp_cca](){ return opp_cca; });
 
-    // number of phenotypic traits assessed
-    // (a.k.a. number of phenotypic change opportunities)
-    size_t phen_size = 0;
-    df.AddVar(phen_size, "Phenotypic Size");
+  // what num of phenotypic change opportunities are same-component
+  size_t opp_sca;
+  mod_man.New("opp_sca").AddPull([&opp_sca](){ return opp_sca; });
 
-    // what num of phenotypic change opportunities are cross-component
-    size_t opp_cca = 0;
-    df.AddVar(opp_cca, "Opportunities for Cross-Component Phenotypic Change");
+  // what num of phenotypic changes are cross-component
+  emp::DataNode<size_t, emp::data::Range> count_cca;
+  mod_man.New("count_cca").AddPull([&count_cca](){
+    const double res = count_cca.GetMean();
+    count_cca.Reset();
+    return res;
+  });
 
-    // what num of phenotypic change opportunities are same-component
-    size_t opp_sca = 0;
-    df.AddVar(opp_sca, "Opportunities for Same-Component Phenotypic Change");
+  // what num of phenotypic change are same-component
+  emp::DataNode<size_t, emp::data::Range> count_sca;
+  mod_man.New("count_sca").AddPull([&count_sca](){
+    const double res = count_sca.GetMean();
+    count_sca.Reset();
+    return res;
+  });
 
-    // what num of phenotypic changes are cross-component
-    emp::DataNode<size_t, emp::data::Range> count_cca;
-    df.AddMean(count_cca, "Cross-Component Phenotypic Changes", "TODO", true);
+  // what proportion of phenotypic change are cross-component
+  emp::DataNode<double, emp::data::Range> prop_cca;
+  mod_man.New("prop_cca").AddPull([&prop_cca](){
+    const double res = prop_cca.GetMean();
+    prop_cca.Reset();
+    return res;
+  });
 
-    // what num of phenotypic change are same-component
-    emp::DataNode<size_t, emp::data::Range> count_sca;
-    df.AddMean(count_sca, "Same-Component Phenotypic Changes", "TODO", true);
+  // what proportion of phenotypic change are same-component
+  emp::DataNode<double, emp::data::Range> prop_sca;
+  mod_man.New("prop_sca").AddPull([&prop_sca](){
+    const double res = prop_sca.GetMean();
+    prop_sca.Reset();
+    return res;
+  });
 
-    // what proportion of phenotypic change are cross-component
-    emp::DataNode<double, emp::data::Range> prop_cca;
-    df.AddMean(prop_cca, "Proportion Cross-Component Phenotypic Change", "TODO", true);
+  // what proportion of phenotypic change are cross-component
+  // scaled by possible scas vs ccas
+  emp::DataNode<double, emp::data::Range> scaled_prop_sca;
+  mod_man.New("scaled_prop_sca").AddPull([&scaled_prop_sca](){
+    const double res = scaled_prop_sca.GetMean();
+    scaled_prop_sca.Reset();
+    return res;
+  });
 
-    // what proportion of phenotypic change are same-component
-    emp::DataNode<double, emp::data::Range> prop_sca;
-    df.AddMean(prop_sca, "Proportion Same-Component Phenotypic Change", "TODO", true);
+  // what proportion of phenotypic change are same-component
+  // scaled by possible scas vs ccas
+  emp::DataNode<double, emp::data::Range> scaled_prop_cca;
+  mod_man.New("scaled_prop_cca").AddPull([&scaled_prop_cca](){
+    const double res = scaled_prop_cca.GetMean();
+    scaled_prop_cca.Reset();
+    return res;
+  });
 
-    // what proportion of phenotypic change are cross-component
-    // scaled by possible scas vs ccas
-    emp::DataNode<double, emp::data::Range> scaled_prop_cca;
-    df.AddMean(scaled_prop_cca, "Per-Possibility Proportion Cross-Component Phenotypic Change");
+  std::string mod_measure;
+  std::string mod_statistic;
+  double mod_value;
 
-    // what proportion of phenotypic change are same-component
-    // scaled by possible scas vs ccas
-    emp::DataNode<double, emp::data::Range> scaled_prop_sca;
-    df.AddMean(scaled_prop_sca, "Per-Possibility Proportion Same-Component Phenotypic Change");
+  auto df = emp::DataFile(emp::keyname::pack({
+    {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
+    {"metric-slug", emp::slugify(metric.name())},
+    {"experiment", cfg.MFM_TITLE()},
+    {"datafile", "modularity-census"},
+    {"treatment", cfg.TREATMENT()},
+    {"seed", emp::to_string(cfg.SEED())},
+    {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
+    // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
+    // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
+    {"ext", ".csv"}
+  }));
 
-    emp_assert(cfg.MFM_RANKED() == "ranked");
+  df.AddFun(
+    std::function([&grid_world](){ return grid_world.GetUpdate(); }),
+    "Update"
+  );
+  df.AddVar(mod_measure, "Measure");
+  df.AddVar(mod_statistic, "Statistic");
+  df.AddVar(mod_value, "Value");
 
-    df.PrintHeaderKeys();
+  df.PrintHeaderKeys();
 
-    for (pop_id = 0; pop_id < grid_world.GetSize(); ++pop_id) {
+  grid_world.OnUpdate([&](const size_t update){
+
+    if (update % cfg.MFM_COMPONENT_FREQ()) return;
+
+    for (size_t pop_id = 0; pop_id < grid_world.GetSize(); ++pop_id) {
 
       std::unordered_map<std::string, size_t> module_left_counts;
       std::unordered_map<std::string, size_t> module_right_counts;
@@ -640,10 +695,51 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
       } // replicate mutational walk
 
-      df.Update();
+      for (auto & [name, node] : mod_man) { node->PullData(); }
 
     } // pop_id
-  }();
+
+    for (auto & [name, key] : emp::vector<std::pair<std::string, std::string>>{
+      {"Mutational Distance", "mean"},
+      {"Initial Cross-Component Activation", "cca_before"},
+      {"Initial Per-Possibility Cross-Component Activation", "scaled_cca_before"},
+      {"Final Cross-Component Activation", "cca_after"},
+      {"Final Per-Possibility Cross-Component Activation", "scaled_cca_after"},
+      {"Phenotypic Changes", "phen_diff"},
+      {"Phenotypic Size", "phen_size"},
+      {"Opportunities for Cross-Component Phenotypic Change", "opp_cca"},
+      {"Opportunities for Same-Component Phenotypic Change", "opp_sca"},
+      {"Cross-Component Phenotypic Changes", "count_cca"},
+      {"Same-Component Phenotypic Changes", "count_sca"},
+      {"Proportion Cross-Component Phenotypic Change", "prop_cca"},
+      {"Proportion Same-Component Phenotypic Change", "prop_sca"},
+      {"Per-Possibility Proportion Cross-Component Phenotypic Change", "scaled_prop_cca"},
+      {"Per-Possibility Proportion Same-Component Phenotypic Change", "scaled_prop_sca"}
+    }) {
+
+      mod_measure = name;
+      mod_statistic = "mean";
+      mod_value = mod_man.Get(key).GetMean();
+      df.Update();
+
+      mod_measure = name;
+      mod_statistic = "median";
+      mod_value = mod_man.Get(key).GetMedian();
+      df.Update();
+
+      mod_measure = name;
+      mod_statistic = "min";
+      mod_value = mod_man.Get(key).GetMin();
+      df.Update();
+
+    }
+
+    mod_man.ResetAll();
+
+  });
+
+  } // end modularity setup
 
   }
+
 }
