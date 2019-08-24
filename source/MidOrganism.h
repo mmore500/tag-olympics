@@ -14,8 +14,14 @@ struct MidOrganism {
   emp::vector<emp::BitSet<BS_WIDTH>> bsets;
   const Config & cfg;
 
-  MidOrganism(const Config & cfg_, emp::Random & rand)
-  : cfg(cfg_)
+  std::function<double(size_t)> site_mut_p;
+
+  MidOrganism(
+    const Config & cfg_,
+    std::function<double(size_t)> site_mut_p_,
+    emp::Random & rand
+  ) : cfg(cfg_)
+  , site_mut_p(site_mut_p_)
   {
     for(size_t i = 0; i < cfg.MO_LENGTH(); ++i) bsets.emplace_back(
       rand,
@@ -46,6 +52,14 @@ struct MidOrganism {
       cfg.MO_MUT_BIT_REDRAW_PER_BIT(),
       cfg.MO_BITWEIGHT()
     );
+
+    for (auto &bs : bsets) {
+      for (size_t idx = 0; idx < bs.GetSize(); ++idx) {
+        if (rand.GetDouble() < site_mut_p(idx)) {
+          bs[idx] = rand.P(cfg.MO_BITWEIGHT());
+        }
+      }
+    }
 
     return res;
 

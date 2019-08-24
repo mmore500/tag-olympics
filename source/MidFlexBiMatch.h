@@ -84,7 +84,6 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
       for (size_t i = 1; i < res.size(); ++i) {
 
-
         emp_assert(
           emp::keyname::unpack(res[0])["module"]
           ==
@@ -302,18 +301,13 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   emp_assert(grid_world.GetSize() == cfg.MFM_POP_SIZE());
 
   for (size_t i = 0; i < cfg.MFM_POP_SIZE(); ++i) {
-    MidOrganism<Config::BS_WIDTH()> org(cfg, rand);
+    MidOrganism<Config::BS_WIDTH()> org(
+      cfg,
+      [](const size_t idx){ return std::pow(0.5, 1+idx/16); },
+      rand
+    );
     grid_world.InjectAt(org, i);
   }
-
-  std::cout << "Metric " << metric.name() << std::endl;
-  for (size_t g = 0; g < cfg.MFM_GENS(); ++g) {
-    grid_world.Update();
-    std::cout << ".";
-    std::cout.flush();
-  }
-
-  std::cout << std::endl;
 
   // [&](){
   //   emp::DataFile df(emp::keyname::pack({
@@ -353,10 +347,12 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   //   }
   // }();
 
-  { // modularity setup
+  // modularity setup
 
   emp::DataManager<
-    double, emp::data::Range, emp::data::Log, emp::data::Pull
+    double,
+    emp::data::Stats, emp::data::Range,
+    emp::data::Log, emp::data::Pull, emp::data::Info
   > mod_man;
 
   // number of mutational steps to first phenotypic change
@@ -366,16 +362,21 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     step.Reset();
     return res;
   });
+  mod_man.Get("step").SetName("Mutational Distance");
 
   // cross-component activation before first phenotypic chagne
   double cca_before;
   mod_man.New("cca_before").AddPull([&cca_before](){ return cca_before; });
+  mod_man.Get("cca_before").SetName("Initial Cross-Component Activation");
 
   // cross-component activation before first phenotypic chagne
   double scaled_cca_before;
   mod_man.New("scaled_cca_before").AddPull([&scaled_cca_before](){
     return scaled_cca_before;
   });
+  mod_man.Get("scaled_cca_before").SetName(
+    "Initial Per-Possibility Cross-Component Activation"
+  );
 
   // cross-component activation after first phenotypic chagne
   emp::DataNode<double, emp::data::Range> cca_after;
@@ -384,6 +385,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     cca_after.Reset();
     return res;
   });
+  mod_man.Get("cca_after").SetName("Final Cross-Component Activation");
 
   emp::DataNode<double, emp::data::Range> scaled_cca_after;
   mod_man.New("scaled_cca_after").AddPull([&scaled_cca_after](){
@@ -391,6 +393,9 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     scaled_cca_after.Reset();
     return res;
   });
+  mod_man.Get("scaled_cca_after").SetName(
+    "Final Per-Possibility Cross-Component Activation"
+  );
 
   // total number of phenotypic changes that occur at once
   emp::DataNode<size_t, emp::data::Range> phen_diff;
@@ -399,19 +404,27 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     phen_diff.Reset();
     return res;
   });
+  mod_man.Get("phen_diff").SetName("Phenotypic Changes");
 
   // number of phenotypic traits assessed
   // (a.k.a. number of phenotypic change opportunities)
   size_t phen_size;
   mod_man.New("phen_size").AddPull([&phen_size](){ return phen_size; });
+  mod_man.Get("phen_size").SetName("Phenotypic Size");
 
   // what num of phenotypic change opportunities are cross-component
   size_t opp_cca;
   mod_man.New("opp_cca").AddPull([&opp_cca](){ return opp_cca; });
+  mod_man.Get("opp_cca").SetName(
+    "Opportunities for Cross-Component Phenotypic Change"
+  );
 
   // what num of phenotypic change opportunities are same-component
   size_t opp_sca;
   mod_man.New("opp_sca").AddPull([&opp_sca](){ return opp_sca; });
+  mod_man.Get("opp_sca").SetName(
+    "Opportunities for Same-Component Phenotypic Change"
+  );
 
   // what num of phenotypic changes are cross-component
   emp::DataNode<size_t, emp::data::Range> count_cca;
@@ -420,6 +433,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     count_cca.Reset();
     return res;
   });
+  mod_man.Get("count_cca").SetName("Cross-Component Phenotypic Changes");
 
   // what num of phenotypic change are same-component
   emp::DataNode<size_t, emp::data::Range> count_sca;
@@ -428,6 +442,7 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     count_sca.Reset();
     return res;
   });
+  mod_man.Get("count_sca").SetName("Same-Component Phenotypic Changes");
 
   // what proportion of phenotypic change are cross-component
   emp::DataNode<double, emp::data::Range> prop_cca;
@@ -436,6 +451,9 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     prop_cca.Reset();
     return res;
   });
+  mod_man.Get("prop_cca").SetName(
+    "Proportion Cross-Component Phenotypic Change"
+  );
 
   // what proportion of phenotypic change are same-component
   emp::DataNode<double, emp::data::Range> prop_sca;
@@ -444,6 +462,9 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     prop_sca.Reset();
     return res;
   });
+  mod_man.Get("prop_sca").SetName(
+    "Proportion Same-Component Phenotypic Change"
+  );
 
   // what proportion of phenotypic change are cross-component
   // scaled by possible scas vs ccas
@@ -453,6 +474,9 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     scaled_prop_sca.Reset();
     return res;
   });
+  mod_man.Get("scaled_prop_sca").SetName(
+    "Per-Possibility Proportion Cross-Component Phenotypic Change"
+  );
 
   // what proportion of phenotypic change are same-component
   // scaled by possible scas vs ccas
@@ -462,6 +486,9 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
     scaled_prop_cca.Reset();
     return res;
   });
+  mod_man.Get("scaled_prop_cca").SetName(
+    "Per-Possibility Proportion Same-Component Phenotypic Change"
+  );
 
   std::string mod_measure;
   std::string mod_statistic;
@@ -493,6 +520,10 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   grid_world.OnUpdate([&](const size_t update){
 
     if (update % cfg.MFM_COMPONENT_FREQ()) return;
+
+    phen_size = 0;
+    opp_cca = 0;
+    opp_sca = 0;
 
     for (size_t pop_id = 0; pop_id < grid_world.GetSize(); ++pop_id) {
 
@@ -602,9 +633,9 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
               walker.bsets[target_bs].size()
             );
             flip = (
-              rand.P(cfg.MO_BITWEIGHT())
-              !=
-              walker.bsets[target_bs].Get(target_bit)
+              rand.GetDouble() < site_mut_p(target_bit)
+            ) && (
+              random.P(cfg.MO_BITWEIGHT()) != walker[target_bs].Get(target_bs)
             );
             if (flip) { walker.bsets[target_bs].Toggle(target_bit); }
           }
@@ -695,41 +726,28 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
       } // replicate mutational walk
 
-      for (auto & [name, node] : mod_man) { node->PullData(); }
+      for (auto & [name, node] : mod_man.GetNodes()) node->PullData();
 
     } // pop_id
 
-    for (auto & [name, key] : emp::vector<std::pair<std::string, std::string>>{
-      {"Mutational Distance", "mean"},
-      {"Initial Cross-Component Activation", "cca_before"},
-      {"Initial Per-Possibility Cross-Component Activation", "scaled_cca_before"},
-      {"Final Cross-Component Activation", "cca_after"},
-      {"Final Per-Possibility Cross-Component Activation", "scaled_cca_after"},
-      {"Phenotypic Changes", "phen_diff"},
-      {"Phenotypic Size", "phen_size"},
-      {"Opportunities for Cross-Component Phenotypic Change", "opp_cca"},
-      {"Opportunities for Same-Component Phenotypic Change", "opp_sca"},
-      {"Cross-Component Phenotypic Changes", "count_cca"},
-      {"Same-Component Phenotypic Changes", "count_sca"},
-      {"Proportion Cross-Component Phenotypic Change", "prop_cca"},
-      {"Proportion Same-Component Phenotypic Change", "prop_sca"},
-      {"Per-Possibility Proportion Cross-Component Phenotypic Change", "scaled_prop_cca"},
-      {"Per-Possibility Proportion Same-Component Phenotypic Change", "scaled_prop_sca"}
-    }) {
+    for (auto & [name, node] : mod_man.GetNodes()) {
 
-      mod_measure = name;
-      mod_statistic = "mean";
-      mod_value = mod_man.Get(key).GetMean();
+      mod_measure = node->GetName();
+
+      mod_statistic = "Mean";
+      mod_value = node->GetMean();
       df.Update();
 
-      mod_measure = name;
-      mod_statistic = "median";
-      mod_value = mod_man.Get(key).GetMedian();
+      mod_statistic = "Median";
+      mod_value = node->GetMedian();
       df.Update();
 
-      mod_measure = name;
-      mod_statistic = "min";
-      mod_value = mod_man.Get(key).GetMin();
+      mod_statistic = "Minimum";
+      mod_value = node->GetMin();
+      df.Update();
+
+      mod_statistic = "Standard Deviation";
+      mod_value = node->GetStandardDeviation();
       df.Update();
 
     }
@@ -738,7 +756,18 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
 
   });
 
-  } // end modularity setup
+  // end modularity setup
+
+  // run the experiment
+  std::cout << "Metric " << metric.name() << std::endl;
+  for (size_t g = 0; g < cfg.MFM_GENS(); ++g) {
+    grid_world.Update();
+    std::cout << ".";
+    std::cout.flush();
+  }
+
+  std::cout << std::endl;
+
 
   }
 

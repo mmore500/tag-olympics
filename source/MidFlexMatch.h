@@ -278,7 +278,11 @@ void MidFlexMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   emp_assert(grid_world.GetSize() == cfg.MFM_POP_SIZE());
 
   for (size_t i = 0; i < cfg.MFM_POP_SIZE(); ++i) {
-    MidOrganism<Config::BS_WIDTH()> org(cfg, rand);
+    MidOrganism<Config::BS_WIDTH()> org(
+      cfg,
+      [&cfg](const size_t idx){ return cfg.MO_MUT_PROB(); },
+      rand
+    );
     grid_world.InjectAt(org, i);
   }
 

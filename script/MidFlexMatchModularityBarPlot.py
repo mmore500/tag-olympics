@@ -31,9 +31,6 @@ res = []
 for filename, df in dfs:
 
     # assumes datafiles are each from one replicate
-    df['null'] = 'null';
-    df = df.groupby('null').mean().reset_index();
-
     for k, v in kn.unpack(filename).items():
         df[k] = v
 
@@ -90,11 +87,17 @@ df_data['Dimension'] = df_data.apply(
 
 print("Data crunched!")
 
+measure = 'Per-Possibility Proportion Cross-Component Phenotypic Change'
 res = sns.barplot(
     'Metric',
-    'Per-Possibility Proportion Cross-Component Phenotypic Change',
-    data=df_data
+    'Value',
+    data=df_data[
+        (df_data['Measure'] == measure)
+        & (df_data['Update'] == df_data['Update'].max())
+        & (df_data['Statistic'] == 'Minimum')
+    ],
 )
+res.set(ylabel=measure)
 
 plt.setp(res.get_xticklabels(), rotation=45)
 
@@ -125,13 +128,19 @@ print("output saved to", outfile)
 
 plt.clf()
 
+measure = 'Per-Possibility Proportion Cross-Component Phenotypic Change'
 res = sns.violinplot(
     'Metric',
-    'Per-Possibility Proportion Cross-Component Phenotypic Change',
-    data=df_data,
+    'Value',
+    data=df_data[
+        (df_data['Measure'] == measure)
+        & (df_data['Update'] == df_data['Update'].max())
+        & (df_data['Statistic'] == 'Minimum')
+    ],
     scale="area",
     inner="stick",
 )
+res.set(ylabel=measure)
 
 plt.setp(res.get_xticklabels(), rotation=45)
 
@@ -162,11 +171,17 @@ print("output saved to", outfile)
 
 plt.clf()
 
+measure = 'Initial Per-Possibility Cross-Component Activation'
 res = sns.barplot(
     'Metric',
-    'Initial Per-Possibility Cross-Component Activation',
-    data=df_data,
+    'Value',
+    data=df_data[
+        (df_data['Measure'] == measure)
+        & (df_data['Update'] == df_data['Update'].max())
+        & (df_data['Statistic'] == 'Minimum')
+    ],
 )
+res.set(ylabel=measure)
 
 plt.setp(res.get_xticklabels(), rotation=45)
 
@@ -197,13 +212,19 @@ print("output saved to", outfile)
 
 plt.clf()
 
+measure = 'Initial Per-Possibility Cross-Component Activation'
 res = sns.violinplot(
     'Metric',
-    'Initial Per-Possibility Cross-Component Activation',
-    data=df_data,
+    'Value',
+    data=df_data[
+        (df_data['Measure'] == measure)
+        & (df_data['Statistic'] == 'Minimum')
+        & (df_data['Update'] == df_data['Update'].max())
+    ],
     scale="area",
     inner="stick",
 )
+res.set(ylabel=measure)
 
 plt.setp(res.get_xticklabels(), rotation=45)
 
@@ -234,11 +255,17 @@ print("output saved to", outfile)
 
 plt.clf()
 
+measure = 'Mutational Distance'
 res = sns.barplot(
     'Metric',
-    'Mutational Distance',
-    data=df_data,
+    'Value',
+    data=df_data[
+        (df_data['Measure'] == measure)
+        & (df_data['Statistic'] == 'Minimum')
+        & (df_data['Update'] == df_data['Update'].max())
+    ],
 )
+res.set(ylabel=measure)
 
 plt.setp(res.get_xticklabels(), rotation=45)
 

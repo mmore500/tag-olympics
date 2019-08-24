@@ -22,16 +22,27 @@ struct AddDim {
 
   // base metrics
   using pack_t = typename emp::TypePack<
-    // emp::HierMetric<>,
     emp::HammingMetric<Config::BS_WIDTH()/Dim>,
     emp::StreakMetric<Config::BS_WIDTH()/Dim>,
     emp::HashMetric<Config::BS_WIDTH()/Dim>,
     emp::SymmetricWrapMetric<Config::BS_WIDTH()/Dim>,
 
-    emp::HardStartMod<emp::HammingMetric<Config::BS_WIDTH()/Dim>>,
-    emp::HardStartMod<emp::StreakMetric<Config::BS_WIDTH()/Dim>>,
-    emp::HardStartMod<emp::HashMetric<Config::BS_WIDTH()/Dim>>,
-    emp::HardStartMod<emp::SymmetricWrapMetric<Config::BS_WIDTH()/Dim>>//
+    emp::FlatMod<emp::HarmonicDimMod<
+      emp::HammingMetric<Config::BS_WIDTH()/4>,
+      4
+    >>,
+    emp::FlatMod<emp::HarmonicDimMod<
+      emp::StreakMetric<Config::BS_WIDTH()/4>,
+      4
+    >>,
+    emp::FlatMod<emp::HarmonicDimMod<
+      emp::HashMetric<Config::BS_WIDTH()/4>,
+      4
+    >>,
+    emp::FlatMod<emp::HarmonicDimMod<
+      emp::SymmetricWrapMetric<Config::BS_WIDTH()/4>,
+      4
+    >>
 
     // emp::SymmetricNoWrapMetric<Config::BS_WIDTH()/Dim>
     // emp::AsymmetricWrapMetric<Config::BS_WIDTH()/Dim>,
