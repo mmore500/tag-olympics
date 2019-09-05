@@ -469,18 +469,6 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
 
   // what proportion of phenotypic change are cross-component
   // scaled by possible scas vs ccas
-  emp::DataNode<double, emp::data::Range> scaled_prop_sca;
-  mod_man.New("scaled_prop_sca").AddPull([&scaled_prop_sca](){
-    const double res = scaled_prop_sca.GetMean();
-    scaled_prop_sca.Reset();
-    return res;
-  });
-  mod_man.Get("scaled_prop_sca").SetName(
-    "Per-Possibility Proportion Cross-Component Phenotypic Change"
-  );
-
-  // what proportion of phenotypic change are same-component
-  // scaled by possible scas vs ccas
   emp::DataNode<double, emp::data::Range> scaled_prop_cca;
   mod_man.New("scaled_prop_cca").AddPull([&scaled_prop_cca](){
     const double res = scaled_prop_cca.GetMean();
@@ -488,6 +476,18 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
     return res;
   });
   mod_man.Get("scaled_prop_cca").SetName(
+    "Per-Possibility Proportion Cross-Component Phenotypic Change"
+  );
+
+  // what proportion of phenotypic change are same-component
+  // scaled by possible scas vs ccas
+  emp::DataNode<double, emp::data::Range> scaled_prop_sca;
+  mod_man.New("scaled_prop_sca").AddPull([&scaled_prop_sca](){
+    const double res = scaled_prop_sca.GetMean();
+    scaled_prop_sca.Reset();
+    return res;
+  });
+  mod_man.Get("scaled_prop_sca").SetName(
     "Per-Possibility Proportion Same-Component Phenotypic Change"
   );
 
