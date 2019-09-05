@@ -12,7 +12,6 @@ EMP_BUILD_CONFIG(
   VALUE(SEED, int, 1, "Random number seed"),
   VALUE(FILENAME, std::string, "configs.cfg", "Default config filename"),
   VALUE(TREATMENT, std::string, "unspecified", "Treatment specifier"),
-  VALUE(MID_ANTI_METRICS, bool, false, "Use anti version of metrics?"),
   CONST(BS_WIDTH, size_t, 64, "BitSet width?"),
 
   GROUP(LOW_MUTATIONAL_WALK, "Settings for low-mutational-walk experiment"),

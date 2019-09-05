@@ -87,13 +87,13 @@ struct AddDim {
 
 };
 
-struct MetricsAll {
+struct MetricsLow {
 
   using collection_t = Metrics::collection_t;
 
   collection_t mets;
 
-  MetricsAll() {
+  MetricsLow() {
     AddDim<4>::append<AddDim<4>::pack_t>(mets);
     std::cout << mets.size() << std::endl;
   }
