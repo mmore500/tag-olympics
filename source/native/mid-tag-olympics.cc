@@ -9,7 +9,6 @@
 #include "config/ArgManager.h"
 
 #include "../Config.h"
-#include "../MidFlexMatch.h"
 #include "../MidFlexBiMatch.h"
 #include "../MakeMetricKey.h"
 #include "../Metrics.h"
@@ -48,9 +47,6 @@ int main(int argc, char* argv[])
     std::cout << "no run type provided" << std::endl;
   } else if (res->size() > 1) {
     std::cout << "multiple run types provided" << std::endl;
-  } else if (res->at(0) == "MFM") {
-    std::cout << "running mode: " << res->at(0) << std::endl;
-    MidFlexMatch(metrics, cfg);
   } else if (res->at(0) == "MBM") {
     std::cout << "running mode: " << res->at(0) << std::endl;
     MidFlexBiMatch(metrics, cfg);
