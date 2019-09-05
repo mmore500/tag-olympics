@@ -303,7 +303,11 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   for (size_t i = 0; i < cfg.MFM_POP_SIZE(); ++i) {
     MidOrganism<Config::BS_WIDTH()> org(
       cfg,
-      [](const size_t idx){ return std::pow(0.5, 1+idx/16); },
+      [&cfg](const size_t idx){
+        return cfg.MO_MUT_BIT_REDRAW_PER_BIT();
+        // for uneven mutational probabilities
+        // return std::pow(0.5, 1+idx/16);
+      },
       rand
     );
     grid_world.InjectAt(org, i);
