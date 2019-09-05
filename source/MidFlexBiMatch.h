@@ -633,9 +633,9 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
               walker.bsets[target_bs].size()
             );
             flip = (
-              rand.GetDouble() < site_mut_p(target_bit)
+              rand.GetDouble() < walker.site_mut_p(target_bit)
             ) && (
-              random.P(cfg.MO_BITWEIGHT()) != walker[target_bs].Get(target_bs)
+              rand.P(cfg.MO_BITWEIGHT()) != walker.bsets[target_bs].Get(target_bs)
             );
             if (flip) { walker.bsets[target_bs].Toggle(target_bit); }
           }
