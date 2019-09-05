@@ -528,6 +528,9 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
 
     for (size_t pop_id = 0; pop_id < grid_world.GetSize(); ++pop_id) {
 
+      if (!(pop_id % 20)) std::cout << "+";
+      std::cout.flush();
+
       std::unordered_map<std::string, size_t> module_left_counts;
       std::unordered_map<std::string, size_t> module_right_counts;
 
@@ -613,6 +616,17 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
         return static_cast<double>(cca) / static_cast<double>(cca + sca);
       };
 
+      emp::MatchBin<
+        std::string,
+        WrapperMetric<Config::BS_WIDTH()>,
+        emp::RankedSelector<>
+      > mb_orig(rand);
+      mb_orig.metric.metric = &metric;
+
+      for (const auto & right : rights) {
+        mb_orig.Put(right, grid_world.GetOrg(pop_id).Get(uids[right]));
+      }
+
       cca_before = calc_cca(grid_world.GetOrg(pop_id));
       scaled_cca_before = scaled_cca_before / static_cast<double>(opp_cca);
 
@@ -634,9 +648,9 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
               walker.bsets[target_bs].size()
             );
             flip = (
-              rand.GetDouble() < walker.site_mut_p(target_bit)
+               walker.site_mut_p(target_bit) == cfg.MO_MUT_BIT_REDRAW_PER_BIT() || rand.GetDouble() < walker.site_mut_p(target_bit)
             ) && (
-              rand.P(cfg.MO_BITWEIGHT()) != walker.bsets[target_bs].Get(target_bs)
+              cfg.MO_BITWEIGHT() == 0.5 || rand.P(cfg.MO_BITWEIGHT()) != walker.bsets[target_bs].Get(target_bs)
             );
             if (flip) { walker.bsets[target_bs].Toggle(target_bit); }
           }
@@ -650,17 +664,8 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
           mb.metric.metric = &metric;
           mb.SetCacheOn(false);
 
-          emp::MatchBin<
-            std::string,
-            WrapperMetric<Config::BS_WIDTH()>,
-            emp::RankedSelector<>
-          > mb_orig(rand);
-          mb_orig.metric.metric = &metric;
-          mb_orig.SetCacheOn(false);
-
           for (const auto & right : rights) {
             mb.Put(right, walker.Get(uids[right]));
-            mb_orig.Put(right, grid_world.GetOrg(pop_id).Get(uids[right]));
           }
 
           // compare phenotypes, count changes
