@@ -747,6 +747,10 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
       mod_value = node->GetMin();
       df.Update();
 
+      mod_statistic = "Maximum";
+      mod_value = node->GetMax();
+      df.Update();
+
       mod_statistic = "Standard Deviation";
       mod_value = node->GetStandardDeviation();
       df.Update();
