@@ -23,10 +23,7 @@
 #include "MidOrganism.h"
 #include "WrapperMetric.h"
 
-void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
-
-  for (const auto & mptr : metrics) {
-  const auto & metric = *mptr;
+void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
 
   emp::Random rand(cfg.SEED());
 
@@ -763,16 +760,19 @@ void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
   // end modularity setup
 
   // run the experiment
-  std::cout << "Metric " << metric.name() << std::endl;
   for (size_t g = 0; g < cfg.MFM_GENS(); ++g) {
     grid_world.Update();
     std::cout << ".";
     std::cout.flush();
   }
 
-  std::cout << std::endl;
+}
 
-
+void MidFlexBiMatch(const Metrics::collection_t &metrics, const Config &cfg) {
+  for (const auto & mptr : metrics) {
+    const auto & metric = *mptr;
+    std::cout << "Metric " << metric.name() << std::endl;
+    MidFlexBiMatch(metric, cfg);
+    std::cout << std::endl;
   }
-
 }

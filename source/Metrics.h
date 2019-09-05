@@ -7,12 +7,14 @@
 
 struct Metrics {
 
+  using metric_t = emp::BaseMetric<
+    emp::BitSet<Config::BS_WIDTH()>,
+    emp::BitSet<Config::BS_WIDTH()>
+  >;
+
   using collection_t = emp::vector<
     emp::Ptr<
-      emp::BaseMetric<
-        emp::BitSet<Config::BS_WIDTH()>,
-        emp::BitSet<Config::BS_WIDTH()>
-      >
+      metric_t
     >
   >;
 
