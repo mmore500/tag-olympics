@@ -520,7 +520,7 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
 
   grid_world.OnUpdate([&](const size_t update){
 
-    if (update % cfg.MFM_COMPONENT_FREQ()) return;
+    if (!update || update % cfg.MFM_COMPONENT_FREQ()) return;
 
     phen_size = 0;
     opp_cca = 0;
