@@ -65,6 +65,14 @@ struct MidOrganism {
 
   }
 
+  double Distance(const MidOrganism & other) const {
+    double res = 0.0;
+    for (size_t idx = 0; idx < bsets.size(); ++idx) {
+      res += (bsets[idx]^other.bsets[idx]).CountOnes();
+    }
+    return res / (bsets.size() * bsets[0].GetSize());
+  }
+
   void Print(std::ostream & os) {
     for (auto & bs : bsets) {
       os << bs << "|";

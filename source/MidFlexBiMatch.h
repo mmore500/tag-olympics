@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <cstdlib>
 #include <sstream>
+#include <list>
 
 #include "base/Ptr.h"
 
@@ -125,20 +126,22 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
     {"ext", ".csv"}
   }));
 
+  auto sys = emp::NewPtr<
+    emp::Systematics<
+      MidOrganism<Config::BS_WIDTH()>,
+      MidOrganism<Config::BS_WIDTH()>
+    >
+  >(
+    [](MidOrganism<Config::BS_WIDTH()> & o){ return o; },
+    true,
+    true,
+    false
+  );
+
   // subrid transfers segfaults systematics
   if (!cfg.MFM_SUBGRID_TRANSFERS()) {
   grid_world.AddSystematics(
-    emp::NewPtr<
-      emp::Systematics<
-        MidOrganism<Config::BS_WIDTH()>,
-        MidOrganism<Config::BS_WIDTH()>
-      >
-    >(
-      [](MidOrganism<Config::BS_WIDTH()> & o){ return o; },
-      true,
-      true,
-      false
-    ),
+    sys,
     "systematics"
   );
 
@@ -525,7 +528,11 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
 
   grid_world.OnUpdate([&](const size_t update){
 
-    if (!update || update % cfg.MFM_COMPONENT_FREQ()) return;
+    if (
+      !update
+      || !cfg.MFM_COMPONENT_FREQ()
+      || update % cfg.MFM_COMPONENT_FREQ()
+    ) return;
 
     phen_size = 0;
     opp_cca = 0;
@@ -778,6 +785,122 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
     grid_world.Update();
     std::cout << ".";
     std::cout.flush();
+  }
+
+  // neutrality census!
+  if (!cfg.MFM_SUBGRID_TRANSFERS()) {
+
+  std::string neut_measure;
+  std::string neut_statistic;
+  double neut_value;
+  size_t step;
+
+  auto df_neut = emp::DataFile(emp::keyname::pack({
+    {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
+    {"metric-slug", emp::slugify(metric.name())},
+    {"experiment", cfg.MFM_TITLE()},
+    {"datafile", "neutrality-census"},
+    {"treatment", cfg.TREATMENT()},
+    {"seed", emp::to_string(cfg.SEED())},
+    {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
+    // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
+    // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
+    {"ext", ".csv"}
+  }));
+
+  df_neut.AddVar(step, "Step");
+  df_neut.AddVar(neut_measure, "Measure");
+  df_neut.AddVar(neut_statistic, "Statistic");
+  df_neut.AddVar(neut_value, "Value");
+
+  df_neut.PrintHeaderKeys();
+
+  emp::DataManager<
+    double,
+    emp::data::Stats, emp::data::Range,
+    emp::data::Log, emp::data::Pull, emp::data::Info
+  > neut_man;
+
+  // how many updates ago did this ancestor live?
+  double update;
+  neut_man.New("update").AddPull([&update](){
+    return update;
+  });
+  neut_man.Get("update").SetName("Updates Elapsed");
+
+  // genetic difference from ancestor to descendant
+  double diff;
+  neut_man.New("diff").AddPull([&diff](){
+    return diff;
+  });
+  neut_man.Get("diff").SetName("Genetic Distance");
+
+  std::list<
+    std::pair<
+      decltype(sys->GetTaxonAt(0)),
+      decltype(grid_world.GetOrgPtr(0))
+    >
+  > taxas;
+  for (size_t pop_id = 0; pop_id < grid_world.GetSize(); ++pop_id) {
+    taxas.push_back({
+      sys->GetTaxonAt(pop_id),
+      grid_world.GetOrgPtr(pop_id)
+    });
+  }
+
+  for (step = 0; taxas.size(); ++step) {
+
+    for (auto it = std::begin(taxas); it != std::end(taxas); ++it) {
+      update = grid_world.GetUpdate() - it->first->GetOriginationTime();
+      diff = it->first->GetInfo().Distance(*(it->second));
+      for (auto & [name, node] : neut_man.GetNodes()) node->PullData();
+    }
+
+    if (step < 100 || step % 100 == 0) {
+    for (auto & [name, node] : neut_man.GetNodes()) {
+
+      neut_measure = node->GetName();
+
+      neut_statistic = "Mean";
+      neut_value = node->GetMean();
+      df_neut.Update();
+
+      neut_statistic = "Median";
+      neut_value = node->GetMedian();
+      df_neut.Update();
+
+      neut_statistic = "Minimum";
+      neut_value = node->GetMin();
+      df_neut.Update();
+
+      neut_statistic = "Maximum";
+      neut_value = node->GetMax();
+      df_neut.Update();
+
+      neut_statistic = "Count";
+      neut_value = node->GetCount();
+      df_neut.Update();
+
+      neut_statistic = "Standard Deviation";
+      neut_value = node->GetStandardDeviation();
+      df_neut.Update();
+
+    }
+    }
+
+    neut_man.ResetAll();
+
+    for (auto it = std::begin(taxas); it != std::end(taxas); ) {
+      it->first = it->first->GetParent();
+      if (it->first) {
+        ++it;
+      } else {
+        it = taxas.erase(it);
+      }
+    }
+
+  }
+
   }
 
 }
