@@ -94,7 +94,7 @@ res = sns.barplot(
     data=df_data[
         (df_data['Measure'] == measure)
         & (df_data['Update'] == df_data['Update'].max())
-        & (df_data['Statistic'] == 'Minimum')
+        & (df_data['Statistic'] == 'Median')
     ],
 )
 res.set(ylabel=measure)
@@ -135,7 +135,7 @@ res = sns.violinplot(
     data=df_data[
         (df_data['Measure'] == measure)
         & (df_data['Update'] == df_data['Update'].max())
-        & (df_data['Statistic'] == 'Minimum')
+        & (df_data['Statistic'] == 'Median')
     ],
     scale="area",
     inner="stick",
@@ -178,7 +178,7 @@ res = sns.barplot(
     data=df_data[
         (df_data['Measure'] == measure)
         & (df_data['Update'] == df_data['Update'].max())
-        & (df_data['Statistic'] == 'Minimum')
+        & (df_data['Statistic'] == 'Median')
     ],
 )
 res.set(ylabel=measure)
@@ -218,7 +218,7 @@ res = sns.violinplot(
     'Value',
     data=df_data[
         (df_data['Measure'] == measure)
-        & (df_data['Statistic'] == 'Minimum')
+        & (df_data['Statistic'] == 'Median')
         & (df_data['Update'] == df_data['Update'].max())
     ],
     scale="area",
@@ -261,7 +261,7 @@ res = sns.barplot(
     'Value',
     data=df_data[
         (df_data['Measure'] == measure)
-        & (df_data['Statistic'] == 'Minimum')
+        & (df_data['Statistic'] == 'Median')
         & (df_data['Update'] == df_data['Update'].max())
     ],
 )
