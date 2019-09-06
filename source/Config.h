@@ -59,22 +59,16 @@ EMP_BUILD_CONFIG(
   VALUE(MO_MUT_PROB, double, 1.0, "TODO"),
 
   GROUP(MID_FLEX_MATCH, "Settings for mid-flex-match experiment"),
-  VALUE(MFM_GENS, size_t, 100, "TODO"),
+  VALUE(MFM_GENS, size_t, 4096, "TODO"),
   VALUE(MFM_POP_SIZE, size_t, 900, "TODO"),
-  VALUE(MFM_SUBGRID_DIM, size_t, 10, "TODO"),
-  VALUE(MFM_SUBGRID_TRANSFERS, size_t, 72, "TODO"),
+  VALUE(MFM_SUBGRID_DIM, size_t, 0, "alt 10 TODO"),
+  VALUE(MFM_SUBGRID_TRANSFERS, size_t, 0, "alt 72 TODO"),
   VALUE(MFM_TOURNEY_SIZE, size_t, 8, "TODO"),
   VALUE(MFM_TOURNEY_REPS, size_t, 1800, "TODO"),
   VALUE(
-    MFM_COMPONENT_WALK_LENGTH,
-    size_t,
-    200,
-    "How many mutational steps to take while tracking cross-component activation?"
-  ),
-  VALUE(
     MFM_COMPONENT_FREQ,
     size_t,
-    128,
+    0,
     "How often to take a modularity census?"
   ),
   VALUE(
