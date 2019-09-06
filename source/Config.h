@@ -114,6 +114,12 @@ EMP_BUILD_CONFIG(
     0,
     "After how many generations should we switch the target? If 0, never switch."
   ),
+  VALUE(
+    MFM_NEUT_INTERVAL,
+    size_t,
+    20,
+    "How many often to output data while stepping back through systematics."
+  ),
   VALUE(MFM_TITLE, std::string, "mid-flex-match", "Default out filename")
 
 )

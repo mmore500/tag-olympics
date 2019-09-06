@@ -856,7 +856,7 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
       for (auto & [name, node] : neut_man.GetNodes()) node->PullData();
     }
 
-    if (step < 100 || step % 100 == 0) {
+    if (step < cfg.MFM_NEUT_INTERVAL() || step % cfg.MFM_NEUT_INTERVAL() == 0) {
     for (auto & [name, node] : neut_man.GetNodes()) {
 
       neut_measure = node->GetName();
