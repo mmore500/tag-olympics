@@ -125,36 +125,39 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
     {"ext", ".csv"}
   }));
 
-  // grid_world.AddSystematics(
-  //   emp::NewPtr<
-  //     emp::Systematics<
-  //       MidOrganism<Config::BS_WIDTH()>,
-  //       MidOrganism<Config::BS_WIDTH()>
-  //     >
-  //   >(
-  //     [](MidOrganism<Config::BS_WIDTH()> & o){ return o; },
-  //     true,
-  //     true,
-  //     false
-  //   ),
-  //   "systematics"
-  // );
+  // subrid transfers segfaults systematics
+  if (!cfg.MFM_SUBGRID_TRANSFERS()) {
+  grid_world.AddSystematics(
+    emp::NewPtr<
+      emp::Systematics<
+        MidOrganism<Config::BS_WIDTH()>,
+        MidOrganism<Config::BS_WIDTH()>
+      >
+    >(
+      [](MidOrganism<Config::BS_WIDTH()> & o){ return o; },
+      true,
+      true,
+      false
+    ),
+    "systematics"
+  );
 
-  // grid_world.SetupSystematicsFile(
-  //   "systematics",
-  //   emp::keyname::pack({
-  //     {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
-  //     {"metric-slug", emp::slugify(metric.name())},
-  //     {"experiment", cfg.MFM_TITLE()},
-  //     {"datafile", "systematics"},
-  //     {"treatment", cfg.TREATMENT()},
-  //     {"seed", emp::to_string(cfg.SEED())},
-  //     {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
-  //     // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
-  //     // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
-  //     {"ext", ".csv"}
-  //   })
-  // );
+  grid_world.SetupSystematicsFile(
+    "systematics",
+    emp::keyname::pack({
+      {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
+      {"metric-slug", emp::slugify(metric.name())},
+      {"experiment", cfg.MFM_TITLE()},
+      {"datafile", "systematics"},
+      {"treatment", cfg.TREATMENT()},
+      {"seed", emp::to_string(cfg.SEED())},
+      {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
+      // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
+      // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
+      {"ext", ".csv"}
+    })
+  );
+  }
 
   const size_t side = (size_t) std::sqrt(cfg.MFM_POP_SIZE());
 
@@ -230,6 +233,7 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
   }
 
   // wrap up into subgrids
+  if (cfg.MFM_SUBGRID_DIM()) {
   grid_world.SetGetNeighborFun([&](emp::WorldPosition pos){
 
     const size_t size_x = grid_world.GetWidth();
@@ -262,6 +266,7 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
     return pos.SetIndex(neighbor_id);
 
   });
+  }
 
 
   grid_world.SetAutoMutate();
