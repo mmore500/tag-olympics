@@ -121,5 +121,6 @@ EMP_BUILD_CONFIG(
     "How many often to output data while stepping back through systematics."
   ),
   VALUE(MFM_TITLE, std::string, "mid-flex-match", "Default out filename")
+  VALUE(MFM_TARGET_CONFIG, std::string, "unspecified", "How are target nodes connected to one another?")
 
 )
