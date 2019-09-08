@@ -85,6 +85,10 @@ df_data['Dimension'] = df_data.apply(
     axis=1
 )
 
+df_data['Target Size'] = df_data['target-size']
+
+df_data['Target Configuration'] = df_data['target-config']
+
 print("Data crunched!")
 
 measure = 'Per-Possibility Proportion Cross-Component Phenotypic Change'
@@ -256,18 +260,28 @@ print("output saved to", outfile)
 plt.clf()
 
 measure = 'Mutational Distance'
-res = sns.barplot(
-    'Metric',
-    'Value',
-    data=df_data[
+
+print(df_data)
+
+g = sns.FacetGrid(
+    df_data[
         (df_data['Measure'] == measure)
         & (df_data['Statistic'] == 'Median')
         & (df_data['Update'] == df_data['Update'].max())
     ],
-)
-res.set(ylabel=measure)
+    col='Target Configuration',
+    row='Target Size',
+    # hue='Metric',
+    margin_titles=True
 
-plt.setp(res.get_xticklabels(), rotation=45)
+)
+g.map(
+    sns.barplot,
+    'Metric',
+    'Value',
+).add_legend()
+g.set_xticklabels(rotation=-90)
+g.set_axis_labels("Metric", "Mutational Distance")
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
@@ -277,7 +291,7 @@ outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
     'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
     'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
-    'viz' : 'modularity-robustness',
+    'viz' : 'robustness-bar',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
     '_script_fullcat_hash' : fsh.FilesHash(
                                 file_parcel="full_parcel",
