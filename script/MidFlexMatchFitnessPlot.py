@@ -82,6 +82,8 @@ df_data['Update'] = df_data['update']
 
 df_data['Maximum Fitness'] = df_data['max_fitness']
 
+df_data['Mean Fitness'] = df_data['mean_fitness']
+
 df_data['Dimension Count'] = df_data['Dimension']
 
 df_data['Dimension'] = df_data.apply(
@@ -124,7 +126,7 @@ outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
     'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
     'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
-    'viz' : 'fitness-line',
+    'viz' : 'fitness-max-line',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
     '_script_fullcat_hash' : fsh.FilesHash(
                                 file_parcel="full_parcel",
@@ -170,7 +172,7 @@ outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
     'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
     'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
-    'viz' : 'fitness-max',
+    'viz' : 'fitness-max-max',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
     '_script_fullcat_hash' : fsh.FilesHash(
                                 file_parcel="full_parcel",
@@ -222,7 +224,153 @@ outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
     'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
     'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
-    'viz' : 'fitness-best',
+    'viz' : 'fitness-max-best',
+    '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
+
+plt.clf()
+
+g = sns.FacetGrid(
+    df_data,
+    col='Target Configuration',
+    row='Target Size',
+    hue='Metric',
+    hue_kws={
+        'ls' : list(itertools.islice(
+            itertools.cycle(['-', '--', '-.', ':']),
+            len(df_data['Metric'].unique())
+        )),
+        'color' : sns.color_palette()
+    },
+    margin_titles=True
+).set(ylim=(0, 1))
+g.map(
+    sns.lineplot,
+    'Update',
+    'Mean Fitness',
+    style_order=list(df_data['Metric'].unique())
+).add_legend()
+
+assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
+
+outfile = kn.pack({
+    'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
+    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
+    'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
+    'viz' : 'fitness-mean-line',
+    '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
+
+plt.clf()
+
+g = sns.FacetGrid(
+    df_data.groupby([
+        'seed',
+        'Metric',
+        'Target Configuration',
+        'Target Size'
+    ]).agg('max').reset_index(),
+    col='Target Configuration',
+    row='Target Size',
+    # hue='Metric',
+    margin_titles=True
+).set(ylim=(0, 1))
+g.map(
+    sns.barplot,
+    'Metric',
+    'Mean Fitness',
+).add_legend()
+g.set_xticklabels(rotation=-90)
+
+assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
+
+outfile = kn.pack({
+    'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
+    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
+    'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
+    'viz' : 'fitness-mean-max',
+    '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
+
+plt.clf()
+
+g = sns.FacetGrid(
+    df_data.sort_values(
+        by=['Mean Fitness', 'Update'],
+        ascending=[True, False]
+    ).drop_duplicates(
+        [
+            'seed',
+            'Metric',
+            'Target Configuration',
+            'Target Size'
+        ],
+        keep='last'
+    ),
+    col='Target Configuration',
+    row='Target Size',
+    # hue='Metric',
+    margin_titles=True
+)
+g.map(
+    sns.barplot,
+    'Metric',
+    'Update',
+).add_legend()
+g.set_xticklabels(rotation=-90)
+
+assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
+
+outfile = kn.pack({
+    'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
+    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
+    'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
+    'viz' : 'fitness-mean-best',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
     '_script_fullcat_hash' : fsh.FilesHash(
                                 file_parcel="full_parcel",
