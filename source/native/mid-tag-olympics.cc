@@ -13,6 +13,7 @@
 #include "../MakeMetricKey.h"
 #include "../Metrics.h"
 #include "../MetricsMid.h"
+#include "../MetricsMidModularity.h"
 
 // This is the main function for the NATIVE version of Tag Olympics.
 
@@ -41,7 +42,9 @@ int main(int argc, char* argv[])
   const auto res = am.UseArg("_positional");
 
   const MetricsMid m;
+  const MetricsMidModularity mod_m;
   const Metrics::collection_t & metrics = m.mets;
+  const Metrics::collection_t & mod_metrics = mod_m.mets;
 
   if (!res) {
     std::cout << "no run type provided" << std::endl;
@@ -50,6 +53,9 @@ int main(int argc, char* argv[])
   } else if (res->at(0) == "MBM") {
     std::cout << "running mode: " << res->at(0) << std::endl;
     MidFlexBiMatch(metrics, cfg);
+  } else if (res->at(0) == "MBMM") {
+    std::cout << "running mode: " << res->at(0) << std::endl;
+    MidFlexBiMatch(mod_metrics, cfg);
   } else if (res->at(0) == "MMK") {
     std::cout << "running mode: " << res->at(0) << std::endl;
     MakeMetricKey(metrics, cfg);
