@@ -154,14 +154,18 @@ g = sns.FacetGrid(
     ]).agg('max').reset_index(),
     col='Target Configuration',
     row='Target Size',
-    # hue='Metric',
+    hue='Metric',
+    hue_kws={
+        'color' : sns.color_palette(),
+    },
     margin_titles=True
 ).set(ylim=(0, 1))
 g.map(
     sns.barplot,
     'Metric',
     'Maximum Fitness',
-).add_legend()
+    order=list(df_data['Metric'].unique()),
+)
 g.set_xticklabels(rotation=-90)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
@@ -206,14 +210,18 @@ g = sns.FacetGrid(
     ),
     col='Target Configuration',
     row='Target Size',
-    # hue='Metric',
+    hue='Metric',
+    hue_kws={
+        'color' : sns.color_palette(),
+    },
     margin_titles=True
 )
 g.map(
     sns.barplot,
     'Metric',
     'Update',
-).add_legend()
+    order=list(df_data['Metric'].unique()),
+)
 g.set_xticklabels(rotation=-90)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
@@ -300,14 +308,18 @@ g = sns.FacetGrid(
     ]).agg('max').reset_index(),
     col='Target Configuration',
     row='Target Size',
-    # hue='Metric',
+    hue='Metric',
+    hue_kws={
+        'color' : sns.color_palette(),
+    },
     margin_titles=True
 ).set(ylim=(0, 1))
 g.map(
     sns.barplot,
     'Metric',
     'Mean Fitness',
-).add_legend()
+    order=list(df_data['Metric'].unique()),
+)
 g.set_xticklabels(rotation=-90)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
@@ -352,14 +364,18 @@ g = sns.FacetGrid(
     ),
     col='Target Configuration',
     row='Target Size',
-    # hue='Metric',
+    hue='Metric',
+    hue_kws={
+        'color' : sns.color_palette(),
+    },
     margin_titles=True
 )
 g.map(
     sns.barplot,
     'Metric',
     'Update',
-).add_legend()
+    order=list(df_data['Metric'].unique()),
+)
 g.set_xticklabels(rotation=-90)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1

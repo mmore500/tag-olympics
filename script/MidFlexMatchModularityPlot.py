@@ -271,14 +271,17 @@ g = sns.FacetGrid(
     ],
     col='Target Configuration',
     row='Target Size',
-    # hue='Metric',
+    hue='Metric',
+    hue_kws={
+        'color' : sns.color_palette(),
+    },
     margin_titles=True
-
 )
 g.map(
     sns.barplot,
     'Metric',
     'Value',
+    order=list(df_data['Metric'].unique()),
 ).add_legend()
 g.set_xticklabels(rotation=-90)
 g.set_axis_labels("Metric", "Mutational Distance")
