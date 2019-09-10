@@ -150,7 +150,7 @@ plt.clf()
 
 g = sns.FacetGrid(
     df_data[
-        (df_data['Measure'] == 'Updates Elapsed')
+        (df_data['Measure'] == 'Genetic Distance')
         & (df_data['Statistic'] == 'Median')
     ],
     col='Target Configuration',
@@ -172,7 +172,7 @@ g.map(
     style_order=list(df_data['Metric'].unique())
 ).add_legend().set_ylabels(
     "Genetic Distance"
-).set_xticklabels(
+).set_xlabels(
     "Fixed Mutational Step"
 )
 
