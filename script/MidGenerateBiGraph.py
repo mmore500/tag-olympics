@@ -14,6 +14,7 @@ parser.add_argument("-l", "--lefts", type=int, action="store", default=1)
 parser.add_argument("-r", "--rights", type=int, action="store", default=1)
 
 parser.add_argument("-e", "--regular", type=int, action="store", default=1)
+parser.add_argument("-q", "--semiregular", type=int, action="store", default=1)
 parser.add_argument("-i", "--irregular", type=int, action="store", default=0)
 
 # TODO left/right hubs
@@ -77,14 +78,22 @@ for i in range(args.instances):
                 if not G.has_edge(*edge)
             ))
 
-        # add irregular edges
-        lefts_withrepl = (
-            random.choice(lefts)
+        # add semiregular edges
+        # regular over lefts, irregular over rights
+        rights_withrepl = (
+            random.choice(rights)
             for __ in it.count()
         )
 
-        rights_withrepl = (
-            random.choice(rights)
+        for __ in range(args.semiregular):
+            G.add_edge(*next(
+                edge for edge in zip(lefts_norepl, rights_withrepl)
+                if not G.has_edge(*edge)
+            ))
+
+        # add irregular edges
+        lefts_withrepl = (
+            random.choice(lefts)
             for __ in it.count()
         )
 
