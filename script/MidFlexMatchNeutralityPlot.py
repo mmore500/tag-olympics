@@ -184,6 +184,59 @@ outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
     'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
     'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
+    'viz' : 'neutrality-step-distance',
+    '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
+
+g = sns.FacetGrid(
+    df_data[
+        (df_data['Measure'] == 'Updates Elapsed')
+        & (df_data['Statistic'] == 'Median')
+    ],
+    col='Target Configuration',
+    row='Target Size',
+    hue='Metric',
+    hue_kws={
+        'ls' : list(itertools.islice(
+            itertools.cycle(['-', '--', '-.', ':']),
+            len(df_data['Metric'].unique())
+        )),
+        'color' : sns.color_palette()
+    },
+    margin_titles=True
+)
+g.map(
+    sns.lineplot,
+    'Step',
+    'Value',
+    style_order=list(df_data['Metric'].unique())
+).add_legend().set_ylabels(
+    "Updates Elapsed"
+).set_xlabels(
+    "Fixed Mutational Step"
+)
+
+assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
+
+outfile = kn.pack({
+    'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
+    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
+    'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
     'viz' : 'neutrality-step-update',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
     '_script_fullcat_hash' : fsh.FilesHash(
