@@ -13,8 +13,8 @@ parser.add_argument("-s", "--seed", type=int, action="store", default=1)
 parser.add_argument("-l", "--lefts", type=int, action="store", default=1)
 parser.add_argument("-r", "--rights", type=int, action="store", default=1)
 
-parser.add_argument("-e", "--regular", type=int, action="store", default=1)
-parser.add_argument("-q", "--semiregular", type=int, action="store", default=1)
+parser.add_argument("-e", "--regular", type=int, action="store", default=0)
+parser.add_argument("-q", "--semiregular", type=int, action="store", default=0)
 parser.add_argument("-i", "--irregular", type=int, action="store", default=0)
 
 # TODO left/right hubs
