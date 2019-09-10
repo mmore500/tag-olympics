@@ -410,3 +410,213 @@ plt.savefig(
 print("output saved to", outfile)
 
 plt.clf()
+
+g = sns.FacetGrid(
+    data=df_data[
+        (df_data['Statistic'] == 'Median')
+        & (df_data['Step'] == 1000)
+    ].pivot_table(
+        index=['Metric', 'seed', 'Target Configuration', 'Target Size'],
+        columns='Measure',
+        values='Value',
+        aggfunc='first',
+    ).reset_index(),
+    col='Target Configuration',
+    row='Target Size',
+    hue='Metric',
+    hue_kws={
+        'color' : sns.color_palette()
+    },
+    margin_titles=True,
+)
+g.map(
+    sns.barplot,
+    'Metric',
+    'Genetic Distance',
+    order=list(df_data['Metric'].unique()),
+)
+g.set_xticklabels(rotation=-90)
+
+assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
+
+outfile = kn.pack({
+    'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
+    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
+    'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
+    'viz' : 'neutrality-distance1000-bar',
+    '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
+
+plt.clf()
+
+g = sns.FacetGrid(
+    data=df_data[
+        (df_data['Statistic'] == 'Median')
+        & (df_data['Step'] == 1500)
+    ].pivot_table(
+        index=['Metric', 'seed', 'Target Configuration', 'Target Size'],
+        columns='Measure',
+        values='Value',
+        aggfunc='first',
+    ).reset_index(),
+    col='Target Configuration',
+    row='Target Size',
+    hue='Metric',
+    hue_kws={
+        'color' : sns.color_palette()
+    },
+    margin_titles=True,
+)
+g.map(
+    sns.barplot,
+    'Metric',
+    'Genetic Distance',
+    order=list(df_data['Metric'].unique()),
+)
+g.set_xticklabels(rotation=-90)
+
+assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
+
+outfile = kn.pack({
+    'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
+    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
+    'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
+    'viz' : 'neutrality-distance1500-bar',
+    '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
+
+plt.clf()
+
+g = sns.FacetGrid(
+    data=df_data[
+        (df_data['Statistic'] == 'Median')
+        & (df_data['Step'] == 2000)
+    ].pivot_table(
+        index=['Metric', 'seed', 'Target Configuration', 'Target Size'],
+        columns='Measure',
+        values='Value',
+        aggfunc='first',
+    ).reset_index(),
+    col='Target Configuration',
+    row='Target Size',
+    hue='Metric',
+    hue_kws={
+        'color' : sns.color_palette()
+    },
+    margin_titles=True,
+)
+g.map(
+    sns.barplot,
+    'Metric',
+    'Genetic Distance',
+    order=list(df_data['Metric'].unique()),
+)
+g.set_xticklabels(rotation=-90)
+
+assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
+
+outfile = kn.pack({
+    'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
+    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
+    'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
+    'viz' : 'neutrality-distance2000-bar',
+    '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
+
+plt.clf()
+
+g = sns.FacetGrid(
+    data=df_data[
+        (df_data['Statistic'] == 'Median')
+        & (df_data['Step'] == 1000)
+    ].pivot_table(
+        index=['Metric', 'seed', 'Target Configuration', 'Target Size'],
+        columns='Measure',
+        values='Value',
+        aggfunc='first',
+    ).reset_index(),
+    col='Target Configuration',
+    row='Target Size',
+    hue='Metric',
+    hue_kws={
+        'color' : sns.color_palette()
+    },
+    margin_titles=True,
+)
+g.map(
+    sns.barplot,
+    'Metric',
+    'Updates Elapsed',
+    order=list(df_data['Metric'].unique()),
+)
+g.set_xticklabels(rotation=-90)
+
+assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
+assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
+
+outfile = kn.pack({
+    'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
+    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
+    'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
+    'viz' : 'neutrality-update1000-bar',
+    '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
