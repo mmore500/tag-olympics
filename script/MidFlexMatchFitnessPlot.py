@@ -119,12 +119,10 @@ g.map(
 ).add_legend()
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
-assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
 
 outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
-    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
     'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
     'viz' : 'fitness-max-line',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
@@ -169,12 +167,10 @@ g.map(
 g.set_xticklabels(rotation=-90)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
-assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
 
 outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
-    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
     'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
     'viz' : 'fitness-max-max',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
@@ -225,12 +221,10 @@ g.map(
 g.set_xticklabels(rotation=-90)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
-assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
 
 outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
-    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
     'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
     'viz' : 'fitness-max-best',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
@@ -273,12 +267,10 @@ g.map(
 ).add_legend()
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
-assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
 
 outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
-    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
     'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
     'viz' : 'fitness-mean-line',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
@@ -323,12 +315,10 @@ g.map(
 g.set_xticklabels(rotation=-90)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
-assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
 
 outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
-    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
     'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
     'viz' : 'fitness-mean-max',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),
@@ -379,12 +369,10 @@ g.map(
 g.set_xticklabels(rotation=-90)
 
 assert len({kn.unpack(f)['experiment'] for f in dataframe_filenames}) == 1
-assert len({kn.unpack(f)['bitweight'] for f in dataframe_filenames}) == 1
 assert len({kn.unpack(f)['fit-fun'] for f in dataframe_filenames}) == 1
 
 outfile = kn.pack({
     'experiment' : kn.unpack(dataframe_filenames[0])['experiment'],
-    'bitweight' : kn.unpack(dataframe_filenames[0])['bitweight'],
     'fit-fun' : kn.unpack(dataframe_filenames[0])['fit-fun'],
     'viz' : 'fitness-mean-best',
     '_data_hathash_hash' : fsh.FilesHash().hash_files(dataframe_filenames),

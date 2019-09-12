@@ -43,11 +43,11 @@ struct MidOrganism {
 
     size_t res = 0;
 
-    const static double MUT_BIT_REDRAW_PER_BIT = (
-      cfg.MO_MUT_EXPECTED_REDRAWS() / cfg.MO_LENGTH()
+    const static double MUT_BIT_TOGGLE_PER_BIT = (
+      cfg.MO_MUT_EXPECTED_REDRAWS() / (cfg.MO_LENGTH() * cfg.BS_WIDTH())
     );
 
-    static emp::Binomial bino(MUT_BIT_REDRAW_PER_BIT, cfg.BS_WIDTH());
+    static emp::Binomial bino(MUT_BIT_TOGGLE_PER_BIT, cfg.BS_WIDTH());
 
     for (auto & bs : bsets) res += bs.Mutate(
       rand,
