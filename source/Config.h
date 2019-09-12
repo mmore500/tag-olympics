@@ -54,8 +54,7 @@ EMP_BUILD_CONFIG(
 
   GROUP(MID_ORGANISM, "Settings for mid-level organism"),
   VALUE(MO_LENGTH, size_t, 48, "TODO"),
-  VALUE(MO_BITWEIGHT, double, 0.5, "TODO"),
-  VALUE(MO_MUT_BIT_REDRAW_PER_BIT, double, 0.005, "TODO"),
+  VALUE(MO_MUT_EXPECTED_REDRAWS, double, 1, "TODO"),
   VALUE(MO_MUT_PROB, double, 1.0, "TODO"),
 
   GROUP(MID_FLEX_MATCH, "Settings for mid-flex-match experiment"),

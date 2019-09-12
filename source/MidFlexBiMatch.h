@@ -114,7 +114,6 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
   emp::World<MidOrganism<Config::BS_WIDTH()>> grid_world(rand);
 
   grid_world.SetupFitnessFile(emp::keyname::pack({
-    {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
     {"metric-slug", emp::slugify(metric.name())},
     {"experiment", cfg.MFM_TITLE()},
     {"datafile", "fitness"},
@@ -150,12 +149,12 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
   grid_world.SetupSystematicsFile(
     "systematics",
     emp::keyname::pack({
-      {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
       {"metric-slug", emp::slugify(metric.name())},
       {"experiment", cfg.MFM_TITLE()},
       {"datafile", "systematics"},
       {"target-config", cfg.MFM_TARGET_CONFIG()},
       {"target-size", emp::to_string(lefts.size() + rights.size())},
+      {"mut", emp::to_string(cfg.MO_MUT_EXPECTED_REDRAWS())},
       {"treatment", cfg.TREATMENT()},
       {"seed", emp::to_string(cfg.SEED())},
       {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
@@ -312,11 +311,6 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
   for (size_t i = 0; i < cfg.MFM_POP_SIZE(); ++i) {
     MidOrganism<Config::BS_WIDTH()> org(
       cfg,
-      [&cfg](const size_t idx){
-        return cfg.MO_MUT_BIT_REDRAW_PER_BIT();
-        // for uneven mutational probabilities
-        // return std::pow(0.5, 1+idx/16);
-      },
       rand
     );
     grid_world.InjectAt(org, i);
@@ -324,11 +318,11 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
 
   // [&](){
   //   emp::DataFile df(emp::keyname::pack({
-  //     {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
   //     {"metric-slug", emp::slugify(metric.name())},
   //     {"experiment", cfg.MFM_TITLE()},
   //     {"datafile", "end-census"},
   //     {"treatment", cfg.TREATMENT()},
+  //     {"mut", emp::to_string(cfg.MO_MUT_EXPECTED_REDRAWS())},
   //     {"seed", emp::to_string(cfg.SEED())},
   //     {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
   //     // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
@@ -508,12 +502,12 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
   double mod_value;
 
   auto df = emp::DataFile(emp::keyname::pack({
-    {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
     {"metric-slug", emp::slugify(metric.name())},
     {"experiment", cfg.MFM_TITLE()},
     {"datafile", "modularity-census"},
     {"target-config", cfg.MFM_TARGET_CONFIG()},
     {"target-size", emp::to_string(lefts.size() + rights.size())},
+    {"mut", emp::to_string(cfg.MO_MUT_EXPECTED_REDRAWS())},
     {"treatment", cfg.TREATMENT()},
     {"seed", emp::to_string(cfg.SEED())},
     {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
@@ -660,18 +654,8 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
         for (step_tally = 1; !phen_diff_tally; ++step_tally) {
 
           // perform one mutational step
-          for (bool flip = false; !flip; ) {
-            const size_t target_bs = rand.GetUInt(walker.bsets.size());
-            const size_t target_bit = rand.GetUInt(
-              walker.bsets[target_bs].size()
-            );
-            flip = (
-               walker.site_mut_p(target_bit) == cfg.MO_MUT_BIT_REDRAW_PER_BIT() || rand.GetDouble() < walker.site_mut_p(target_bit)
-            ) && (
-              cfg.MO_BITWEIGHT() == 0.5 || rand.P(cfg.MO_BITWEIGHT()) != walker.bsets[target_bs].Get(target_bs)
-            );
-            if (flip) { walker.bsets[target_bs].Toggle(target_bit); }
-          }
+          const size_t target_bs = rand.GetUInt(walker.bsets.size());
+          walker.bsets[target_bs].Mutate(rand, 1);
 
           // set up match bins
           emp::MatchBin<
@@ -802,12 +786,12 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
   size_t step;
 
   auto df_neut = emp::DataFile(emp::keyname::pack({
-    {"bitweight", emp::to_string(cfg.MO_BITWEIGHT())},
     {"metric-slug", emp::slugify(metric.name())},
     {"experiment", cfg.MFM_TITLE()},
     {"datafile", "neutrality-census"},
     {"target-config", cfg.MFM_TARGET_CONFIG()},
     {"target-size", emp::to_string(lefts.size() + rights.size())},
+    {"mut", emp::to_string(cfg.MO_MUT_EXPECTED_REDRAWS())},
     {"treatment", cfg.TREATMENT()},
     {"seed", emp::to_string(cfg.SEED())},
     {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
