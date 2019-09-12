@@ -119,6 +119,7 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
     {"datafile", "fitness"},
     {"target-config", cfg.MFM_TARGET_CONFIG()},
     {"target-size", emp::to_string(lefts.size() + rights.size())},
+    {"mut", emp::to_string(cfg.MO_MUT_EXPECTED_REDRAWS())},
     {"treatment", cfg.TREATMENT()},
     {"seed", emp::to_string(cfg.SEED())},
     {"fit-fun", cfg.MFM_RANKED() ? "ranked" : "scored"},
