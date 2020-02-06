@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 from keyname import keyname as kn
 from fileshash import fileshash as fsh
+import math
 
 # open-type fonts
 matplotlib.rcParams['pdf.fonttype'] = 42
@@ -52,31 +53,71 @@ df_data['Metric'] = df_data.apply(
     axis=1
 )
 
+df_data['Match Distance'] = df_data['Match Score']
+
+df_data['Metric'] = df_data.apply(
+    lambda x: {
+        'Hamming Metric' : 'Hamming',
+        'Hash Metric' : 'Hash',
+        'Asymmetric Wrap Metric' : 'Integer',
+        'Symmetric Wrap Metric' : 'Integer (bi)',
+        'Approx Dual Streak Metric' : 'Streak',
+    }[x['Metric']],
+    axis=1
+)
+
 print("data crunched!")
 
 g = sns.FacetGrid(
     df_data,
     col='Metric',
-    row='Dimension',
-    hue='Dimension Type',
+    hue='Metric',
+    hue_order=['Hamming', 'Hash', 'Integer', 'Streak', 'Integer (bi)'],
+    col_order=['Hamming', 'Hash', 'Integer', 'Streak', 'Integer (bi)'],
     margin_titles=True,
-    row_order=(
-        sorted(
-            [x for x in df_data['Dimension'].unique() if 'Mean' in x],
-            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
-        ) + sorted(
-            [x for x in df_data['Dimension'].unique() if 'Minimum' in x],
-            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
-        ) + sorted(
-            [x for x in df_data['Dimension'].unique() if 'Euclidean' in x],
-            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
-        )
-    )
 ).set(ylim=(0, 1))
-g.map(sns.lineplot, "Mutational Step",  "Match Score", ci="sd")
+g.map(sns.lineplot, "Mutational Step",  "Match Distance", ci="sd")
+
+plt.gcf().set_size_inches(7.5, 1.5)
 
 outfile = kn.pack({
-    'title' : kn.unpack(dataframe_filename)['title'],
+    'title' : 'mutational_walk_lineplot',
+    'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
+    'seed' : kn.unpack(dataframe_filename)['seed'],
+    '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
+
+plt.clf()
+plt.close(plt.gcf())
+
+g = sns.barplot(
+    data=df_data[df_data.apply(
+        lambda x: x['Mutational Step'] == 0 or math.log2(x['Mutational Step']).is_integer(),
+        axis=1
+    )],
+    x='Mutational Step',
+    y='Match Distance',
+    hue='Metric',
+    hue_order=['Hamming', 'Hash', 'Integer', 'Streak', 'Integer (bi)'],
+).set(ylim=(0, 1))
+
+plt.gcf().set_size_inches(3.75, 3.75)
+
+outfile = kn.pack({
+    'title' : 'mutational_walk_barplot',
     'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
     'seed' : kn.unpack(dataframe_filename)['seed'],
     '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
