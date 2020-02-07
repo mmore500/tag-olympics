@@ -60,6 +60,17 @@ df_data['Metric'] = df_data.apply(
     axis=1
 )
 
+df_data['Metric'] = df_data.apply(
+    lambda x: {
+        'Hamming Metric' : 'Hamming',
+        'Hash Metric' : 'Hash',
+        'Asymmetric Wrap Metric' : 'Integer',
+        'Symmetric Wrap Metric' : 'Integer (bi)',
+        'Approx Dual Streak Metric' : 'Streak',
+    }[x['Metric']],
+    axis=1
+)
+
 df_data['Dimension Count'] = df_data['Dimension']
 
 df_data['Dimension'] = df_data.apply(
@@ -72,36 +83,34 @@ df_data['Detour Difference'] = df_data.apply(
     axis=1
 )
 
+df_data['Rank'] = 0
+
+for metric in df_data['Metric'].unique():
+    df_data.loc[df_data['Metric'] == metric, 'Rank'] = (
+        df_data[df_data['Metric'] == metric][
+            'Detour Difference'
+        ].rank(ascending=0)
+    )
+
 print("Data crunched!")
 
-g = sns.FacetGrid(
-    df_data,
-    col='Metric',
-    row='Dimension',
-    hue='Dimension Count',
-    margin_titles=True,
-    sharey=False,
-    col_order=(
-        sorted(
-            [x for x in df_data['Metric'].unique() if 'Inverse' in x]
-        ) + sorted(
-            [x for x in df_data['Metric'].unique() if 'Inverse' not in x],
-        )
-    ),
-    row_order=(
-        sorted(
-            [x for x in df_data['Dimension'].unique() if 'Mean' in x],
-            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
-        ) + sorted(
-            [x for x in df_data['Dimension'].unique() if 'Minimum' in x],
-            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
-        ) + sorted(
-            [x for x in df_data['Dimension'].unique() if 'Euclidean' in x],
-            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
-        )
-    )
-).set(xlim=(-1, 2))
-g.map(sns.distplot, "Detour Difference", hist=False, rug=True)
+g = sns.heatmap(
+    df_data.pivot("Rank", "Metric", "Detour Difference"),
+    cmap='RdBu_r',
+    center=0,
+    vmin=-1,
+    vmax=2,
+    cbar_kws={'label': 'Detour Difference'},
+    x_order=['Hamming', 'Hash', 'Integer', 'Streak', 'Integer (bi)'],
+)
+g.set_xticklabels(g.get_xticklabels(), rotation=90)
+
+plt.gca().vlines(list(range(5)), *plt.gca().get_ylim(), "white")
+plt.gca().set(yticks=[])
+plt.gca().set_ylabel('')
+
+plt.gcf().set_size_inches(3.75, 2.75)
+
 
 outfile = kn.pack({
     'title' : kn.unpack(dataframe_filename)['title'],
@@ -122,3 +131,8 @@ plt.savefig(
     pad_inches=0
 )
 print("output saved to", outfile)
+
+for metric in df_data['Metric'].unique():
+    print(metric)
+    print(df_data[df_data['Metric'] == metric]['Detour Difference'].min())
+    print()
