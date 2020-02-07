@@ -12,13 +12,13 @@ EMP_BUILD_CONFIG(
   VALUE(SEED, int, 1, "Random number seed"),
   VALUE(FILENAME, std::string, "configs.cfg", "Default config filename"),
   VALUE(TREATMENT, std::string, "unspecified", "Treatment specifier"),
-  CONST(BS_WIDTH, size_t, 64, "BitSet width?"),
+  CONST(BS_WIDTH, size_t, 32, "BitSet width?"),
 
   GROUP(LOW_MUTATIONAL_WALK, "Settings for low-mutational-walk experiment"),
   VALUE(LMW_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a bitstring"),
-  VALUE(LMW_NSTEPS, size_t, 100, "Number of mutational steps in each walk"),
+  VALUE(LMW_NSTEPS, size_t, 65, "Number of mutational steps in each walk"),
   VALUE(LMW_NREPS, size_t, 1, "Number of replicates of each walk"),
-  VALUE(LMW_NSAMPLES, size_t, 20000, "Number of sample walks to conduct"),
+  VALUE(LMW_NSAMPLES, size_t, 1000, "Number of sample walks to conduct"),
   VALUE(LMW_TITLE, std::string, "low-mutational-walk", "Default out filename"),
 
   GROUP(LOW_MAKE_GRAPH, "Settings to generate weighted graph from match scores"),
@@ -35,7 +35,7 @@ EMP_BUILD_CONFIG(
 
   GROUP(LOW_TRIPLET_ANALYSIS, "Settings for low-triplet-analysis experiment"),
   VALUE(LTA_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a bitstring"),
-  VALUE(LTA_NSAMPLES, size_t, 20000, "Number of sample graphs to study"),
+  VALUE(LTA_NSAMPLES, size_t, 5000, "Number of sample graphs to study"),
   VALUE(LTA_TITLE, std::string, "low-triplet-analysis", "Default out filename"),
 
   GROUP(LOW_SPECIFICITY_ANALYSIS, "Settings for low-specificty-analysis experiment"),
