@@ -78,53 +78,54 @@ df_data['Dimension'] = df_data.apply(
     axis=1
 )
 
+df_data['Rank'] = 0
+
+for metric in df_data['Metric'].unique():
+    for affinity in df_data['Affinity'].unique():
+        which = (
+            (df_data['Metric'] == metric)
+            & (df_data['Affinity'] == affinity)
+        )
+        df_data.loc[which, 'Rank'] = df_data[which][
+            'Match Distance Change'
+        ].rank(ascending=0, method='first')
+
 print("Data crunched!")
 
-cmap = sns.diverging_palette(10, 240, l=65, as_cmap=True)
+cmap = sns.diverging_palette(240, 10, l=65, sep=1, n=1000)
 
-def draw_heatmap(*args, **kwargs):
+def draw(*args, **kwargs):
+
     df_data = kwargs.pop('data')
-    df_data['Rank'] = 0
-
-    for metric in df_data['Metric'].unique():
-        df_data.loc[df_data['Metric'] == metric, 'Rank'] = (
-            df_data[df_data['Metric'] == metric][
-                'Match Distance Change'
-            ].rank(ascending=0, method='first')
-        )
-
-
-    g = sns.heatmap(
-        df_data.pivot(index=args[1], columns=args[0], values=args[2]),
-        center=0,
-        cbar=False,
-        cbar_kws={'label': 'Match Distance Change'},
-        cmap=cmap,
-        vmin=-1,
-        vmax=1,
-        **kwargs
+    g = sns.barplot(
+        data=df_data,
+        x="Match Distance Change",
+        y="Rank",
+        orient="h",
+        ci=None,
+        palette=list(map(
+            lambda x: 'red' if x < 0 else 'blue' if x > 0 else 'white',
+            sorted(df_data["Match Distance Change"], reverse=True)
+        )),
     )
     g.set_xticklabels(g.get_xticklabels(), rotation=90)
 
-    g.vlines(list(range(5)), 0, 1000, "white")
     g.set(yticks=[])
     g.set_ylabel('')
 
 plt.gcf().set_size_inches(3.75, 2.75)
 
-fg = sns.FacetGrid(df_data, col='Affinity')
-g = fg.map_dataframe(draw_heatmap, 'Metric', 'Rank', 'Match Distance Change')
-
-g.fig.subplots_adjust(right=.92)
-
-# Define a new Axes where the colorbar will go
-cax = g.fig.add_axes([.94, .25, .02, .6])
-
-# Get a mappable object with the same colormap as the data
-points = plt.scatter([], [], c=[], vmin=-1, vmax=1, cmap=cmap)
-
-# Draw the colorbar
-g.fig.colorbar(points, cax=cax, label='Match Distance Change').outline.set_visible(False)
+fg = sns.FacetGrid(
+    df_data,
+    col='Metric',
+    row='Affinity',
+    hue='Metric',
+    margin_titles=True,
+    xlim=(-1.01, 1.01),
+)
+g = fg.map_dataframe(
+    draw
+)
 
 g.set_ylabels("")
 
