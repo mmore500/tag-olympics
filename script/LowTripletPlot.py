@@ -94,23 +94,45 @@ for metric in df_data['Metric'].unique():
 
 print("Data crunched!")
 
-g = sns.heatmap(
-    df_data.pivot("Rank", "Metric", "Detour Difference"),
-    cmap='RdBu_r',
-    center=0,
-    vmin=-1,
-    vmax=2,
-    cbar_kws={'label': 'Detour Difference'},
-    x_order=['Hamming', 'Hash', 'Integer', 'Streak', 'Integer (bi)'],
-)
-g.set_xticklabels(g.get_xticklabels(), rotation=90)
+def draw(*args, **kwargs):
 
-plt.gca().vlines(list(range(5)), *plt.gca().get_ylim(), "white")
-plt.gca().set(yticks=[])
-plt.gca().set_ylabel('')
+    df_data = kwargs.pop('data')
+
+    g = sns.barplot(
+        data=df_data,
+        x="Detour Difference",
+        y="Rank",
+        orient="h",
+        ci=None,
+        palette=list(map(
+            lambda x: 'red' if x < 0 else 'blue' if x > 0 else 'white',
+            sorted(df_data["Detour Difference"], reverse=True)
+        )),
+    )
+    # g.set_xticklabels(g.get_xticklabels(), rotation=90)
+
+
+    g.set(yticks=[])
+    g.set_ylabel('')
+
+fg = sns.FacetGrid(
+    df_data,
+    col='Metric',
+    col_order=sorted(df_data["Metric"].unique()),
+    margin_titles=True,
+)
+g = fg.map_dataframe(
+    draw
+)
+
+g.set_ylabels("")
 
 plt.gcf().set_size_inches(3.75, 2.75)
 
+for ax, title in zip(g.axes.flat, sorted(df_data["Metric"].unique())):
+    ax.set_title(title)
+    ax.set_xlim(xmin=-1.5, xmax=2.5)
+    ax.set_xticks([-1.0, 0.0, 1.0, 2.0])
 
 outfile = kn.pack({
     'title' : kn.unpack(dataframe_filename)['title'],
