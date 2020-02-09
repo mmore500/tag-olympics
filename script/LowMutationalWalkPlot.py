@@ -72,11 +72,15 @@ g = sns.FacetGrid(
     df_data,
     col='Metric',
     hue='Metric',
-    hue_order=['Hamming', 'Hash', 'Integer', 'Streak', 'Integer (bi)'],
-    col_order=['Hamming', 'Hash', 'Integer', 'Streak', 'Integer (bi)'],
+    hue_order=sorted(df_data["Metric"].unique()),
+    col_order=sorted(df_data["Metric"].unique()),
     margin_titles=True,
 ).set(ylim=(0, 1))
 g.map(sns.lineplot, "Mutational Step",  "Match Distance", ci="sd")
+g.set_titles("{col_name}")
+
+for ax, title in zip(g.axes.flat, sorted(df_data["Metric"].unique())):
+    ax.set_title(title, fontsize=10)
 
 plt.gcf().set_size_inches(7.5, 1.5)
 
@@ -111,7 +115,7 @@ g = sns.barplot(
     x='Mutational Step',
     y='Match Distance',
     hue='Metric',
-    hue_order=['Hamming', 'Hash', 'Integer', 'Streak', 'Integer (bi)'],
+    hue_order=sorted(df_data["Metric"].unique()),
 ).set(ylim=(0, 1))
 
 plt.gcf().set_size_inches(3.75, 3.75)

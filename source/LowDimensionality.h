@@ -23,8 +23,8 @@ void LowDimensionality(const Metrics::collection_t &metrics, const Config &cfg) 
   double score;
 
   emp::DataFile df(emp::keyname::pack({
-    {"bitweight", emp::to_string(cfg.LSD_BITWEIGHT())},
-    {"title", cfg.LSD_TITLE()},
+    {"bitweight", emp::to_string(cfg.LD_BITWEIGHT())},
+    {"title", cfg.LD_TITLE()},
     {"seed", emp::to_string(cfg.SEED())},
     // {"_emp_hash=", STRINGIFY(EMPIRICAL_HASH_)},
     // {"_source_hash=", STRINGIFY(DISHTINY_HASH_)},
@@ -32,7 +32,7 @@ void LowDimensionality(const Metrics::collection_t &metrics, const Config &cfg) 
   }));
   df.AddVar(s, "Sample");
   df.AddVar(name, "Metric");
-  df.AddVar(score, "Mean Match Distance");
+  df.AddVar(score, "Match Distance");
   df.PrintHeaderKeys();
 
 
@@ -42,25 +42,18 @@ void LowDimensionality(const Metrics::collection_t &metrics, const Config &cfg) 
 
     for (const auto & mptr : metrics) {
       const auto & metric = *mptr;
+      name = metric.name() + " Distance";
 
       emp::vector<emp::BitSet<Config::BS_WIDTH()>> bitsets;
 
-      while(bitsets.size() < 100) {
+      while (bitsets.size() < 2) {
         emp::BitSet<Config::BS_WIDTH()> bs_test(rand, cfg.LSD_BITWEIGHT());
         if (metric(bs_target, bs_test) < 0.01) {
           bitsets.push_back(bs_test);
         }
       }
 
-      double total = 0.0;
-      for (const auto & bs1 : bitsets) {
-        for (const auto & bs2 : bitsets) {
-          total += metric(bs1, bs2);
-        }
-      }
-
-      name = metric.name() + " Distance";
-      score = total / (bitsets.size() * bitsets.size());
+      score = metric(bitsets[0], bitsets[1]);
       df.Update();
 
     }

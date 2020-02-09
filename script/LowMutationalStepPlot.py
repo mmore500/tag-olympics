@@ -108,18 +108,19 @@ def draw(*args, **kwargs):
             sorted(df_data["Match Distance Change"], reverse=True)
         )),
     )
-    g.set_xticklabels(g.get_xticklabels(), rotation=90)
+    g.set_xticklabels(g.get_xticklabels(), fontdict={'fontsize':8})
 
     g.set(yticks=[])
     g.set_ylabel('')
-
-plt.gcf().set_size_inches(3.75, 2.75)
+    g.spines['left'].set_position('zero')
+    g.spines['left'].set_zorder(-10000)
+    g.spines['left'].set_color('lightgray')
 
 fg = sns.FacetGrid(
     df_data,
     col='Metric',
     row='Affinity',
-    hue='Metric',
+    col_order=sorted(df_data["Metric"].unique()),
     margin_titles=True,
     xlim=(-1.01, 1.01),
 )
@@ -129,7 +130,13 @@ g = fg.map_dataframe(
 
 g.set_ylabels("")
 
-plt.gcf().set_size_inches(7.5, 4)
+g.fig.text(0.3, 0.1, s='Match Distance Change', fontdict={'fontsize':10})
+g.fig.subplots_adjust(bottom=0.17, wspace=0.3)
+
+for ax, title in zip(g.axes.flat, sorted(df_data["Metric"].unique())):
+    ax.set_title(title, fontsize=10)
+
+plt.gcf().set_size_inches(3.75, 4.75)
 
 
 outfile = kn.pack({

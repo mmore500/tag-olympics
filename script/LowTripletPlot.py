@@ -89,7 +89,7 @@ for metric in df_data['Metric'].unique():
     df_data.loc[df_data['Metric'] == metric, 'Rank'] = (
         df_data[df_data['Metric'] == metric][
             'Detour Difference'
-        ].rank(ascending=0)
+        ].rank(ascending=0, method='first')
     )
 
 print("Data crunched!")
@@ -109,17 +109,22 @@ def draw(*args, **kwargs):
             sorted(df_data["Detour Difference"], reverse=True)
         )),
     )
-    # g.set_xticklabels(g.get_xticklabels(), rotation=90)
-
+    # g.set_xlim(xmin=-1.0, xmax=2.0)
+    g.set_xticks([-1, 0, 1, 2])
+    g.set_xticklabels(g.get_xticklabels(), fontdict={'fontsize':8})
 
     g.set(yticks=[])
     g.set_ylabel('')
+    g.spines['left'].set_position('zero')
+    g.spines['left'].set_zorder(-10000)
+    g.spines['left'].set_color('lightgray')
 
 fg = sns.FacetGrid(
     df_data,
     col='Metric',
     col_order=sorted(df_data["Metric"].unique()),
     margin_titles=True,
+    xlim=(-1,2),
 )
 g = fg.map_dataframe(
     draw
@@ -127,12 +132,16 @@ g = fg.map_dataframe(
 
 g.set_ylabels("")
 
+g.fig.text(0.27, 0.1, s='Match Distance Change', fontdict={'fontsize':10})
+g.fig.subplots_adjust(bottom=0.22, wspace=0.3)
+
+for ax, title in zip(g.axes.flat, sorted(df_data["Metric"].unique())):
+    ax.set_title(title, fontsize=10)
+
 plt.gcf().set_size_inches(3.75, 2.75)
 
 for ax, title in zip(g.axes.flat, sorted(df_data["Metric"].unique())):
-    ax.set_title(title)
-    ax.set_xlim(xmin=-1.5, xmax=2.5)
-    ax.set_xticks([-1.0, 0.0, 1.0, 2.0])
+    ax.set_title(title, fontsize=10)
 
 outfile = kn.pack({
     'title' : kn.unpack(dataframe_filename)['title'],

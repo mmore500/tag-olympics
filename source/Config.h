@@ -29,7 +29,7 @@ EMP_BUILD_CONFIG(
   GROUP(LOW_Dimensionality, "Settings for dimensionality experiments"),
   VALUE(LD_TITLE, std::string, "low-dimensionality", "TODO"),
   VALUE(LD_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a BitSet"),
-  VALUE(LD_NSAMPLES, size_t, 100, "TODO"),
+  VALUE(LD_NSAMPLES, size_t, 5000, "TODO"),
 
   GROUP(LOW_MAKE_GRAPH, "Settings to generate weighted graph from match scores"),
   VALUE(LMG_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a BitSet"),
