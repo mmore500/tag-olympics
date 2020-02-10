@@ -12,6 +12,7 @@
 #include "../LowMutationalWalk.h"
 #include "../LowMutationalStep.h"
 #include "../LowDimensionality.h"
+#include "../LowReverseDimensionality.h"
 #include "../LowMakeDigraph.h"
 #include "../LowMakeGraph.h"
 #include "../LowTripletAnalysis.h"
@@ -77,7 +78,9 @@ int main(int argc, char* argv[])
     LowScoreDistribution(metrics, cfg);
   } else if (res->at(0) == "LD") {
     std::cout << "running mode: " << res->at(0) << std::endl;
-    LowDimensionality(metrics, cfg);
+  } else if (res->at(0) == "LRD") {
+    std::cout << "running mode: " << res->at(0) << std::endl;
+    LowReverseDimensionality(metrics, cfg);
   } else if (res->at(0) == "MMK") {
     std::cout << "running mode: " << res->at(0) << std::endl;
     MakeMetricKey(metrics, cfg);

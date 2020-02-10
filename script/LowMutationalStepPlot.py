@@ -88,7 +88,7 @@ for metric in df_data['Metric'].unique():
         )
         df_data.loc[which, 'Rank'] = df_data[which][
             'Match Distance Change'
-        ].rank(ascending=0, method='first')
+        ].rank(ascending=1, method='first')
 
 print("Data crunched!")
 
@@ -104,8 +104,8 @@ def draw(*args, **kwargs):
         orient="h",
         ci=None,
         palette=list(map(
-            lambda x: 'red' if x < 0 else 'blue' if x > 0 else 'white',
-            sorted(df_data["Match Distance Change"], reverse=True)
+            lambda x: 'red' if x > 0 else 'blue' if x < 0 else 'white',
+            sorted(df_data["Match Distance Change"])
         )),
     )
     g.set_xticklabels(g.get_xticklabels(), fontdict={'fontsize':8})
@@ -116,13 +116,38 @@ def draw(*args, **kwargs):
     g.spines['left'].set_zorder(-10000)
     g.spines['left'].set_color('lightgray')
 
+    vals = sorted(df_data["Match Distance Change"])
+    plt.hlines(
+        [x for x in [
+            min(
+                [idx for idx, val in enumerate(vals) if val == 0],
+                default=None,
+            ),
+            max(
+                [idx for idx, val in enumerate(vals) if val == 0],
+                default=None,
+            ),
+        ] if x is not None],
+        xmin=-1,
+        xmax=1,
+        linestyles='dashed',
+    )
+    plt.hlines(
+        np.mean([
+            min(idx for idx, val in enumerate(vals) if val > 0),
+            max(idx for idx, val in enumerate(vals) if val < 0),
+        ]),
+        xmin=-1,
+        xmax=1,
+    )
+
 fg = sns.FacetGrid(
     df_data,
     col='Metric',
     row='Affinity',
     col_order=sorted(df_data["Metric"].unique()),
     margin_titles=True,
-    xlim=(-1.01, 1.01),
+    xlim=(1.01, -1.01),
 )
 g = fg.map_dataframe(
     draw

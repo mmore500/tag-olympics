@@ -46,27 +46,28 @@ void LowMutationalStep(const Metrics::collection_t &metrics, const Config &cfg) 
     std::cout << "metric " << name << std::endl;
     name = metric.name() + " Distance";
 
-    for (const size_t sample : {1, 100}) {
+    for (const std::string sample : {"Loose", "Tight"}) {
 
-      affinity = sample == 1 ? "Loose" : "Tight";
+      affinity = sample;
+
       for (s = 0; s < cfg.LMS_NSAMPLES(); ++s) {
 
         const emp::BitSet<Config::BS_WIDTH()> target(rand, cfg.LMS_BITWEIGHT());
 
         emp::vector<emp::BitSet<Config::BS_WIDTH()>> options;
-        for (size_t opt = 0; opt < sample; ++opt) {
-          options.emplace_back(rand, cfg.LMS_BITWEIGHT());
+        while (options.size() == 0) {
+          const emp::BitSet<Config::BS_WIDTH()> candidate(
+            rand,
+            cfg.LMS_BITWEIGHT()
+          );
+          if (affinity == "Loose" && metric(target, candidate) > 0.5) {
+            options.push_back(candidate);
+          } else if (affinity == "Tight" && metric(target, candidate) < 0.01) {
+            options.push_back(candidate);
+          }
         }
 
-        const auto & best = *std::min_element(
-          std::begin(options),
-          std::end(options),
-          [&](const auto & a, const auto & b){
-            return metric(target, a) < metric(target, b);
-          }
-        );
-
-        auto walker = best;
+        auto walker = options[0];
 
         const size_t num_ones = walker.CountOnes();
 
@@ -97,7 +98,7 @@ void LowMutationalStep(const Metrics::collection_t &metrics, const Config &cfg) 
           walker.Toggle(pos);
         }
 
-        match = metric(target, best) - metric(target, walker);
+        match = metric(target, walker) - metric(target, options[0]);
         df.Update();
 
       }

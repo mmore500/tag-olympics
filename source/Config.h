@@ -23,13 +23,18 @@ EMP_BUILD_CONFIG(
 
   GROUP(LOW_MUTATIONAL_STEP, "Settings for low-mutational-step experiment"),
   VALUE(LMS_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a bitstring"),
-  VALUE(LMS_NSAMPLES, size_t, 1000, "Number of sample walks to conduct"),
+  VALUE(LMS_NSAMPLES, size_t, 5000, "Number of sample walks to conduct"),
   VALUE(LMS_TITLE, std::string, "low-mutational-step", "Default out filename"),
 
-  GROUP(LOW_Dimensionality, "Settings for dimensionality experiments"),
+  GROUP(LOW_DIMENSIONALITY, "Settings for dimensionality experiments"),
   VALUE(LD_TITLE, std::string, "low-dimensionality", "TODO"),
   VALUE(LD_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a BitSet"),
   VALUE(LD_NSAMPLES, size_t, 5000, "TODO"),
+
+  GROUP(LOW_REVERSE_DIMENSIONALITY, "Settings for dimensionality experiments"),
+  VALUE(LRD_TITLE, std::string, "low-revese-dimensionality", "TODO"),
+  VALUE(LRD_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a BitSet"),
+  VALUE(LRD_NSAMPLES, size_t, 5000, "TODO"),
 
   GROUP(LOW_MAKE_GRAPH, "Settings to generate weighted graph from match scores"),
   VALUE(LMG_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a BitSet"),
