@@ -61,7 +61,7 @@ EMP_BUILD_CONFIG(
 
   GROUP(LOW_SCORE_DISTRIBUTION, "Settings for low-score-distribution experiment"),
   VALUE(LSD_BITWEIGHT, double, 0.5, "Per-position probability of 1 in a bitstring"),
-  VALUE(LSD_NSAMPLES, size_t, 500, "Number of samples to take"),
+  VALUE(LSD_NSAMPLES, size_t, 5000, "Number of samples to take"),
   VALUE(LSD_TITLE, std::string, "low-score-distribution", "Default out filename"),
 
   GROUP(MAKE_METRIC_KEY, "Settings for make-metric-key utility"),

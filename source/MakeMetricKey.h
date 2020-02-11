@@ -25,6 +25,7 @@ void MakeMetricKey(
   size_t width;
   bool slide_mod;
   bool anti_mod;
+  bool unif_mod;
   std::string base;
   std::string dim_type;
 
@@ -41,6 +42,7 @@ void MakeMetricKey(
   df.AddVar(width, "Width");
   df.AddVar(slide_mod, "Sliding");
   df.AddVar(anti_mod, "Inverse");
+  df.AddVar(unif_mod, "Uniformified");
   df.AddVar(dim_type, "Dimension Type");
   df.PrintHeaderKeys();
 
@@ -53,6 +55,7 @@ void MakeMetricKey(
     width = metric.width();
     slide_mod = metric.name().find("Sliding") != std::string::npos;
     anti_mod = metric.name().find("Inverse") != std::string::npos;
+    unif_mod = metric.name().find("Unif") != std::string::npos;
     base = metric.base();
 
     if (metric.name().find("Minimum") != std::string::npos) {
