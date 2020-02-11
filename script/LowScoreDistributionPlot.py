@@ -44,6 +44,11 @@ df_data['Dimension'] = df_data.apply(
     axis=1
 )
 
+df_data['Uniformified'] = df_data.apply(
+    lambda x: key[x['Metric']]['Uniformified'],
+    axis=1
+)
+
 df_data['Metric'] = df_data.apply(
     lambda x: (
         ('Sliding ' if key[x['Metric']]['Sliding'] else '')
@@ -57,29 +62,97 @@ df_data['Match Score'] = df_data.apply(
     axis=1
 )
 
+df_data['Match Distance'] = df_data['Match Score']
+
+df_data['Metric'] = df_data.apply(
+    lambda x: {
+        'Hamming Metric' : 'Hamming',
+        'Hash Metric' : 'Hash',
+        'Asymmetric Wrap Metric' : 'Integer',
+        'Symmetric Wrap Metric' : 'Integer (bi)',
+        'Approx Dual Streak Metric' : 'Streak',
+    }[x['Metric']],
+    axis=1
+)
+
+df_data['Rank'] = 0
+
+for metric in df_data['Metric'].unique():
+    for affinity in df_data['Uniformified'].unique():
+        which = (
+            (df_data['Metric'] == metric)
+            & (df_data['Uniformified'] == affinity)
+        )
+        df_data.loc[which, 'Rank'] = df_data[which][
+            'Match Distance'
+        ].rank(ascending=1, method='first')
+
+df_data['Uniformified'] = df_data.apply(
+    lambda x: 'Uniformified' if x['Uniformified'] else 'Raw',
+    axis=1
+)
+
 print("data crunched!")
 
-g = sns.FacetGrid(
+def draw(*args, **kwargs):
+
+    df_data = kwargs.pop('data')
+    g = sns.barplot(
+        data=df_data,
+        x="Match Score",
+        y="Rank",
+        orient="h",
+        ci=None,
+        palette=list(map(
+            lambda x: 'blue',
+            sorted(df_data["Match Score"])
+        )),
+    )
+    g.set_xticklabels([0, 1], fontdict={'fontsize':8})
+
+    g.set(yticks=[])
+    g.set_ylabel('')
+    g.spines['left'].set_position('zero')
+    g.spines['left'].set_zorder(-10000)
+    g.spines['left'].set_color('black')
+
+    plt.plot([1, 0], [5000, 0], 'k--', lw=0.5)
+
+
+fg = sns.FacetGrid(
     df_data,
     col='Metric',
-    row='Dimension',
-    hue='Dimension Type',
-    sharey=False,
+    row='Uniformified',
+    col_order=sorted(df_data["Metric"].unique()),
+    row_order=sorted(['Raw', 'Uniformified']),
     margin_titles=True,
-    row_order=(
-        sorted(
-            [x for x in df_data['Dimension'].unique() if 'Mean' in x],
-            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
-        ) + sorted(
-            [x for x in df_data['Dimension'].unique() if 'Minimum' in x],
-            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
-        ) + sorted(
-            [x for x in df_data['Dimension'].unique() if 'Euclidean' in x],
-            key=lambda str: next(int(s) for s in str.split() if s.isdigit())
+    xlim=(0, 1.01),
+)
+g = fg.map_dataframe(
+    draw
+)
+
+g.set_ylabels("")
+
+g.fig.text(0.36, 0.1, s='Match Distance', fontdict={'fontsize':10})
+g.fig.subplots_adjust(bottom=0.17, wspace=0.3)
+
+for ax, title in zip(g.axes.flat, sorted(df_data["Metric"].unique())):
+    ax.set_title(title, fontsize=10)
+
+# adapted from https://cduvallet.github.io/posts/2018/11/facetgrid-ylabel-access
+# Iterate thorugh each axis
+for ax in g.axes.flat:
+
+    # Make right ylabel more human-readable and larger
+    # Only the 2nd and 4th axes have something in ax.texts
+    if ax.texts:
+        # This contains the right ylabel text
+        ax.texts[0].set_text(
+            ax.texts[0].get_text().split('=')[1]
         )
-    )
-).set(xlim=(0, 1))
-g.map(sns.distplot, "Match Score", hist=False, rug=True)
+
+plt.gcf().set_size_inches(3.75, 4.75)
 
 outfile = kn.pack({
     'title' : kn.unpack(dataframe_filename)['title'],
