@@ -92,8 +92,6 @@ for metric in df_data['Metric'].unique():
 
 print("Data crunched!")
 
-cmap = sns.diverging_palette(240, 10, l=65, sep=1, n=1000)
-
 def draw(*args, **kwargs):
 
     df_data = kwargs.pop('data')
