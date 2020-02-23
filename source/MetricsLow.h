@@ -23,7 +23,7 @@ struct MetricsLow {
   collection_t mets{
     new emp::UnifMod<emp::HammingMetric<Config::BS_WIDTH()>>,
     new emp::UnifMod<emp::StreakMetric<Config::BS_WIDTH()>>,
-    new emp::UnifMod<emp::HashMetric<Config::BS_WIDTH()>>,
+    new emp::UnifMod<emp::CryptoHashMetric<Config::BS_WIDTH()>>,
     new emp::UnifMod<emp::SymmetricWrapMetric<Config::BS_WIDTH()>>,
     new emp::UnifMod<emp::AsymmetricWrapMetric<Config::BS_WIDTH()>>
   };
