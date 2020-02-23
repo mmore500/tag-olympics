@@ -117,7 +117,8 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
     {"metric-slug", emp::slugify(metric.name())},
     {"experiment", cfg.MFM_TITLE()},
     {"datafile", "fitness"},
-    {"target-config", cfg.MFM_TARGET_CONFIG()},
+    {"target-structure", cfg.MFM_TARGET_STRUCTURE()},
+    {"target-degree", cfg.MFM_TARGET_DEGREE()},
     {"target-size", emp::to_string(lefts.size() + rights.size())},
     {"mut", emp::to_string(cfg.MO_MUT_EXPECTED_REDRAWS())},
     {"treatment", cfg.TREATMENT()},
@@ -153,7 +154,8 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
       {"metric-slug", emp::slugify(metric.name())},
       {"experiment", cfg.MFM_TITLE()},
       {"datafile", "systematics"},
-      {"target-config", cfg.MFM_TARGET_CONFIG()},
+      {"target-structure", cfg.MFM_TARGET_STRUCTURE()},
+      {"target-degree", cfg.MFM_TARGET_DEGREE()},
       {"target-size", emp::to_string(lefts.size() + rights.size())},
       {"mut", emp::to_string(cfg.MO_MUT_EXPECTED_REDRAWS())},
       {"treatment", cfg.TREATMENT()},
@@ -177,10 +179,11 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
         emp::MatchBin<
           std::string,
           WrapperMetric<Config::BS_WIDTH()>,
-          emp::RankedSelector<>
+          emp::RankedSelector<>,
+          emp::NopRegulator
         > mb(rand);
         mb.metric.metric = &metric;
-        mb.SetCacheOn(false);
+        mb.DeactivateCaching();
 
         for (const auto & right : rights) {
           mb.Put(right, org.Get(uids[right]));
@@ -506,7 +509,8 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
     {"metric-slug", emp::slugify(metric.name())},
     {"experiment", cfg.MFM_TITLE()},
     {"datafile", "modularity-census"},
-    {"target-config", cfg.MFM_TARGET_CONFIG()},
+    {"target-structure", cfg.MFM_TARGET_STRUCTURE()},
+    {"target-degree", cfg.MFM_TARGET_DEGREE()},
     {"target-size", emp::to_string(lefts.size() + rights.size())},
     {"mut", emp::to_string(cfg.MO_MUT_EXPECTED_REDRAWS())},
     {"treatment", cfg.TREATMENT()},
@@ -563,10 +567,11 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
       emp::MatchBin<
         std::string,
         WrapperMetric<Config::BS_WIDTH()>,
-        emp::RankedSelector<>
+        emp::RankedSelector<>,
+        emp::NopRegulator
       > mb(rand);
       mb.metric.metric = &metric;
-      mb.SetCacheOn(false);
+      mb.DeactivateCaching();
 
       for (const auto & right : rights) mb.Put(right, grid_world.GetOrg(pop_id).Get(uids[right]));
 
@@ -596,10 +601,11 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
         emp::MatchBin<
           std::string,
           WrapperMetric<Config::BS_WIDTH()>,
-          emp::RankedSelector<>
+          emp::RankedSelector<>,
+          emp::NopRegulator
         > mb(rand);
         mb.metric.metric = &metric;
-        mb.SetCacheOn(false);
+        mb.DeactivateCaching();
 
         for (const auto & right : rights) mb.Put(right, org.Get(uids[right]));
 
@@ -632,7 +638,8 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
       emp::MatchBin<
         std::string,
         WrapperMetric<Config::BS_WIDTH()>,
-        emp::RankedSelector<>
+        emp::RankedSelector<>,
+        emp::NopRegulator
       > mb_orig(rand);
       mb_orig.metric.metric = &metric;
 
@@ -662,10 +669,11 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
           emp::MatchBin<
             std::string,
             WrapperMetric<Config::BS_WIDTH()>,
-            emp::RankedSelector<>
+            emp::RankedSelector<>,
+            emp::NopRegulator
           > mb(rand);
           mb.metric.metric = &metric;
-          mb.SetCacheOn(false);
+          mb.DeactivateCaching();
 
           for (const auto & right : rights) {
             mb.Put(right, walker.Get(uids[right]));
@@ -790,7 +798,8 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
     {"metric-slug", emp::slugify(metric.name())},
     {"experiment", cfg.MFM_TITLE()},
     {"datafile", "neutrality-census"},
-    {"target-config", cfg.MFM_TARGET_CONFIG()},
+    {"target-structure", cfg.MFM_TARGET_STRUCTURE()},
+    {"target-degree", cfg.MFM_TARGET_DEGREE()},
     {"target-size", emp::to_string(lefts.size() + rights.size())},
     {"mut", emp::to_string(cfg.MO_MUT_EXPECTED_REDRAWS())},
     {"treatment", cfg.TREATMENT()},
