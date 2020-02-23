@@ -1,7 +1,7 @@
 #!/bin/bash
 ########## Define Resources Needed with SBATCH Lines ##########
 #SBATCH --time=4:00:00
-#SBATCH --array=0-199
+#SBATCH --array=0-19
 #SBATCH --mem=2G
 #SBATCH --ntasks 1
 #SBATCH --cpus-per-task 1
