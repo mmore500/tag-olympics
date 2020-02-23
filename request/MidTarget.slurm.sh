@@ -83,7 +83,7 @@ trials = list(
   it.product(mutation_rates, target_degrees, target_structures, meta_replicates)
 )
 
-mutation_rate, target_degree, target_structure = next(
+mutation_rate, target_degree, target_structure, __ = next(
   trial for i, trial in enumerate(trials) if i == ${SLURM_ARRAY_TASK_ID}
 )
 print(
