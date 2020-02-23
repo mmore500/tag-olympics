@@ -93,7 +93,7 @@ print(
 )
 ")
 SEED_OFFSET=1000
-SEED=$((SLURM_ARRAY_TASK_ID + SEED_OFFSET))
+SEED=$((SLURM_ARRAY_TASK_ID * 10 + SEED_OFFSET))
 
 OUTPUT_DIR="/mnt/scratch/mmore500/tag-olympics-midtarget/run=${SLURM_ARRAY_TASK_ID}"
 CONFIG_DIR="/mnt/home/mmore500/tag-olympics/request/"
@@ -126,24 +126,32 @@ echo "Do Work"
 echo "-------"
 ################################################################################
 
-module purge; module load GCC/7.3.0-2.30 OpenMPI/3.1.1 Python/3.6.6
-source "/mnt/home/mmore500/myPy/bin/activate"
+for REP in {0..9}; do
 
-python3 /mnt/home/mmore500/tag-olympics/script/MidGenerateBiGraph.py           \
-  -s $SEED --lefts 16 --rights 16                                              \
-  --regular $(( $TARGET_REGULAR_DEGREE * 16 ))                                 \
-  --irregular $(( $TARGET_IRREGULAR_DEGREE * 16 ))                             \
+  echo "   REP " $REP
 
-echo "   RUN EXECUTABLE"
+  module purge; module load GCC/7.3.0-2.30 OpenMPI/3.1.1 Python/3.6.6
+  source "/mnt/home/mmore500/myPy/bin/activate"
 
-module purge; module load GCC/8.2.0-2.31.1 OpenMPI/3.1.3 HDF5/1.10.4;
+  python3 /mnt/home/mmore500/tag-olympics/script/MidGenerateBiGraph.py         \
+    -s $(( $SEED + $REP )) --lefts 16 --rights 16                              \
+    --regular $(( $TARGET_REGULAR_DEGREE * 16 ))                               \
+    --irregular $(( $TARGET_IRREGULAR_DEGREE * 16 ))                           \
 
-./mid-tag-olympics MBM                                                         \
-  -SEED $SEED                                                                  \
-  -MFM_TARGET_DEGREE $(( $TARGET_REGULAR_DEGREE + $TARGET_IRREGULAR_DEGREE ))  \
-  -MFM_TARGET_STRUCTURE $TARGET_STRUCTURE                                      \
-  -MFM_GENS 1000 -MO_LENGTH 32 -MO_MUT_EXPECTED_REDRAWS $MUTATION_RATE         \
-  >"title=run+ext=.log" 2>&1
+  echo "   RUN EXECUTABLE"
+
+  module purge; module load GCC/8.2.0-2.31.1 OpenMPI/3.1.3 HDF5/1.10.4;
+
+  ./mid-tag-olympics MBM                                                       \
+    -SEED $(( $SEED + $REP ))                                                  \
+    -MFM_TARGET_DEGREE $(( $TARGET_REGULAR_DEGREE + $TARGET_IRREGULAR_DEGREE ))\
+    -MFM_TARGET_STRUCTURE $TARGET_STRUCTURE                                    \
+    -MFM_GENS 500 -MO_LENGTH 32 -MO_MUT_EXPECTED_REDRAWS $MUTATION_RATE        \
+    >"title=run+rep=${REP}+ext=.log" 2>&1
+
+  echo "   REP COMPLETE"
+
+done
 
 ################################################################################
 echo
