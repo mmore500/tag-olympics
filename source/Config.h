@@ -74,11 +74,11 @@ EMP_BUILD_CONFIG(
 
   GROUP(MID_FLEX_MATCH, "Settings for mid-flex-match experiment"),
   VALUE(MFM_GENS, size_t, 4096, "TODO"),
-  VALUE(MFM_POP_SIZE, size_t, 900, "TODO"),
+  VALUE(MFM_POP_SIZE, size_t, 500, "TODO"),
   VALUE(MFM_SUBGRID_DIM, size_t, 0, "alt 10 TODO"),
   VALUE(MFM_SUBGRID_TRANSFERS, size_t, 0, "alt 72 TODO"),
-  VALUE(MFM_TOURNEY_SIZE, size_t, 8, "TODO"),
-  VALUE(MFM_TOURNEY_REPS, size_t, 900, "TODO"),
+  VALUE(MFM_TOURNEY_SIZE, size_t, 7, "TODO"),
+  VALUE(MFM_TOURNEY_REPS, size_t, 500, "TODO"),
   VALUE(
     MFM_COMPONENT_FREQ,
     size_t,
