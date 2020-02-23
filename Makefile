@@ -40,11 +40,11 @@ debug-web:	$(PROJECT).js
 web-debug:	debug-web
 
 low-$(PROJECT):	source/native/low-$(PROJECT).cc
-	$(CXX_nat) $(CFLAGS_nat) source/native/low-$(PROJECT).cc -lstdc++fs -o low-$(PROJECT)
+	$(CXX_nat) $(CFLAGS_nat) source/native/low-$(PROJECT).cc -lstdc++fs -o low-$(PROJECT) -lcrypto -lssl -pthread
 	@echo To build the web version use: make web
 
 mid-$(PROJECT):	source/native/low-$(PROJECT).cc
-	$(CXX_nat) $(CFLAGS_nat) source/native/mid-$(PROJECT).cc -lstdc++fs -o mid-$(PROJECT)
+	$(CXX_nat) $(CFLAGS_nat) source/native/mid-$(PROJECT).cc -lstdc++fs -o mid-$(PROJECT) -lcrypto -lssl -pthread
 	@echo To build the web version use: make web
 
 $(PROJECT).js: source/web/$(PROJECT)-web.cc
