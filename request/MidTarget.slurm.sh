@@ -74,7 +74,7 @@ import itertools as it
 import random
 random.seed(1)
 
-mutation_rates = ['0.5', '1.5', '3.0', '6.0', '12.0', ]
+mutation_rates = ['1.0', '2.0', '4.0', '8.0', '16.0', ]
 target_degrees = [ '1', '2', ]
 target_structures = [ 'Regular', 'Irregular', ]
 meta_replicates = range(10)
@@ -84,7 +84,7 @@ trials = list(
 )
 
 mutation_rate, target_degree, target_structure, __ = next(
-  trial for i, trial in enumerate(trials) if i == ${SLURM_ARRAY_TASK_ID} - 200
+  trial for i, trial in enumerate(trials) if i == ${SLURM_ARRAY_TASK_ID}
 )
 print(
   mutation_rate,
