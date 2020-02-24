@@ -26,6 +26,11 @@ struct MetricsLow {
     new emp::UnifMod<emp::CryptoHashMetric<Config::BS_WIDTH()>>,
     new emp::UnifMod<emp::SymmetricWrapMetric<Config::BS_WIDTH()>>,
     new emp::UnifMod<emp::AsymmetricWrapMetric<Config::BS_WIDTH()>>
+    // new emp::HammingMetric<Config::BS_WIDTH()>,
+    // new emp::StreakMetric<Config::BS_WIDTH()>,
+    // new emp::HashMetric<Config::BS_WIDTH()>,
+    // new emp::SymmetricWrapMetric<Config::BS_WIDTH()>,
+    // new emp::AsymmetricWrapMetric<Config::BS_WIDTH()>
   };
 
   MetricsLow() {
