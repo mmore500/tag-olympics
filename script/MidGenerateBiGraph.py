@@ -129,11 +129,47 @@ for i in range(args.instances):
 
     assert nx.is_bipartite(G)
 
-    # nx.draw(G, pos=nx.drawing.layout.bipartite_layout(
-    #     G,
-    #     [n for n in sorted(G.nodes(), key=lambda n: kn.unpack(n)['module']) if kn.unpack(n)['side'] == 'left']
-    # ))
-    # plt.show()
+    # plt.clf()
+    #
+    # for edge in list(G.edges):
+    #     nx.draw_networkx(
+    #         G,
+    #         pos=nx.drawing.layout.bipartite_layout(
+    #             G,
+    #             [n for n in sorted(G.nodes(), key=lambda n: kn.unpack(n)['module']) if kn.unpack(n)['side'] == 'left'],
+    #         ),
+    #         # arrows=True,
+    #         node_size=10,
+    #         edgelist=[edge],
+    #         edge_color='white',
+    #         width=1.0,
+    #         with_labels=False,
+    #     )
+    #     nx.draw_networkx(
+    #         G,
+    #         pos=nx.drawing.layout.bipartite_layout(
+    #             G,
+    #             [n for n in sorted(G.nodes(), key=lambda n: kn.unpack(n)['module']) if kn.unpack(n)['side'] == 'left'],
+    #         ),
+    #         with_labels=False,
+    #         arrows=True,
+    #         node_size=10,
+    #         edgelist=[edge],
+    #         edge_color='black',
+    #         width=0.5,
+    #     )
+    #
+    # outfile = kn.pack({
+    #     'title' : 'irregular-1',
+    #     'ext' : '.pdf'
+    # })
+    # plt.gcf().set_size_inches(1.75, 1.75)
+    # plt.savefig(
+    #     outfile,
+    #     transparent=True,
+    #     bbox_inches='tight',
+    #     pad_inches=0,
+    # )
 
     outfile = kn.pack({
         'seed' : args.seed,
