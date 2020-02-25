@@ -74,7 +74,7 @@ import itertools as it
 import random
 random.seed(1)
 
-mutation_rates = ['0.75', '1.0', '1.5', '2.0', '3.0', '4.0', '6.0', '8.0', '12.0', ]
+mutation_rates = ['0.75', '1.0', '1.5', '2.0', '3.0', '4.0', '6.0', '8.0', '12.0', '16.0', ]
 target_degrees = [ '1', '2', ]
 target_structures = [ 'Regular', 'Irregular', ]
 meta_replicates = range(10)

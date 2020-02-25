@@ -1,7 +1,7 @@
 #!/bin/bash
 ########## Define Resources Needed with SBATCH Lines ##########
 #SBATCH --time=4:00:00
-#SBATCH --array=0-199
+#SBATCH --array=0-399
 #SBATCH --mem=2G
 #SBATCH --ntasks 1
 #SBATCH --cpus-per-task 1
@@ -74,7 +74,7 @@ import itertools as it
 import random
 random.seed(1)
 
-mutation_rates = ['1.0', '2.0', '4.0', '8.0', '16.0', ]
+mutation_rates = mutation_rates = ['0.75', '1.0', '1.5', '2.0', '3.0', '4.0', '6.0', '8.0', '12.0', '16.0', ]
 target_degrees = [ '1', '2', ]
 target_structures = [ 'Regular', 'Irregular', ]
 meta_replicates = range(10)
