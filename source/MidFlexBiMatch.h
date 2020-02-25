@@ -194,6 +194,10 @@ void MidFlexBiMatch(const Metrics::metric_t &metric,  const Config &cfg) {
 
         for (const auto & left : lefts) {
 
+          // have to handle weird edge case that mb.Match for 0
+          // returns the /default/ number of matches according to the Selector
+          if (!outgoing_edge_counts[left]) continue;
+
           worst += outgoing_edge_counts[left];
 
           const auto resp = mb.GetVals(
