@@ -132,7 +132,7 @@ g = fg.map_dataframe(
     draw
 )
 
-g.set_ylabels("")
+g.set_ylabels('Percentile')
 
 g.fig.text(0.36, 0.1, s='Match Distance', fontdict={'fontsize':10})
 g.fig.subplots_adjust(bottom=0.17, wspace=0.3)
@@ -151,6 +151,21 @@ for ax in g.axes.flat:
         ax.texts[0].set_text(
             ax.texts[0].get_text().split('=')[1]
         )
+
+    ax.set_xticks([0, 0.5, 1])
+    ax.set_xticklabels(['0', '0.5', '1'])
+
+    yticks=list(range(0,101,10))
+    ax.set_ylim(0, 5000)
+    ax.yaxis.set_major_locator(plt.LinearLocator(numticks=len(yticks)))
+    ax.set_yticklabels(yticks)
+
+    ax.xaxis.set_minor_locator(plt.LinearLocator(numticks=5))
+
+    ax.grid(which='major', axis='both', linestyle='-', linewidth=0.5)
+    ax.grid(which='minor', axis='both', linestyle=':', linewidth=0.5)
+    ax.set_axisbelow(True)
+
 
 plt.gcf().set_size_inches(3.75, 4.75)
 
