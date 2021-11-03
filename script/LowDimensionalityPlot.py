@@ -140,7 +140,7 @@ g = fg.map_dataframe(
     draw
 )
 
-g.set_ylabels("")
+g.set_ylabels('Percentile')
 
 g.fig.text(0.37, 0.1, s='Match Distance', fontdict={'fontsize':10})
 g.fig.subplots_adjust(bottom=0.225, wspace=0.3)
@@ -148,8 +148,18 @@ g.fig.subplots_adjust(bottom=0.225, wspace=0.3)
 for ax, title in zip(g.axes.flat, sorted(df_data["Metric"].unique())):
     ax.set_title(title, fontsize=10)
     ax.set_xlim(xmin=0.0, xmax=1)
-    ax.set_xticks([0, 1])
+    ax.set_xticks([0, 0.5, 1])
+    ax.set_xticklabels(['0', '0.5', '1'])
 
+    yticks=list(range(0,101,10))
+    ax.yaxis.set_major_locator(plt.LinearLocator(numticks=len(yticks)))
+    ax.set_yticklabels(reversed(yticks))
+
+    ax.xaxis.set_minor_locator(plt.LinearLocator(numticks=5))
+
+    ax.grid(which='major', axis='both', linestyle='-', linewidth=0.5)
+    ax.grid(which='minor', axis='both', linestyle=':', linewidth=0.5)
+    ax.set_axisbelow(True)
 
 plt.gcf().set_size_inches(3.75, 2.75)
 
