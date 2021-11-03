@@ -108,16 +108,33 @@ def draw(*args, **kwargs):
             lambda x: 'red' if x < 0 else 'blue' if x > 0 else 'white',
             sorted(df_data["Detour Difference"], reverse=True)
         )),
+        zorder=100,
     )
-    # g.set_xlim(xmin=-1.0, xmax=2.0)
+    # adapted from https://stackoverflow.com/a/32289054
+    plt.setp(g.lines, zorder=100)
+    plt.setp(g.collections, zorder=100, label="")
+
+    plt.axvline(x=0, color='black', linewidth=0.8, zorder=1)
+
+    g.set_xlim(xmin=-1.0, xmax=2.0)
     g.set_xticks([-1, 0, 1, 2])
     g.set_xticklabels(g.get_xticklabels(), fontdict={'fontsize':8})
 
     g.set(yticks=[])
     g.set_ylabel('')
-    g.spines['left'].set_position('zero')
     g.spines['left'].set_zorder(-10000)
     g.spines['left'].set_color('lightgray')
+
+    yticks=list(range(0,101,10))
+    g.yaxis.set_major_locator(plt.LinearLocator(numticks=len(yticks)))
+    g.set_yticklabels(reversed(yticks))
+
+    g.xaxis.set_minor_locator(plt.LinearLocator(numticks=7))
+
+    g.grid(which='major', axis='both', linestyle='-', linewidth=0.5)
+    g.grid(which='minor', axis='both', linestyle=':', linewidth=0.5)
+    g.set_axisbelow(True)
+
 
 fg = sns.FacetGrid(
     df_data,
@@ -130,7 +147,7 @@ g = fg.map_dataframe(
     draw
 )
 
-g.set_ylabels("")
+g.set_ylabels('Percentile')
 
 g.fig.text(0.27, 0.1, s='Match Distance Change', fontdict={'fontsize':10})
 g.fig.subplots_adjust(bottom=0.22, wspace=0.3)
