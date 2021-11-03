@@ -79,6 +79,7 @@ df_data['Dimension'] = df_data.apply(
 )
 
 df_data['Rank'] = 0
+df_data['Normalized Rank'] = 0
 
 for metric in df_data['Metric'].unique():
     for affinity in df_data['Affinity'].unique():
@@ -90,6 +91,12 @@ for metric in df_data['Metric'].unique():
             'Match Distance Change'
         ].rank(ascending=1, method='first')
 
+        df_data.loc[which, 'Normalized Rank'] = df_data[which][
+            'Rank'
+        ] / df_data[which][
+            'Rank'
+        ].max()
+
 print("Data crunched!")
 
 def draw(*args, **kwargs):
@@ -98,21 +105,36 @@ def draw(*args, **kwargs):
     g = sns.barplot(
         data=df_data,
         x="Match Distance Change",
-        y="Rank",
+        y="Normalized Rank",
         orient="h",
         ci=None,
         palette=list(map(
             lambda x: 'red' if x > 0 else 'blue' if x < 0 else 'white',
             sorted(df_data["Match Distance Change"])
         )),
+        zorder=100,
     )
+    # adapted from https://stackoverflow.com/a/32289054
+    plt.setp(g.lines, zorder=100)
+    plt.setp(g.collections, zorder=100, label="")
+
+    plt.axvline(x=0, color='black', linewidth=0.8, zorder=1)
     g.set_xticklabels(g.get_xticklabels(), fontdict={'fontsize':8})
 
     g.set(yticks=[])
     g.set_ylabel('')
-    g.spines['left'].set_position('zero')
     g.spines['left'].set_zorder(-10000)
     g.spines['left'].set_color('lightgray')
+
+    yticks=list(range(0,101,10))
+    g.yaxis.set_major_locator(plt.LinearLocator(numticks=len(yticks)))
+    g.set_yticklabels(reversed(yticks))
+
+    g.xaxis.set_minor_locator(plt.LinearLocator(numticks=5))
+
+    g.grid(which='major', axis='both', linestyle='-', linewidth=0.5)
+    g.grid(which='minor', axis='both', linestyle=':', linewidth=0.5)
+    g.set_axisbelow(True)
 
     vals = sorted(df_data["Match Distance Change"])
     plt.hlines(
@@ -129,6 +151,7 @@ def draw(*args, **kwargs):
         xmin=-1,
         xmax=1,
         linestyles='dashed',
+        color='black',
     )
     plt.hlines(
         np.mean([
@@ -137,6 +160,7 @@ def draw(*args, **kwargs):
         ]),
         xmin=-1,
         xmax=1,
+        color='black',
     )
 
 fg = sns.FacetGrid(
@@ -146,12 +170,13 @@ fg = sns.FacetGrid(
     col_order=sorted(df_data["Metric"].unique()),
     margin_titles=True,
     xlim=(1.01, -1.01),
+    ylim=(0, 1),
 )
 g = fg.map_dataframe(
     draw
 )
 
-g.set_ylabels("")
+g.set_ylabels('Percentile')
 
 g.fig.text(0.3, 0.1, s='Match Distance Change', fontdict={'fontsize':10})
 g.fig.subplots_adjust(bottom=0.17, wspace=0.3)
@@ -172,7 +197,7 @@ outfile = kn.pack({
                                 files_join="cat_join"
                             ).hash_files([sys.argv[0]]),
     # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
-    'ext' : '.pdf'
+    'ext' : '.pdf',
 })
 plt.savefig(
     outfile,
