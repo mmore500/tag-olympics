@@ -1,7 +1,7 @@
 #!/bin/bash
 ########## Define Resources Needed with SBATCH Lines ##########
 #SBATCH --time=4:00:00
-#SBATCH --array=0-269
+#SBATCH --array=0-539
 #SBATCH --mem=2G
 #SBATCH --ntasks 1
 #SBATCH --cpus-per-task 1
@@ -79,7 +79,7 @@ mutation_rates = ['0.375', '0.5', '0.75', '1.0', '1.5', '2.0', '3.0', '4.0', '6.
 target_degrees = [ '2', ]
 target_structures = [ 'Irregular', ]
 target_ks = [ '1', '2', '4', ]
-meta_replicates = range(10)
+meta_replicates = range(20)
 
 trials = list(
   it.product(mutation_rates, target_degrees, target_structures, target_ks, meta_replicates)
@@ -97,7 +97,7 @@ print(
 )
 ")
 SEED_OFFSET=1000
-SEED=$((SLURM_ARRAY_TASK_ID * 10 + SEED_OFFSET))
+SEED=$((SLURM_ARRAY_TASK_ID * 20 + SEED_OFFSET))
 
 OUTPUT_DIR="/mnt/scratch/mmore500/tag-olympics-midtarget-nk/run=${SLURM_ARRAY_TASK_ID}"
 CONFIG_DIR="/mnt/home/mmore500/tag-olympics/request/"
@@ -130,7 +130,7 @@ echo "Do Work"
 echo "-------"
 ################################################################################
 
-for REP in {0..9}; do
+for REP in {0..19}; do
 
   echo "   REP " $REP
 
