@@ -87,7 +87,7 @@ g = sns.FacetGrid(
     col='Target Degree',
     row='Target Structure',
     margin_titles=True,
-).set(ylim=(0, 1))
+)#.set(ylim=(0, 1))
 g.map_dataframe(
     sns.lineplot,
     'Update',
@@ -126,7 +126,7 @@ g = sns.FacetGrid(
     row='Metric',
     col='Target Configuration',
     margin_titles=True,
-).set(ylim=(0, 1))
+)#.set(ylim=(0, 1))
 g.map(
     sns.barplot,
     'Update',
