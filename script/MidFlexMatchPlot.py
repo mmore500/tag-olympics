@@ -46,11 +46,14 @@ print("Data loaded!")
 
 df['Metric'] = df.progress_apply(
     lambda x: {
+        'Codon Metric' : 'Codon',
         'Hamming Metric' : 'Hamming',
+        'Hamming-Streak Metric' : 'Hamming-Streak',
         'Hash Metric' : 'Hash',
         'Asymmetric Wrap Metric' : 'Integer',
         'Symmetric Wrap Metric' : 'Integer (bi)',
         'Approx Dual Streak Metric' : 'Streak',
+        'Approx Single Streak Metric' : 'Simple Streak',
     }[x['Metric']],
     axis=1
 )
