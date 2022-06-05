@@ -110,7 +110,7 @@ g = sns.FacetGrid(
         'color' : sns.color_palette()
     },
     margin_titles=True
-).set(ylim=(0, 1))
+)#.set(ylim=(0, 1))
 g.map(
     sns.lineplot,
     'Update',

@@ -62,11 +62,14 @@ df_data['Metric'] = df_data.apply(
 
 df_data['Metric'] = df_data.apply(
     lambda x: {
+        'Codon Metric' : 'Codon',
         'Hamming Metric' : 'Hamming',
+        'Hamming-Streak Metric' : 'Hamming-Streak',
         'Hash Metric' : 'Hash',
         'Asymmetric Wrap Metric' : 'Integer',
         'Symmetric Wrap Metric' : 'Integer (bi)',
         'Approx Dual Streak Metric' : 'Streak',
+        'Approx Single Streak Metric' : 'Simple Streak',
     }[x['Metric']],
     axis=1
 )
