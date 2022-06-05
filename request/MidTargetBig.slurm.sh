@@ -26,8 +26,7 @@ function on_exit() {
   qstat -f ${SLURM_JOB_ID}
 
   # prepare python environment
-  module purge; module load GCC/7.3.0-2.30 OpenMPI/3.1.1 Python/3.6.6
-  source "/mnt/home/mmore500/myPy/bin/activate"
+  module purge; module load GCCcore/11.2.0 GCC/11.2.0 Python/3.9.6
 
   echo "   SECONDS" $SECONDS
   echo "   MINUTES" $(python3 -c "print( ${SECONDS}/60 )")
@@ -131,7 +130,7 @@ for REP in 0; do
 
   echo "   REP " $REP
 
-  module purge; module load GCC/7.3.0-2.30 OpenMPI/3.1.1 Python/3.6.6
+  module purge; module load GCCcore/11.2.0 GCC/11.2.0 Python/3.9.6
   source "/mnt/home/mmore500/myPy/bin/activate"
 
   python3 /mnt/home/mmore500/tag-olympics/script/MidGenerateBiGraph.py         \
