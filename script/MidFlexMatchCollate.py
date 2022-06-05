@@ -15,6 +15,8 @@ from tqdm import tqdm
 from keyname import keyname as kn
 from fileshash import fileshash as fsh
 
+import glob
+
 tqdm.pandas()
 
 # open-type fonts
@@ -22,7 +24,8 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 
 df_key = pd.read_csv(sys.argv[1])
 
-filenames = sys.argv[2:]
+filenames = glob.glob(sys.argv[2])
+assert len(sys.argv) == 3
 
 dfs = [
     (filename, pd.read_csv(filename))
