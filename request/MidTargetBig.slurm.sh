@@ -140,7 +140,7 @@ for REP in 0; do
 
   echo "   RUN EXECUTABLE"
 
-  module purge; module load GCC/8.2.0-2.31.1 OpenMPI/3.1.3 HDF5/1.10.4;
+  module purge; module load GCCcore/11.2.0 GCC/11.2.0 Python/3.9.6
 
   ./mid-tag-olympics MBM                                                       \
     -SEED $(( $SEED + $REP ))                                                  \
