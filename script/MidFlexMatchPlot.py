@@ -87,7 +87,6 @@ print("Data crunched!")
 
 for name, group in df[idx_bests].groupby([
     'Metric',
-    'Target Structure',
     'Target Configuration',
 ]):
     print(name, ' mut rate ', ip.pophomogeneous(
@@ -96,13 +95,19 @@ for name, group in df[idx_bests].groupby([
     print(name, ' n obvs ', len(group[group['Update'] == 1]))
 
 # MAX FITNESS BY METRIC, LINE ##################################################
-
-g = sns.FacetGrid(
-    df[idx_bests],
-    col='Target Degree',
-    row='Target Structure',
-    margin_titles=True,
-)#.set(ylim=(0, 1))
+if 'Target k' in df:
+    g = sns.FacetGrid(
+        df[idx_bests],
+        col='Target Configuration',
+        margin_titles=True,
+    )
+else:
+    g = sns.FacetGrid(
+        df[idx_bests],
+        col='Target Degree',
+        row='Target Structure',
+        margin_titles=True,
+    ).set(ylim=(0, 1))
 g.map_dataframe(
     sns.lineplot,
     'Update',
