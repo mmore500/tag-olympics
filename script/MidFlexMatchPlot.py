@@ -88,7 +88,7 @@ print("Data crunched!")
 for name, group in df[idx_bests].groupby([
     'Metric',
     'Target Structure',
-    'Target Configutration',
+    'Target Configuration',
 ]):
     print(name, ' mut rate ', ip.pophomogenous(
         group['Mutation Rate']
