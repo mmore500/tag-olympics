@@ -90,7 +90,7 @@ for name, group in df[idx_bests].groupby([
     'Target Structure',
     'Target Configuration',
 ]):
-    print(name, ' mut rate ', ip.pophomogenous(
+    print(name, ' mut rate ', ip.pophomogeneous(
         group['Mutation Rate']
     ))
     print(name, ' n obvs ', len(group[group['Update'] == 1]))
