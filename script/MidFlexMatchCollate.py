@@ -104,6 +104,9 @@ df_data['Target Degree'] = df_data['target-degree']
 
 df_data['Target Structure'] = df_data['target-structure']
 
+if 'target-k' in df_data:
+    df_data['Target k'] = df_data['target-k']
+
 df_data['Mutation Rate'] = df_data['mut']
 
 print("Data crunched!")
