@@ -10,6 +10,7 @@ import numpy as np
 import itertools
 import math
 from tqdm import tqdm
+from iterpop import iterpop as ip
 
 from keyname import keyname as kn
 from fileshash import fileshash as fsh
@@ -59,14 +60,17 @@ df['Metric'] = df.progress_apply(
 )
 
 df['Target Configuration'] = df.progress_apply(
-    lambda x: x['Target Structure'] + " " + str(x['Target Degree']),
+    lambda x: x['Target Structure'] + " " + str(x['Target Degree']) + (
+        ' , k ' + str(x['Target k'])
+        if 'Target k' in df
+        else ''
+    ),
     axis=1,
 )
 
 df["Sum Fitness"] = df.groupby([
     'Metric',
-    'Target Structure',
-    'Target Degree',
+    'Target Configuration',
     'Mutation Rate',
 ]).transform(sum)["Maximum Fitness"]
 
@@ -74,11 +78,22 @@ df["Sum Fitness"] = df.groupby([
 # adapted from https://stackoverflow.com/a/15705958
 idx_bests = df.groupby([
     'Metric',
-    'Target Structure',
-    'Target Degree',
+    'Target Configuration',
 ])["Sum Fitness"].transform(max) == df['Sum Fitness']
 
 print("Data crunched!")
+
+# PRINT MUT RATES WITH BEST SUM FITNESSES ######################################
+
+for name, group in df[idx_bests].groupby([
+    'Metric',
+    'Target Structure',
+    'Target Configutration',
+]):
+    print(name, ' mut rate ', ip.pophomogenous(
+        group['Mutation Rate']
+    ))
+    print(name, ' n obvs ', len(group[group['Update'] == 1]))
 
 # MAX FITNESS BY METRIC, LINE ##################################################
 
