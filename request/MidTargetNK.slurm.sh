@@ -150,7 +150,8 @@ for REP in {0..19}; do
     -SEED $(( $SEED + $REP ))                                                  \
     -MFM_TARGET_DEGREE $(( $TARGET_REGULAR_DEGREE + $TARGET_IRREGULAR_DEGREE ))\
     -MFM_TARGET_STRUCTURE $TARGET_STRUCTURE                                    \
-    -MFM_GENS 2050 -MO_LENGTH 32 -MO_MUT_EXPECTED_REDRAWS $MUTATION_RATE        \
+    -MFM_GENS 2050 -MO_LENGTH 32 -MO_MUT_EXPECTED_REDRAWS $MUTATION_RATE       \
+    -MFM_NK_K $TARGET_K \
     >"title=run+rep=${REP}+ext=.log" 2>&1
 
   echo "   REP COMPLETE"
