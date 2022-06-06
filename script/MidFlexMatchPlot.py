@@ -41,7 +41,11 @@ df = df[[
     'Mutation Rate',
     'seed',
     'Maximum Fitness',
-]]
+] + (
+    ['Target k']
+    if 'Target k' in df
+    else []
+)]
 
 print("Data loaded!")
 
