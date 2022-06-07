@@ -74,6 +74,7 @@ df_data['Metric'] = df_data.apply(
         'Symmetric Wrap Metric' : 'Integer (bi)',
         'Approx Dual Streak Metric' : 'Streak',
         'Approx Single Streak Metric' : 'Simple Streak',
+        'Sliding Approx Single Streak Metric' : 'Sli-Sim-Stk',
     }[x['Metric']],
     axis=1
 )
