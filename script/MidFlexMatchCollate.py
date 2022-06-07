@@ -78,7 +78,7 @@ df_data['Inverse'] = df_data.progress_apply(
 df_data['Metric'] = df_data.progress_apply(
     lambda x: (
         ('Started ' if 'Started' in x['Metric'] else '')
-        ('Sliding ' if 'Sliding' in x['Metric'] else '')
+        + ('Sliding ' if 'Sliding' in x['Metric'] else '')
         + key[x['Slug']]['Base Metric']
     ),
     axis=1
