@@ -15,11 +15,11 @@ struct MetricsMid {
 
   collection_t mets{
     new emp::UnifMod<emp::HammingMetric<Config::BS_WIDTH()>>,
-    new emp::UnifMod<emp::HammingStreakMetric<Config::BS_WIDTH()>>,
-    // new emp::UnifMod<emp::CodonMetric<Config::BS_WIDTH()>>,
+    new emp::UnifMod<emp::SlideMod<emp::ApproxSingleStreakMetric<Config::BS_WIDTH()>>>,
     new emp::UnifMod<emp::ApproxDualStreakMetric<Config::BS_WIDTH()>>,
     new emp::UnifMod<emp::ApproxSingleStreakMetric<Config::BS_WIDTH()>>,
-    new emp::UnifMod<emp::CryptoHashMetric<Config::BS_WIDTH()>>,
+    // new emp::UnifMod<emp::CryptoHashMetric<Config::BS_WIDTH()>>,
+    // new emp::UnifMod<emp::CodonMetric<Config::BS_WIDTH()>>,
   };
 
   MetricsMid() {
