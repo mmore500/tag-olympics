@@ -9,6 +9,7 @@ import sys
 from matplotlib import pyplot as plt
 from matplotlib import collections as mpl_collections
 from matplotlib import patches as mpl_patches
+from matplotlib import ticker as mpl_ticker
 import seaborn as sns
 import pandas as pd
 import numpy as np
@@ -198,15 +199,13 @@ for ax in g.axes.flat:
             ax.texts[0].get_text().split('=')[1]
         )
 
-    # ax.set_xticks([0, 0.5, 1])
-    # ax.set_xticklabels(['0', '0.5', '1'])
-    #
-    # yticks=list(range(0,101,10))
-    # ax.set_ylim(0, 5000)
-    # ax.yaxis.set_major_locator(plt.LinearLocator(numticks=len(yticks)))
-    # ax.set_yticklabels(yticks)
+    ax.set_xticks([0, 0.5, 1])
+    ax.set_xticklabels(['0', '0.5', '1'])
+    ax.xaxis.set_minor_locator(plt.LinearLocator(numticks=5))
 
-    # ax.xaxis.set_minor_locator(plt.LinearLocator(numticks=5))
+    ax.yaxis.set_major_locator(plt.MaxNLocator(4))
+    ax.yaxis.set_minor_locator(mpl_ticker.AutoMinorLocator(2))
+
 
     ax.grid(which='major', axis='both', linestyle='-', linewidth=0.5)
     ax.grid(which='minor', axis='both', linestyle=':', linewidth=0.5)
