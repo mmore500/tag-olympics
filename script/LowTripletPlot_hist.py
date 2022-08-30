@@ -190,6 +190,7 @@ for ax, title in zip(g.axes.flat, sorted(df_data["Metric"].unique())):
 outfile = kn.pack({
     'title' : kn.unpack(dataframe_filename)['title'],
     'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
+    'viz' : 'hist',
     'seed' : kn.unpack(dataframe_filename)['seed'],
     '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
     '_script_fullcat_hash' : fsh.FilesHash(
