@@ -11,6 +11,10 @@ from keyname import keyname as kn
 from fileshash import fileshash as fsh
 import math
 
+from pylib import (
+    lookup_metric_priority,
+)
+
 # open-type fonts
 matplotlib.rcParams['pdf.fonttype'] = 42
 
@@ -119,7 +123,10 @@ g = sns.barplot(
     x='Mutational Step',
     y='Match Distance',
     hue='Metric',
-    hue_order=sorted(df_data["Metric"].unique()),
+    hue_order=sorted(
+        df_data["Metric"].unique(),
+        key=lookup_metric_priority,
+    ),
 ).set(ylim=(0, 1))
 
 plt.gcf().set_size_inches(3.75, 3.75)
