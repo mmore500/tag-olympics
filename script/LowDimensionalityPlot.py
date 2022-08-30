@@ -11,6 +11,8 @@ from keyname import keyname as kn
 from fileshash import fileshash as fsh
 import math
 
+from pylib import lookup_metric_priority
+
 # open-type fonts
 matplotlib.rcParams['pdf.fonttype'] = 42
 
@@ -80,7 +82,10 @@ g = sns.barplot(
     data=df_data,
     x='Metric',
     y='Match Distance',
-    order=sorted(['Hamming', 'Hash', 'Integer', 'Streak', 'Integer (bi)']),
+    order=sorted(
+        df_data["Metric"].unique(),
+        key=lookup_metric_priority,
+    ),
 )
 g.set(ylim=(0, 1))
 g.set_xticklabels(g.get_xticklabels(), rotation=90)
