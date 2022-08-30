@@ -141,6 +141,9 @@ def draw(*args, **kwargs):
     g.set_axisbelow(True)
 
     vals = sorted(df_data["Match Distance Change"])
+    metric, = df_data["Metric"].unique()
+    affinity, = df_data["Affinity"].unique()
+    print(metric, affinity, "num exactly neutral", sum(v == 0 for v in vals), "/", len(vals))
     plt.hlines(
         [x for x in [
             min(
