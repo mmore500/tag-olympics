@@ -113,7 +113,7 @@ print("data crunched!")
 
 def draw_bar(*args, **kwargs):
 
-    bins = np.linspace(0,1,64)
+    bins = np.linspace(0,1,65) # yields 64 bins
 
     df_data = kwargs.pop('data')
 
