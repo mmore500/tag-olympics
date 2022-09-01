@@ -144,6 +144,51 @@ print("output saved to", outfile)
 
 plt.clf()
 
+# MAX FITNESS BY METRIC, BAR ##################################################
+if 'Target k' in df:
+    g = sns.FacetGrid(
+        df[idx_bests],
+        col='Target Configuration',
+        margin_titles=True,
+    )
+else:
+    g = sns.FacetGrid(
+        df[idx_bests].astype({"Update": int}),
+        col='Target Degree',
+        row='Target Structure',
+        margin_titles=True,
+    ).set(ylim=(0, 1))
+g.map_dataframe(
+    sns.barplot,
+    'Update',
+    'Maximum Fitness',
+    hue='Metric',
+    hue_order=sorted(df['Metric'].unique()),
+    palette=sns.color_palette(),
+).add_legend()
+g.set_xticklabels(rotation=90)
+
+plt.gcf().set_size_inches(7.5, 6)
+
+outfile = kn.pack({
+    'viz' : 'max-fitness-bar',
+    '_data_hathash_hash' : fsh.FilesHash().hash_files([filename]),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0,
+)
+print("output saved to", outfile)
+
+plt.clf()
+
 # MAX FITNESS BY MUTATION RATE, LINE ###########################################
 
 g = sns.FacetGrid(
