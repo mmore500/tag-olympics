@@ -15,6 +15,10 @@ from iterpop import iterpop as ip
 from keyname import keyname as kn
 from fileshash import fileshash as fsh
 
+from pylib import (
+    lookup_metric_priority,
+)
+
 # open-type fonts
 matplotlib.rcParams['pdf.fonttype'] = 42
 
@@ -119,7 +123,10 @@ g.map_dataframe(
     'Maximum Fitness',
     hue='Metric',
     style='Metric',
-    hue_order=sorted(df['Metric'].unique()),
+    hue_order=sorted(
+        df['Metric'].unique(),
+        key=lookup_metric_priority,
+    ),
     style_order=sorted(df['Metric'].unique()),
 ).add_legend().set(xscale = 'log')
 
@@ -163,7 +170,10 @@ g.map_dataframe(
     'Update',
     'Maximum Fitness',
     hue='Metric',
-    hue_order=sorted(df['Metric'].unique()),
+    hue_order=sorted(
+        df['Metric'].unique(),
+        key=lookup_metric_priority,
+    ),
     palette=sns.color_palette(),
 ).add_legend()
 g.set_xticklabels(rotation=90)
@@ -208,8 +218,8 @@ g.set_xticklabels(rotation=90)
 g.set_titles(col_template='{col_name}')
 
 plt.gcf().set_size_inches(7, 8)
-plt.tight_layout()
 g.fig.get_children()[-1].set_bbox_to_anchor((1.1, 0.5, 0, 0))
+plt.tight_layout()
 
 outfile = kn.pack({
     'title' : 'fitness_mutation_barplot',
