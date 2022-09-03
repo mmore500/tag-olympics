@@ -103,7 +103,7 @@ print("Data crunched!")
 
 def draw(*args, **kwargs):
 
-    bins = np.linspace(-1,2,16) # yields 15 bins
+    bins = np.linspace(-1,2,17) # yields 16 bins
 
     df_data = kwargs.pop('data')
 
@@ -144,10 +144,12 @@ def draw(*args, **kwargs):
         width=3/len(x),
         error_kw={'lw': 0.5},
         color=lookup_metric_color(metric),
+        capsize=1,
         # linefmt='C0-',
         # basefmt='none',
         # markerfmt='none',
         yerr=np.swapaxes(cis_e, 0, 1),
+        zorder=2,
     )
 
     ax.xaxis.set_major_locator(plt.MultipleLocator(1))
@@ -159,7 +161,7 @@ def draw(*args, **kwargs):
     ax.grid(which='major', axis='both', linestyle='-', linewidth=0.5)
     ax.grid(which='minor', axis='both', linestyle=':', linewidth=0.5)
     ax.set_axisbelow(True)
-    ax.axvline(0, color="black", lw=0.8)
+    ax.axvline(0, color="black", lw=0.8, zorder=1)
 
     ax.spines['left'].set_visible(False)
 
