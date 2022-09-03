@@ -173,6 +173,8 @@ def draw(*args, **kwargs):
     ax.set_axisbelow(True)
     ax.axvline(0, color="black", lw=0.8, zorder=1)
 
+    ax.spines['left'].set_visible(False)
+
     return ax
 
 fg = sns.FacetGrid(
