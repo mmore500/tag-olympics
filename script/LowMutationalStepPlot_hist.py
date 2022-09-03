@@ -84,7 +84,7 @@ df_data['Metric'] = df_data.apply(
 
 df_data['Dimension Count'] = df_data['Dimension']
 
-df_data['Match Similarity Change'] = -df_data['Match Distance Change']
+df_data['Match Closeness Change'] = -df_data['Match Distance Change']
 
 df_data['Dimension'] = df_data.apply(
     lambda x: x['Dimension Type'] + " " + str(x['Dimension']),
@@ -119,7 +119,7 @@ def draw(*args, **kwargs):
     df_data = kwargs.pop('data')
 
     x, binedges = np.histogram(
-        df_data["Match Similarity Change"],
+        df_data["Match Closeness Change"],
         bins=bins,
     )
     bin_centers = 0.5*(bins[1:] + bins[:-1])
@@ -193,7 +193,7 @@ g = fg.map_dataframe(
 
 g.set_ylabels('Count')
 
-g.fig.text(0.2, 0.1, s='Match Similarity Change', fontdict={'fontsize':10})
+g.fig.text(0.2, 0.1, s='Match Closeness Change', fontdict={'fontsize':10})
 g.fig.subplots_adjust(bottom=0.17, wspace=0.3)
 
 for ax, title in zip(g.axes.flat, sorted(
