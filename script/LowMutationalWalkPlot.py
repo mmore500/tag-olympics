@@ -4,6 +4,7 @@ import pandas as pd
 import seaborn as sns
 import sys
 from matplotlib import pyplot as plt
+from matplotlib import ticker as mpl_ticker
 import seaborn as sns
 import pandas as pd
 import numpy as np
@@ -133,6 +134,56 @@ plt.gcf().set_size_inches(3.75, 3.75)
 
 outfile = kn.pack({
     'title' : 'mutational_walk_barplot',
+    'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
+    'seed' : kn.unpack(dataframe_filename)['seed'],
+    '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
+
+plt.clf()
+plt.close(plt.gcf())
+
+fil = df_data.apply(
+    lambda x: x['Mutational Step'] == 0 or math.log2(x['Mutational Step']).is_integer(),
+    axis=1
+)
+g = sns.lineplot(
+    data=df_data[fil],
+    x='Mutational Step',
+    y='Match Distance',
+    markers=True,
+    hue='Metric',
+    style='Metric',
+    hue_order=sorted(
+        df_data["Metric"].unique(),
+        key=lookup_metric_priority,
+    ),
+)
+
+g.set(ylim=(0, 1))
+g.set_xscale('symlog', base=2)
+g.set_xticks(sorted(
+    df_data[fil]['Mutational Step'].unique()
+))
+g.xaxis.set_major_formatter(mpl_ticker.FormatStrFormatter("%d"))
+
+
+plt.gcf().set_size_inches(3.75, 3.75)
+
+outfile = kn.pack({
+    'title' : 'mutational_walk_lineplot_ci',
     'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
     'seed' : kn.unpack(dataframe_filename)['seed'],
     '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
