@@ -170,7 +170,10 @@ def draw(*args, **kwargs):
 fg = sns.FacetGrid(
     df_data,
     col='Metric',
-    col_order=sorted(df_data["Metric"].unique()),
+    col_order=sorted(
+        df_data["Metric"].unique(),
+        key=lookup_metric_priority,
+    ),
     margin_titles=True,
     xlim=(-1,2),
 )
@@ -183,13 +186,13 @@ g.set_ylabels('Count')
 g.fig.text(0.27, 0.1, s='Match Distance Change', fontdict={'fontsize':10})
 g.fig.subplots_adjust(bottom=0.22, wspace=0.3)
 
-for ax, title in zip(g.axes.flat, sorted(df_data["Metric"].unique())):
+for ax, title in zip(g.axes.flat, sorted(
+    df_data["Metric"].unique(),
+    key=lookup_metric_priority,
+)):
     ax.set_title(title, fontsize=10)
 
 plt.gcf().set_size_inches(3.75, 2.75)
-
-for ax, title in zip(g.axes.flat, sorted(df_data["Metric"].unique())):
-    ax.set_title(title, fontsize=10)
 
 outfile = kn.pack({
     'title' : kn.unpack(dataframe_filename)['title'],
