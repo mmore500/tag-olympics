@@ -201,3 +201,59 @@ plt.savefig(
     pad_inches=0
 )
 print("output saved to", outfile)
+
+g = sns.FacetGrid(
+    data=df_data,
+    col='Metric',
+    hue='Metric',
+    col_wrap=3,
+    hue_order=sorted(
+        df_data["Metric"].unique(),
+        key=lookup_metric_priority,
+    ),
+    col_order=sorted(
+        df_data["Metric"].unique(),
+        key=lookup_metric_priority,
+    ),
+    margin_titles=True,
+).set(ylim=(0, 1), xlim=df_data['Mutational Step'].agg(['min', 'max']))
+g.map(
+    sns.histplot,
+    "Mutational Step",
+    "Match Distance",
+    bins=(32, 10),
+)
+g.set_titles("{col_name}")
+
+for ax, title in zip(g.axes.flat, sorted(
+    df_data["Metric"].unique(),
+    key=lookup_metric_priority,
+)):
+    ax.set_title(title, fontsize=10)
+    ax.set_xscale('symlog', base=2)
+    ax.set_xticks(sorted(
+        df_data[fil]['Mutational Step'].unique()
+    ))
+    ax.xaxis.set_major_formatter(mpl_ticker.FormatStrFormatter("%d"))
+
+plt.gcf().set_size_inches(7.5, 3)
+plt.tight_layout()
+outfile = kn.pack({
+    'title' : 'mutational_walk_heatplot',
+    'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
+    'seed' : kn.unpack(dataframe_filename)['seed'],
+    '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
