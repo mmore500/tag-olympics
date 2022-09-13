@@ -112,6 +112,56 @@ plt.savefig(
 )
 print("output saved to", outfile)
 
+plt.clf()
+plt.close(plt.gcf())
+
+g = sns.violinplot(
+    data=df_data,
+    x='Metric',
+    y='Match Distance',
+    order=sorted(
+        df_data["Metric"].unique(),
+        key=lookup_metric_priority,
+    ),
+    scale='width',
+    inner=None,
+)
+sns.pointplot(
+    data=df_data,
+    x='Metric',
+    y='Match Distance',
+    order=sorted(
+        df_data["Metric"].unique(),
+        key=lookup_metric_priority,
+    ),
+    palette=['black'],
+    markers="_",
+    ax=g,
+)
+g.set(ylim=(0, 1))
+g.set_xticklabels(g.get_xticklabels(), rotation=90)
+
+plt.gcf().set_size_inches(3.75, 2.75)
+
+outfile = kn.pack({
+    'title' : 'dimensionality_violinplot',
+    'bitweight' : kn.unpack(dataframe_filename)['bitweight'],
+    'seed' : kn.unpack(dataframe_filename)['seed'],
+    '_data_hathash_hash' : fsh.FilesHash().hash_files([dataframe_filename]),
+    '_script_fullcat_hash' : fsh.FilesHash(
+                                file_parcel="full_parcel",
+                                files_join="cat_join"
+                            ).hash_files([sys.argv[0]]),
+    # '_source_hash' :kn.unpack(dataframe_filename)['_source_hash'],
+    'ext' : '.pdf'
+})
+plt.savefig(
+    outfile,
+    transparent=True,
+    bbox_inches='tight',
+    pad_inches=0
+)
+print("output saved to", outfile)
 
 plt.clf()
 plt.close(plt.gcf())
