@@ -80,6 +80,7 @@ EMP_BUILD_CONFIG(
   VALUE(MFM_SUBGRID_TRANSFERS, size_t, 0, "alt 72 TODO"),
   VALUE(MFM_TOURNEY_SIZE, size_t, 7, "TODO"),
   VALUE(MFM_TOURNEY_REPS, size_t, 500, "TODO"),
+  VALUE(MFM_ZEROINIT, bool, false, "Should genomes be zero-initialized?"),
   VALUE(
     MFM_COMPONENT_FREQ,
     size_t,

@@ -20,9 +20,13 @@ struct MidOrganism {
     emp::Random & rand
   ) : cfg(cfg_)
   {
-    for(size_t i = 0; i < cfg.MO_LENGTH(); ++i) bsets.emplace_back(
-      rand
-    );
+    for(size_t i = 0; i < cfg.MO_LENGTH(); ++i) {
+      if (cfg.MFM_ZEROINIT()) {
+        bsets.emplace_back();
+      } else {
+        bsets.emplace_back(rand);
+      }
+    }
   }
 
   bool operator==(const MidOrganism & other) const {
