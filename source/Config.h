@@ -71,6 +71,8 @@ EMP_BUILD_CONFIG(
   VALUE(MO_LENGTH, size_t, 48, "TODO"),
   VALUE(MO_MUT_EXPECTED_REDRAWS, double, 1, "TODO"),
   VALUE(MO_MUT_PROB, double, 1.0, "TODO"),
+  VALUE(MO_MUT_NORMAL, bool, false, "TODO"),
+  VALUE(MO_MUT_NORMAL_SD, double, 1.0, "TODO"),
 
   GROUP(MID_FLEX_MATCH, "Settings for mid-flex-match experiment"),
   VALUE(MFM_GENS, size_t, 4096, "TODO"),

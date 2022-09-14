@@ -53,10 +53,25 @@ struct MidOrganism {
 
     static emp::Binomial bino(MUT_BIT_TOGGLE_PER_BIT, cfg.BS_WIDTH());
 
-    for (auto & bs : bsets) res += bs.Mutate(
-      rand,
-      bino.PickRandom(rand)
-    );
+    if (!cfg.MO_MUT_NORMAL()) {
+      for (auto & bs : bsets) res += bs.Mutate(
+        rand,
+        bino.PickRandom(rand)
+      );
+    } else {
+      for (auto & bs : bsets) {
+        int64_t diff_val = rand.GetRandNormal(
+          0.0,
+          bs.MaxDouble() * cfg.MO_MUT_NORMAL_SD()
+        );
+        emp::BitSet<BS_WIDTH> diff_bs{};
+        diff_bs.SetUInt64(0, std::abs(diff_val));
+        if (diff_val < 0) bs -= diff_bs;
+        else bs += diff_bs;
+
+        ++res;
+      }
+    }
 
     return res;
 
