@@ -115,6 +115,7 @@ else:
         df[idx_bests],
         col='Target Degree',
         row='Target Structure',
+        row_order=['Regular', 'Irregular'],
         margin_titles=True,
     ).set(ylim=(0, 1))
 g.map_dataframe(
