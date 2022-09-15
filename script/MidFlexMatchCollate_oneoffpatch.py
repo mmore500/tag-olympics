@@ -36,14 +36,15 @@ dfs = [
 
 print("Data loaded!")
 
+pattern = re.compile("^set MO_MUT_NORMAL_SD (\d*\.?\d*)")
 res = []
 for filename, df in tqdm(dfs):
     dir = os.path.dirname(filename)
     log = f"{dir}/title=run+rep=0+ext=.log"
 
-    pattern = re.compile("^set MO_MUT_NORMAL_SD (\d*\.?\d*)")
     with open(log) as f:
-        match, = re.finditer(pattern, f)
+        filetext = f.read()
+        match, = re.finditer(pattern, filetext)
         mut_rate = float(match.group())
 
     # assumes datafiles are each from one replicate
