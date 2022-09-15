@@ -36,7 +36,7 @@ dfs = [
 
 print("Data loaded!")
 
-pattern = re.compile("^set MO_MUT_NORMAL_SD (\d*\.?\d*)")
+pattern = re.compile(r"^set MO_MUT_NORMAL_SD (\d*\.?\d*)", re.MULTILINE)
 res = []
 for filename, df in tqdm(dfs):
     dir = os.path.dirname(filename)
@@ -45,7 +45,7 @@ for filename, df in tqdm(dfs):
     with open(log) as f:
         filetext = f.read()
         match, = re.finditer(pattern, filetext)
-        mut_rate = float(match.group())
+        mut_rate = float(match.groups()[0])
 
     # assumes datafiles are each from one replicate
     for k, v in kn.unpack(filename).items():
