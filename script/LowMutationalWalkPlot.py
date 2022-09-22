@@ -203,7 +203,12 @@ plt.savefig(
 print("output saved to", outfile)
 
 g = sns.FacetGrid(
-    data=df_data,
+    # need to compensate for custom heatmap binning below
+    data=pd.concat([
+        df_data,
+        df_data[df_data["Mutational Step"] <= 2],
+    ]),
+    # data=df_data.groupby(['bin', "Metric", "Sample", "Replicate"]).mean().reset_index(),
     col='Metric',
     hue='Metric',
     col_wrap=3,
@@ -221,7 +226,7 @@ g.map(
     sns.histplot,
     "Mutational Step",
     "Match Distance",
-    bins=(32, 10),
+    bins=([-0.5, 0.5, 1.5] + [2*x + 2.5 for x in range(32)], 10),
 )
 g.set_titles("{col_name}")
 
@@ -229,6 +234,7 @@ for ax, title in zip(g.axes.flat, sorted(
     df_data["Metric"].unique(),
     key=lookup_metric_priority,
 )):
+    ax.set_xlim(left=-0.5)
     ax.set_title(title, fontsize=10)
     ax.set_xscale('symlog', base=2)
     ax.set_xticks(sorted(
